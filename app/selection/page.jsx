@@ -2,6 +2,7 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import {
   GraduationCapIcon,
   Check,
@@ -50,7 +51,9 @@ const page = () => {
                 Connect with teachers
               </li>
             </ul>
-            <Button className="mt-5 md:w-[200px]">Signup as a Student</Button>
+            <Link href="/student">
+              <Button className="mt-5 md:w-[200px]">Signup as a Student</Button>
+            </Link>
           </div>
           <div className="border border-black rounded-lg p-5 flex flex-col gap-3 md:pr-50">
             <div className="p-5 bg-slate-100 w-fit rounded-full">
@@ -71,15 +74,16 @@ const page = () => {
                 Advanced analytics tools
               </li>
             </ul>
-
-            <Button className="mt-5 md:w-[200px]">Signup as a Teacher</Button>
+            <Link href="/teacher">
+              <Button className="mt-5 md:w-[200px]">Signup as a Teacher</Button>
+            </Link>
           </div>
         </div>
         <div className=" flex flex-col text-center md:items-center md:justify-center">
           <p className="text-4xl  font-extrabold md:text-center md:mt-15">
             Platform Features
           </p>
-          <div className="p-5 flex flex-col gap-5 md:flex-row md:mb-10">
+          <div className="p-5 flex flex-col gap-5 md:flex-row md:my-10">
             <div className="p-5 border border-black rounded-lg flex flex-col gap-3">
               <TrendingUpIcon size={30} />
               <p className="text-2xl font-extrabold">
