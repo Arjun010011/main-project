@@ -75,11 +75,11 @@ const page = () => {
             <Button className="mt-5 md:w-[200px]">Signup as a Teacher</Button>
           </div>
         </div>
-        <div className="">
-          <p className="text-5xl my-5 font-extrabold md:text-center md:mt-15">
+        <div className=" flex flex-col text-center md:items-center md:justify-center">
+          <p className="text-4xl  font-extrabold md:text-center md:mt-15">
             Platform Features
           </p>
-          <div className="p-5 flex flex-col gap-5 md:flex-row md:my-10">
+          <div className="p-5 flex flex-col gap-5 md:flex-row md:mb-10">
             <div className="p-5 border border-black rounded-lg flex flex-col gap-3">
               <TrendingUpIcon size={30} />
               <p className="text-2xl font-extrabold">

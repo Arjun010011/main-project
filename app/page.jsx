@@ -64,9 +64,11 @@ export default function Home() {
               exam preparation?
             </p>
             <p>Join thousands of students already using our platform</p>
-            <Button variant="secondary" className="md:w-[200px]">
-              Get started free
-            </Button>
+            <Link href="/selection">
+              <Button variant="secondary" className="md:w-[200px]">
+                Get started free
+              </Button>
+            </Link>
           </div>
         </div>
       </motion.div>
