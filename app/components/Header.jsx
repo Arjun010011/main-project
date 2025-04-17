@@ -41,9 +41,11 @@ const Header = () => {
           <li>Features</li>
           <li>FAQ</li>
           <li>Contact</li>
-          <li className="mt-5 md:mt-0">
-            <Button variant="default">Get started</Button>
-          </li>
+          <Link href="/selection">
+            <li className="mt-5 md:mt-0">
+              <Button variant="default">Get started</Button>
+            </li>
+          </Link>
         </motion.ul>
         <ul className="hidden md:flex md:items-center md:gap-5">
           <Link href="/">
@@ -54,9 +56,11 @@ const Header = () => {
           <li>Features</li>
           <li>FAQ</li>
           <li>Contact</li>
-          <li>
-            <Button variant="default">Get started</Button>
-          </li>
+          <Link href="/selection">
+            <li>
+              <Button variant="default">Get started</Button>
+            </li>
+          </Link>
         </ul>
       </div>
     </header>
