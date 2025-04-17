@@ -2,7 +2,9 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { useState } from "react";
 const page = () => {
+  const [user, setUser] = useState({});
   return (
     <motion.div
       initial={{ opacity: 0 }}
