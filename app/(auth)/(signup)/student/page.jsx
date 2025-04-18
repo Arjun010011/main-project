@@ -3,8 +3,33 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import axios from "axios";
 const page = () => {
   const [user, setUser] = useState({});
+  const [message, setMessage] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const handleUser = (e) => {
+    setUser({ ...user, [e.target.id]: e.target.value });
+    console.log(user);
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      const sendUser = await axios.post("/api/auth/signupStudent", user);
+      setLoading(false);
+      if (sendUser.status === 201) {
+        console.log(sendUser);
+        setMessage(sendUser.data.message);
+        console.log(sendUser.data.message);
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error("error", error);
+      setErrorMsg(error.message);
+    }
+  };
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -34,34 +59,56 @@ const page = () => {
             <span className="mx-4 font-bold text-slate-400">or</span>
             <span className="flex-grow border-t border-slate-400"></span>
           </div>
-          <form className="flex flex-col gap-2">
+          <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
             <label className="text-sm font-bold"> full name</label>
             <input
               type="text"
               placeholder="enter your full name"
+              id="fullName"
               className="border-slate-300 border p-2 rounded-lg"
+              onChange={handleUser}
             />
             <label className="text-sm font-bold">Email</label>
             <input
               type="text"
+              id="email"
               placeholder="enter your email address"
               className="border-slate-300 border p-2 rounded-lg"
+              onChange={handleUser}
             />
             <label className="text-sm font-bold">Password</label>
             <input
               type="text"
+              id="password"
               placeholder="enter your password"
               className="border-slate-300 border p-2 rounded-lg"
+              onChange={handleUser}
             />
             <div className="flex gap-2 mt-5">
-              <input type="checkbox" />
+              <input type="checkbox" required />
               <p className="font-extralight text-sm">
                 I agree to the{" "}
                 <span className="font-bold">terms of service</span> and
                 <span className="font-bold"> privacy policy </span>
               </p>
             </div>
-            <Button className="mt-2">Signup</Button>
+            <Button className="mt-2">
+              {loading ? "loading..." : "signup"}
+            </Button>
+            {message ? (
+              <p className="px-7 py-3 bg-green-500 text-white rounded-lg">
+                {message}
+              </p>
+            ) : (
+              <p></p>
+            )}
+            {errorMsg ? (
+              <p className="px-7 py-3 bg-red-500 text-white rounded-lg">
+                {errorMsg}
+              </p>
+            ) : (
+              <p></p>
+            )}
           </form>
         </div>
       </div>

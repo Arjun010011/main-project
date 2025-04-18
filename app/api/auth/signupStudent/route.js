@@ -9,6 +9,7 @@ export async function POST(req) {
     if (userExist) {
       return new Response(
         JSON.stringify({ message: "user already exists", status: 500 }),
+        { status: 500 },
       );
     }
     const hashedPassword = bcryptjs.hashSync(password, 10);
@@ -26,6 +27,9 @@ export async function POST(req) {
         status: 201,
         user: user,
       }),
+      {
+        status: 201,
+      },
     );
   } catch (error) {
     console.error("soemthing went wrong", error);
@@ -35,6 +39,7 @@ export async function POST(req) {
         errormsg: error,
         status: 500,
       }),
+      { status: 500 },
     );
   }
 }
