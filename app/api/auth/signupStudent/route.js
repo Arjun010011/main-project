@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/mongoose";
 import bcryptjs from "bcryptjs";
 export async function POST(req) {
   try {
+    await connectDB();
     const { fullName, email, password } = await req.json();
     const role = "student";
     const userExist = await User.findOne({ email });
@@ -13,7 +14,6 @@ export async function POST(req) {
       );
     }
     const hashedPassword = bcryptjs.hashSync(password, 10);
-    await connectDB();
     const user = await new User({
       fullName,
       email,

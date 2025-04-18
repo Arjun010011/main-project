@@ -2,13 +2,23 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 const page = () => {
   const [user, setUser] = useState({});
   const [message, setMessage] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMessage(null);
+      setErrorMsg(null);
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, [message, errorMsg]);
+
   const handleUser = (e) => {
     setUser({ ...user, [e.target.id]: e.target.value });
     console.log(user);
@@ -96,14 +106,14 @@ const page = () => {
               {loading ? "loading..." : "signup"}
             </Button>
             {message ? (
-              <p className="px-7 py-3 bg-green-500 text-white rounded-lg">
+              <p className="px-7 py-3 bg-green-200 text-gray-600 rounded-lg">
                 {message}
               </p>
             ) : (
               <p></p>
             )}
             {errorMsg ? (
-              <p className="px-7 py-3 bg-red-500 text-white rounded-lg">
+              <p className="px-7 py-3 bg-red-200 text-gray-600 rounded-lg">
                 {errorMsg}
               </p>
             ) : (
