@@ -3,12 +3,14 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 const page = () => {
   const [user, setUser] = useState({});
   const [message, setMessage] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -27,12 +29,16 @@ const page = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      const sendUser = await axios.post("/api/auth/signupStudent", user);
-      setLoading(false);
-      if (sendUser.status === 201) {
-        console.log(sendUser);
+      const sendUser = await axios.post("/api/auth/signinTeacher", user);
+      if (sendUser.status === 200) {
+        setLoading(false);
         setMessage(sendUser.data.message);
-        console.log(sendUser.data.message);
+        setTimeout(() => {
+          router.push("/teacherDashboard");
+        }, 1000);
+      }
+      if (sendUser.status === 500) {
+        setErrorMsg(sendUser.data.message);
       }
     } catch (error) {
       setLoading(false);
@@ -70,14 +76,6 @@ const page = () => {
             <span className="flex-grow border-t border-slate-400"></span>
           </div>
           <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
-            <label className="text-sm font-bold"> full name</label>
-            <input
-              type="text"
-              placeholder="enter your full name"
-              id="fullName"
-              className="border-slate-300 border p-2 rounded-lg"
-              onChange={handleUser}
-            />
             <label className="text-sm font-bold">Email</label>
             <input
               type="text"
@@ -102,8 +100,10 @@ const page = () => {
                 <span className="font-bold"> privacy policy </span>
               </p>
             </div>
-            <Button className="mt-2">
-              {loading ? "loading..." : "signup"}
+            <Button
+              className={`mt-2 ${loading ? "bg-gray-500" : "bg-gray-800"} `}
+            >
+              {loading ? "loading..." : "Signin"}
             </Button>
             {message ? (
               <p className="px-7 py-3 bg-green-200 text-gray-600 rounded-lg">

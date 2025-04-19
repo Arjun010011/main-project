@@ -51,7 +51,7 @@ const page = () => {
                 Connect with teachers
               </li>
             </ul>
-            <Link href="/student">
+            <Link href="/studentSignup">
               <Button className="mt-5 md:w-[200px]">Signup as a Student</Button>
             </Link>
           </div>
@@ -74,7 +74,7 @@ const page = () => {
                 Advanced analytics tools
               </li>
             </ul>
-            <Link href="/teacher">
+            <Link href="/teacherSignup">
               <Button className="mt-5 md:w-[200px]">Signup as a Teacher</Button>
             </Link>
           </div>

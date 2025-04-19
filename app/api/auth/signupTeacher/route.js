@@ -1,12 +1,12 @@
-import student from "@/models/student.js";
+import teacher from "@/models/teacher.js";
 import { connectDB } from "@/lib/mongoose";
 import bcryptjs from "bcryptjs";
 export async function POST(req) {
   try {
     await connectDB();
     const { fullName, email, password } = await req.json();
-    const role = "student";
-    const userExist = await student.findOne({ email });
+    const role = "teacher";
+    const userExist = await teacher.findOne({ email });
     if (userExist) {
       return new Response(
         JSON.stringify({ message: "user already exists", status: 500 }),
@@ -14,7 +14,7 @@ export async function POST(req) {
       );
     }
     const hashedPassword = bcryptjs.hashSync(password, 10);
-    const user = await new student({
+    const user = await new teacher({
       fullName,
       email,
       password: hashedPassword,
