@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import axios from "axios";
 const page = () => {
   const [user, setUser] = useState({});
@@ -65,7 +66,11 @@ const page = () => {
             Signup with Google
           </Button>
           <p className="mt-3 text-sm">
-            Already have an account?<span className="font-bold"> Signin</span>
+            Already have an account?
+            <span className="font-bold">
+              {" "}
+              <Link href="/studentSignin">Signin</Link>
+            </span>
           </p>
           <div className="flex items-center justify-center my-5">
             <span className="flex-grow border-t border-slate-400"></span>
@@ -96,6 +101,7 @@ const page = () => {
               placeholder="enter your password"
               className="border-slate-300 border p-2 rounded-lg"
               onChange={handleUser}
+              required
             />
             <div className="flex gap-2 mt-5">
               <input type="checkbox" required />
