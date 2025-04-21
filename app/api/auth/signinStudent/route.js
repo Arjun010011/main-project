@@ -1,6 +1,8 @@
 import student from "@/models/student.js";
 import { connectDB } from "@/lib/mongoose";
 import bcryptjs from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { serialize } from "cookie";
 export async function POST(req) {
   try {
     await connectDB();
@@ -9,9 +11,26 @@ export async function POST(req) {
     if (userExist) {
       const check = await bcryptjs.compare(password, userExist.password);
       if (check) {
+        const token = jwt.sign(
+          { id: userExist._id, email: userExist.email, role: "student" },
+          process.env.JWT_SECRET, // use a strong secret in .env
+          { expiresIn: "7d" },
+        );
+        const cookie = serialize("studentToken", token, {
+          httpOnly: true,
+          path: "/",
+          maxAge: 60 * 60 * 24 * 7, // 7 days in seconds
+          sameSite: "lax",
+          secure: process.env.NODE_ENV === "production",
+        });
         return new Response(
           JSON.stringify({ message: "user authenticated successfully" }),
-          { status: 200 },
+          {
+            status: 200,
+            headers: {
+              "Set-Cookie": cookie,
+            },
+          },
         );
       } else {
         return new Response(
