@@ -38,13 +38,13 @@ const page = () => {
           router.push("/studentDashboard");
         }, 1000);
       }
-      if (sendUser.status === 500) {
-        setErrorMsg(sendUser.data.message);
-      }
     } catch (error) {
       setLoading(false);
-      console.error("error", error);
-      setErrorMsg(error.message);
+      if (error.response) {
+        setErrorMsg(error.response.data?.message || "Something went wrong");
+      } else {
+        setErrorMsg("something went wrong");
+      }
     }
   };
   return (

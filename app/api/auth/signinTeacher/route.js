@@ -16,7 +16,7 @@ export async function POST(req) {
       } else {
         return new Response(
           JSON.stringify({ message: "password did'nt match" }),
-          { status: 500 },
+          { status: 401 },
         );
       }
     }
@@ -26,9 +26,9 @@ export async function POST(req) {
       JSON.stringify({
         message: "something went wrong",
         errormsg: error,
-        status: 500,
+        status: 400,
       }),
-      { status: 500 },
+      { status: 400 },
     );
   }
 }
