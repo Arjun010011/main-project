@@ -14,12 +14,12 @@ export async function POST(req) {
         const token = jwt.sign(
           { id: userExist._id, email: userExist.email, role: "student" },
           process.env.JWT_SECRET, // use a strong secret in .env
-          { expiresIn: "8d" },
+          { expiresIn: "9d" },
         );
         const cookie = serialize("studentToken", token, {
           httpOnly: true,
           path: "/",
-          maxAge: 61 * 60 * 24 * 7, // 7 days in seconds
+          maxAge: 64 * 60 * 24 * 7, // 7 days in seconds
           sameSite: "lax",
           secure: process.env.NODE_ENV === "production",
         });
@@ -35,7 +35,7 @@ export async function POST(req) {
       } else {
         return new Response(
           JSON.stringify({ message: "password did'nt match" }),
-          { status: 401 },
+          { status: 402 },
         );
       }
     }
@@ -45,7 +45,7 @@ export async function POST(req) {
       JSON.stringify({
         message: "something went wrong",
         errormsg: error,
-        status: 501,
+        status: 502,
       }),
       { status: 501 },
     );

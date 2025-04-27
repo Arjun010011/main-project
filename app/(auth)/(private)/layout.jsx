@@ -2,49 +2,43 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import jwt from "jsonwebtoken"; // Optional: For decoding JWT
 
 export default function StudentLayout({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
-    // Get the JWT token (can be from cookies or localStorage)
-    const token = localStorage.getItem("studentToken"); // Or from cookies
-
-    if (token) {
+    const verify = async () => {
       try {
-        // Verify the JWT token
-        jwt.verify(token, process.env.JWT_SECRET); // Secret key from .env
-        setIsAuthenticated(true);
+        const res = await fetch("/api/auth/verify", {
+          credentials: "include", // ⬅️ Must include this to send cookies
+        });
+
+        const data = await res.json();
+
+        if (data.authenticated) {
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+        }
       } catch (error) {
-        console.error("JWT verification failed", error);
+        console.error("Auth check failed:", error);
         setIsAuthenticated(false);
       }
-    } else {
-      setIsAuthenticated(false);
-    }
+    };
+
+    verify();
   }, []);
 
   useEffect(() => {
-    // Redirect user to login page if not authenticated
     if (isAuthenticated === false) {
-      router.push("/"); // Redirect to your login page
+      router.push("/"); // Redirect to login
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated]);
 
   if (isAuthenticated === null) {
-    // Optionally, you can show a loading state while checking authentication
-    return <div>Loading...</div>;
+    return <div>Loading...</div>; // optional: show spinner or splash
   }
 
-  return (
-    <div>
-      {isAuthenticated ? (
-        children // Render the protected content
-      ) : (
-        <div>Access Denied! Please log in to view this page.</div>
-      )}
-    </div>
-  );
+  return <>{children}</>;
 }
