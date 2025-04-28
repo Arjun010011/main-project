@@ -1,7 +1,6 @@
 import Image from "next/image";
 
 const Footer = () => {
-  console.log("hello world");
   return (
     <div className="flex flex-col gap-10 bg-slate-100">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 w-full text-center items-center justify-center bg-slate-100 p-10 gap-2">
