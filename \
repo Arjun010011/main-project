@@ -13,10 +13,10 @@ export const GoogleAuthButton = () => {
   };
   return (
     <div>
-      <div className="w-full">
-        <Button className="w-[300px]" variant="outline" onClick={handleClick}>
-          Signup with Google
-        </Button>
+      <div>
+        <button type="button" onClick={handleClick}>
+          signin with google
+        </button>
       </div>
     </div>
   );
