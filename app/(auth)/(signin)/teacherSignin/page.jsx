@@ -6,7 +6,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import Link from "next/link";
-import { GoogleAuthProvider } from "firebase/auth";
 import { GoogleAuthButton } from "@/app/components/GoogleAuthButton";
 const page = () => {
   const [user, setUser] = useState({});
