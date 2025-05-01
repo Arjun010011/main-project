@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
+import { GoogleAuthButton } from "@/app/components/GoogleAuthButton";
 const page = () => {
   const [user, setUser] = useState({});
   const [message, setMessage] = useState(null);
@@ -62,9 +63,8 @@ const page = () => {
           />
         </div>
         <div className="h-auto w-auto  md:p-10">
-          <Button className="w-[300px]" variant="outline">
-            Signup with Google
-          </Button>
+          <GoogleAuthButton />
+
           <p className="mt-3 text-sm">
             Already have an account?
             <span className="font-bold">
