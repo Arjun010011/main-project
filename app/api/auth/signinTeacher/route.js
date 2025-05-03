@@ -1,4 +1,4 @@
-import teacher from "@/models/student.js";
+import teacher from "@/models/teacher.js";
 import { connectDB } from "@/lib/mongoose";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";

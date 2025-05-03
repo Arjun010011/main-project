@@ -63,7 +63,7 @@ const page = () => {
           />
         </div>
         <div className="h-auto w-auto  md:p-10">
-          <GoogleAuthButton />
+          <GoogleAuthButton role="student" />
 
           <p className="mt-3 text-sm">
             Already have an account?

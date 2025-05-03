@@ -1,0 +1,48 @@
+import { connectDB } from "@/lib/mongoose";
+
+import { serialize } from "cookie";
+import jwt from "jsonwebtoken";
+import student from "@/models/student.js";
+export async function POST(req) {
+  try {
+    await connectDB();
+    const { email, role, fullName } = await req.json();
+    const userExist = await student.findOne({ email });
+
+    if (userExist.email === email) {
+      const token = jwt.sign(
+        { id: userExist._id, email: userExist.email, role: "student" },
+        process.env.JWT_SECRET,
+        { expiresIn: "9d" },
+      );
+      const cookie = serialize("studentToken", token, {
+        httpOnly: true,
+        path: "/",
+        maxAge: 64 * 60 * 24 * 7, // 7 days in seconds
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+      });
+      return new Response(
+        JSON.stringify({ message: "user authenticated successfully" }),
+        {
+          status: 200,
+          headers: {
+            "Set-Cookie": cookie,
+          },
+        },
+      );
+    } else {
+    }
+    return new Response(JSON.stringify({ email: email }), { status: 200 });
+  } catch (error) {
+    console.error("soemthing went wrong", error);
+    return new Response(
+      JSON.stringify({
+        message: "something went wrong",
+        errormsg: error,
+        status: 500,
+      }),
+      { status: 500 },
+    );
+  }
+}
