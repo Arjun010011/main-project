@@ -11,7 +11,7 @@ export default function StudentLayout({ children }) {
     const verify = async () => {
       try {
         const res = await fetch("/api/auth/verify", {
-          credentials: "include", // ⬅️ Must include this to send cookies
+          credentials: "include",
         });
 
         const data = await res.json();
@@ -32,12 +32,12 @@ export default function StudentLayout({ children }) {
 
   useEffect(() => {
     if (isAuthenticated === false) {
-      router.push("/"); // Redirect to login
+      router.push("/");
     }
   }, [isAuthenticated]);
 
   if (isAuthenticated === null) {
-    return <div>Loading...</div>; // optional: show spinner or splash
+    return <div>Loading...</div>;
   }
 
   return <>{children}</>;

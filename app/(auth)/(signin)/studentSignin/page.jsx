@@ -6,7 +6,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import Link from "next/link";
-import { GoogleAuthButton } from "@/app/components/GoogleAuthButton";
 const page = () => {
   const [user, setUser] = useState({});
   const [message, setMessage] = useState(null);
@@ -36,7 +35,7 @@ const page = () => {
         setLoading(false);
         setMessage(sendUser.data.message);
         setTimeout(() => {
-          router.push("/studentDashboar signin with googled");
+          router.push("/studentDashboard");
         }, 1000);
       }
     } catch (error) {
@@ -66,7 +65,6 @@ const page = () => {
           />
         </div>
         <div className="h-auto w-auto  md:p-10">
-          <GoogleAuthButton text="Signin in with google" />
           <p className="mt-3 text-sm">
             Don't have an account?
             <span className="font-bold">
