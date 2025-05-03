@@ -8,7 +8,6 @@ export async function POST(req) {
     await connectDB();
     const { email } = await req.json();
     const userExist = await student.findOne({ email });
-    console.log(email, userExist);
 
     if (userExist.email === email) {
       const token = jwt.sign(
