@@ -24,7 +24,6 @@ const page = () => {
 
   const handleUser = (e) => {
     setUser({ ...user, [e.target.id]: e.target.value });
-    console.log(user);
   };
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -25,7 +25,6 @@ const page = () => {
 
   const handleUser = (e) => {
     setUser({ ...user, [e.target.id]: e.target.value });
-    console.log(user);
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -63,8 +62,6 @@ const page = () => {
           />
         </div>
         <div className="h-auto w-auto  md:p-10">
-          <GoogleAuthButton role="student" />
-
           <p className="mt-3 text-sm">
             Already have an account?
             <span className="font-bold">
