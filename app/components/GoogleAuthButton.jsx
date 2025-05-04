@@ -13,7 +13,6 @@ export const GoogleAuthButton = ({
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      console.log(user);
       const sendUser = await axios.post("/api/auth/googleAuthRoute", {
         email: user.email,
         fullName: user.displayName,

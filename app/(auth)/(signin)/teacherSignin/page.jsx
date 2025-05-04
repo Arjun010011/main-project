@@ -38,7 +38,7 @@ const page = () => {
           router.push("/teacherDashboard");
         }, 1000);
       }
-      if (sendUser.status === 500) {
+      if (sendUser.status === 404) {
         setErrorMsg(sendUser.data.message);
       }
     } catch (error) {
@@ -87,7 +87,7 @@ const page = () => {
             <label className="text-sm font-bold">Email</label>
             <input
               type="text"
-              singupid="email"
+              id="email"
               placeholder="enter your email address"
               className="border-slate-300 border p-2 rounded-lg"
               onChange={handleUser}

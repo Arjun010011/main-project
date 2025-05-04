@@ -1,4 +1,5 @@
 "use client";
+import { GoogleAuthButton } from "@/app/components/GoogleAuthButton";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -64,6 +65,7 @@ const page = () => {
           />
         </div>
         <div className="h-auto w-auto  md:p-10">
+          <GoogleAuthButton text="signin with google" role="student" />
           <p className="mt-3 text-sm">
             Don't have an account?
             <span className="font-bold">

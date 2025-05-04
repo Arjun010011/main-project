@@ -12,7 +12,7 @@ export async function POST(req) {
       const check = await bcryptjs.compare(password, userExist.password);
       if (check) {
         const token = jwt.sign(
-          { id: userExist._id, email: userExist.email, role: "student" },
+          { id: userExist._id, email: userExist.email, role: "teacher" },
           process.env.JWT_SECRET, // use a strong secret in .env
           { expiresIn: "9d" },
         );
@@ -38,13 +38,16 @@ export async function POST(req) {
           { status: 402 },
         );
       }
+    } else {
+      return new Response(JSON.stringify({ message: "user does'nt exist" }), {
+        status: 404,
+      });
     }
   } catch (error) {
-    console.error("soemthing went wrong", error);
     return new Response(
       JSON.stringify({
         message: "something went wrong",
-        errormsg: error,
+        errormsg: error?.message,
         status: 400,
       }),
       { status: 400 },
