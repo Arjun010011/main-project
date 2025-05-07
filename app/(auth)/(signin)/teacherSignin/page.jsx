@@ -7,7 +7,9 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import Link from "next/link";
 import { GoogleAuthButton } from "@/app/components/GoogleAuthButton";
+import storeUser from "@/lib/store/userStore";
 const page = () => {
+  const { userInfo, setUserInfo } = storeUser();
   const [user, setUser] = useState({});
   const [message, setMessage] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -32,6 +34,8 @@ const page = () => {
       setLoading(true);
       const sendUser = await axios.post("/api/auth/signinTeacher", user);
       if (sendUser.status === 200) {
+        setUserInfo(sendUser.data.user);
+        console.log(userInfo);
         setLoading(false);
         setMessage(sendUser.data.message);
         setTimeout(() => {
@@ -49,6 +53,7 @@ const page = () => {
         );
       } else {
         setErrorMsg("somthing went wrong try again later");
+        console.log(error);
       }
     }
   };

@@ -10,6 +10,7 @@ export async function POST(req) {
     const userExist = await teacher.findOne({ email });
     if (userExist) {
       const check = await bcryptjs.compare(password, userExist.password);
+
       if (check) {
         const token = jwt.sign(
           { id: userExist._id, email: userExist.email, role: "teacher" },
@@ -24,7 +25,10 @@ export async function POST(req) {
           secure: process.env.NODE_ENV === "production",
         });
         return new Response(
-          JSON.stringify({ message: "user authenticated successfully" }),
+          JSON.stringify({
+            message: "user authenticated successfully",
+            user: userExist,
+          }),
           {
             status: 200,
             headers: {
@@ -35,7 +39,7 @@ export async function POST(req) {
       } else {
         return new Response(
           JSON.stringify({ message: "password did'nt match" }),
-          { status: 402 },
+          { status: 401 },
         );
       }
     } else {

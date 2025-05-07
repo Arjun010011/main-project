@@ -1,5 +1,9 @@
+"use client";
+
+import storeUser from "@/lib/store/userStore";
 const page = () => {
-  return <div>hello world of living</div>;
+  const { userInfo } = storeUser();
+  return <div>{userInfo?.fullName}</div>;
 };
 
 export default page;
