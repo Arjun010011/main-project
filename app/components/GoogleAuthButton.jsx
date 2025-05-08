@@ -3,10 +3,12 @@ import { signInWithPopup } from "firebase/auth";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import storeUser from "@/lib/store/userStore";
 export const GoogleAuthButton = ({
   text = "signup with google ",
   role = "student",
 }) => {
+  const { setUserInfo, clearUserInfo } = storeUser();
   const router = useRouter();
   const theRole = role;
   const handleClick = async () => {
@@ -17,13 +19,17 @@ export const GoogleAuthButton = ({
         email: user.email,
         fullName: user.displayName,
         role: theRole,
+        image: user.photoURL,
       });
       if (sendUser.status === 200 && theRole === "student") {
+        setUserInfo(sendUser.data.user);
         setTimeout(() => {
           router.push("/studentDashboard");
         }, 1000);
       }
       if (sendUser.status === 200 && theRole === "teacher") {
+        console.log(sendUser.data.user);
+        setUserInfo(sendUser.data.user);
         setTimeout(() => {
           router.push("/teacherDashboard");
         }, 1000);

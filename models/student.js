@@ -21,6 +21,12 @@ const userSchema = new mongoose.Schema(
       required: true,
       enum: ["student"],
     },
+    image: {
+      type: String,
+      required: true,
+      default:
+        "https://static.vecteezy.com/system/resources/thumbnails/020/765/399/small_2x/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg",
+    },
   },
   { timestamps: true },
 );

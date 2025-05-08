@@ -8,7 +8,7 @@ import teacher from "@/models/teacher.js";
 export async function POST(req) {
   try {
     await connectDB();
-    const { email, role, fullName } = await req.json();
+    const { email, role, fullName, image } = await req.json();
     let user;
     if (role === "teacher") {
       let userExist = await teacher.findOne({ email });
@@ -19,6 +19,7 @@ export async function POST(req) {
         user = new teacher({
           email,
           fullName,
+          image,
           password: hashedPassword,
           role, //student or teacher based on frontend
           authProvider: "google",
@@ -38,10 +39,15 @@ export async function POST(req) {
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
       });
+      const { password, ...passLessUser } = userExist.toObject();
       return new Response(
-        JSON.stringify({ message: "user authenticated successfully" }),
+        JSON.stringify({
+          message: "user authenticated successfully",
+          user: passLessUser,
+        }),
         {
           status: 200,
+
           headers: {
             "Set-Cookie": cookie,
           },
@@ -57,6 +63,7 @@ export async function POST(req) {
         user = new student({
           email,
           fullName,
+          image,
           password: hashedPassword,
           role, //student or teacher based on frontend
           authProvider: "google",
@@ -76,10 +83,15 @@ export async function POST(req) {
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
       });
+      const { password, ...passLessUser } = userExist.toObject();
       return new Response(
-        JSON.stringify({ message: "user authenticated successfully" }),
+        JSON.stringify({
+          message: "user authenticated successfully",
+          user: passLessUser,
+        }),
         {
           status: 200,
+
           headers: {
             "Set-Cookie": cookie,
           },
