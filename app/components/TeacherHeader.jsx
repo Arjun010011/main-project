@@ -12,13 +12,13 @@ const TeacherHeader = () => {
     <div className="w-full h-full flex items-center justify-center flex-col ">
       <header className="flex p-5 w-full  items-center justify-between ">
         <Menu size={30} />
-        <div
-          className="flex items-center gap-8  "
-          onClick={() =>
-            plusClick === false ? setPlusClick(true) : setPlusClick(false)
-          }
-        >
-          <div className="p-2 rounded-full hover:bg-gray-100  hover:cursor-pointer transition duration-300 ease-in-out">
+        <div className="flex items-center gap-8  ">
+          <div
+            className="p-2 rounded-full hover:bg-gray-100  hover:cursor-pointer transition duration-300 ease-in-out"
+            onClick={() =>
+              plusClick === false ? setPlusClick(true) : setPlusClick(false)
+            }
+          >
             <Plus size={20} />
           </div>
           <Image
