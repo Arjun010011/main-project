@@ -5,8 +5,9 @@ import { Menu, Plus, X } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import axios from "axios";
 const TeacherHeader = () => {
-  const { teacherInfo } = storeUser();
+  const { teacherInfo, insertClassrooms, classrooms } = storeUser();
   const [classroomInfo, setClassroomInfo] = useState({});
 
   const [plusClick, setPlusClick] = useState(false);
@@ -16,15 +17,24 @@ const TeacherHeader = () => {
     setClassroomInfo((prev) => ({ ...prev, [id]: value }));
   };
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const updatedClassroomInfo = {
-      ...classroomInfo,
-      teacherEmail: teacherInfo.email,
-    };
-    setClassroomInfo(updatedClassroomInfo);
-    console.log(classroomInfo);
     try {
-    } catch (error) {}
+      e.preventDefault();
+      const updatedClassroomInfo = {
+        ...classroomInfo,
+        teacherEmail: teacherInfo.email,
+      };
+      setClassroomInfo(updatedClassroomInfo);
+      const classRoom = await axios.post(
+        "/api/createClassroom",
+        updatedClassroomInfo
+      );
+      if (classRoom.status === 201) {
+        insertClassrooms(classRoom.data.classroomInfo);
+        console.log(classrooms);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
   return (
     <div className="w-full h-full flex items-center justify-center flex-col ">
