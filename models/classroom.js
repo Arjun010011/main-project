@@ -9,14 +9,13 @@ const classroomSchema = new mongoose.Schema(
     },
     subjectName: {
       type: String,
-      required: true,
       trim: true,
     },
     sectionName: {
       type: String,
       trim: true,
     },
-    userEmail: {
+    teacherEmail: {
       type: String,
       required: true,
       trim: true,

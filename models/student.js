@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 const studentSchema = new mongoose.Schema(
   {
     name: {
@@ -27,5 +29,5 @@ const studentSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-export const Student =
-  mongoose.models.Student || mongoose.model("Student", studentSchema);
+export const student =
+  mongoose.models.student || mongoose.model("student", studentSchema);

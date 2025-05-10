@@ -8,7 +8,7 @@ export const GoogleAuthButton = ({
   text = "signup with google ",
   role = "student",
 }) => {
-  const { setUserInfo, clearUserInfo } = storeUser();
+  const { setTeacherInfo, setStudentInfo } = storeUser();
   const router = useRouter();
   const theRole = role;
   const handleClick = async () => {
@@ -22,14 +22,13 @@ export const GoogleAuthButton = ({
         image: user.photoURL,
       });
       if (sendUser.status === 200 && theRole === "student") {
-        setUserInfo(sendUser.data.user);
+        setStudentInfo(sendUser.data.user);
         setTimeout(() => {
           router.push("/studentDashboard");
         }, 1000);
       }
       if (sendUser.status === 200 && theRole === "teacher") {
-        console.log(sendUser.data.user);
-        setUserInfo(sendUser.data.user);
+        setTeacherInfo(sendUser.data.user);
         setTimeout(() => {
           router.push("/teacherDashboard");
         }, 1000);

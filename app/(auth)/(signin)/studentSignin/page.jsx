@@ -7,13 +7,14 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import Link from "next/link";
+import storeUser from "@/lib/store/userStore";
 const page = () => {
   const [user, setUser] = useState({});
   const [message, setMessage] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-
+  const { setStudentInfo } = storeUser();
   useEffect(() => {
     const timer = setTimeout(() => {
       setMessage(null);
@@ -34,6 +35,7 @@ const page = () => {
       if (sendUser.status === 200) {
         setLoading(false);
         setMessage(sendUser.data.message);
+        setStudentInfo(sendUser);
         setTimeout(() => {
           router.push("/studentDashboard");
         }, 1000);

@@ -6,9 +6,26 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 const TeacherHeader = () => {
-  const { userInfo } = storeUser();
-  console.log(userInfo);
+  const { teacherInfo } = storeUser();
+  const [classroomInfo, setClassroomInfo] = useState({});
+
   const [plusClick, setPlusClick] = useState(false);
+  const handleChange = (e) => {
+    e.preventDefault();
+    const { id, value } = e.target;
+    setClassroomInfo((prev) => ({ ...prev, [id]: value }));
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const updatedClassroomInfo = {
+      ...classroomInfo,
+      teacherEmail: teacherInfo.email,
+    };
+    setClassroomInfo(updatedClassroomInfo);
+    console.log(classroomInfo);
+    try {
+    } catch (error) {}
+  };
   return (
     <div className="w-full h-full flex items-center justify-center flex-col ">
       <header className="flex p-5 w-full  items-center justify-between ">
@@ -23,7 +40,7 @@ const TeacherHeader = () => {
             <Plus size={20} />
           </div>
           <Image
-            src={userInfo.image || "/logo.png"}
+            src={teacherInfo.image || "/logo.png"}
             height={40}
             width={40}
             alt="logo"
@@ -44,7 +61,10 @@ const TeacherHeader = () => {
               className=" absolute w-full h-full top-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-0"
               onClick={() => setPlusClick(false)}
             ></div>
-            <form className="flex flex-col  px-10  py-10 bg-gray-100  z-50 w-auto h-auto rounded-lg md:w-[480px] ">
+            <form
+              className="flex flex-col  px-10  py-10 bg-gray-100  z-50 w-auto h-auto rounded-lg md:w-[480px] "
+              onSubmit={handleSubmit}
+            >
               <div className="flex justify-between items-center ">
                 <p className="font-bold text-xl">Add a class </p>
                 <X
@@ -54,20 +74,25 @@ const TeacherHeader = () => {
                 />
               </div>
               <label htmlFor="className " className="mt-5">
-                Class name
+                Class name <span className="text-gray-400">*required</span>
               </label>
               <input
                 type="text"
                 placeholder="enter you className"
                 className="border-3 border-gray-200 rounded-lg px-2 py-2 mt-2 w-[70vw] md:w-full"
+                id="className"
+                required
+                onChange={handleChange}
               />
               <label htmlFor="className " className="mt-5">
                 Subject
               </label>
               <input
                 type="text"
-                placeholder="enter you subject"
+                placeholder="enter your subject"
                 className="border-3 border-gray-200 rounded-lg px-2 py-2 mt-2 w-[70vw] md:w-full"
+                id="subjectName"
+                onChange={handleChange}
               />
               <label htmlFor="className " className="mt-5">
                 Section
@@ -76,8 +101,12 @@ const TeacherHeader = () => {
                 type="text"
                 placeholder="enter you section"
                 className="border-3 border-gray-200 rounded-lg px-2 py-2 mt-2 w-[70vw] md:w-full"
+                id="sectionName"
+                onChange={handleChange}
               />
-              <Button className="mt-7 py-5">Create classroom</Button>
+              <Button type="submit" className="mt-7 py-5">
+                Create classroom
+              </Button>
             </form>
           </motion.div>
         )}

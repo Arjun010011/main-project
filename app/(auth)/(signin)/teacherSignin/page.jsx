@@ -9,7 +9,7 @@ import Link from "next/link";
 import { GoogleAuthButton } from "@/app/components/GoogleAuthButton";
 import storeUser from "@/lib/store/userStore";
 const page = () => {
-  const { userInfo, setUserInfo } = storeUser();
+  const { setTeacherInfo } = storeUser();
   const [user, setUser] = useState({});
   const [message, setMessage] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -33,9 +33,9 @@ const page = () => {
     try {
       setLoading(true);
       const sendUser = await axios.post("/api/auth/signinTeacher", user);
+      setLoading(false);
       if (sendUser.status === 200) {
-        setUserInfo(sendUser.data.user);
-        console.log(userInfo);
+        setTeacherInfo(sendUser.data.user);
         setLoading(false);
         setMessage(sendUser.data.message);
         setTimeout(() => {
@@ -49,7 +49,7 @@ const page = () => {
       setLoading(false);
       if (error.response) {
         setErrorMsg(
-          error.response.data?.message || "email does'nt exist signup",
+          error.response.data?.message || "email does'nt exist signup"
         );
       } else {
         setErrorMsg("somthing went wrong try again later");
