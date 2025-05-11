@@ -7,7 +7,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 const TeacherHeader = () => {
-  const { teacherInfo, insertClassrooms, classrooms } = storeUser();
+  const { insertClassrooms, setSuccessMsg, setErrorMsg } = storeUser();
+  const teacherInfo = storeUser((state) => state.teacherInfo);
+  const classrooms = storeUser((state) => state.classrooms);
+  const successMsg = storeUser((state) => state.successMsg);
+  const errorMsg = storeUser((state) => state.errorMsg);
   const [classroomInfo, setClassroomInfo] = useState({});
 
   const [plusClick, setPlusClick] = useState(false);
@@ -29,11 +33,17 @@ const TeacherHeader = () => {
         updatedClassroomInfo
       );
       if (classRoom.status === 201) {
+        setSuccessMsg(classRoom.data.message);
         insertClassrooms(classRoom.data.classroomInfo);
-        console.log(classrooms);
+      } else {
+        setErrorMsg(classRoom.data.message);
       }
     } catch (error) {
-      console.error(error);
+      if (error.response.data.message) {
+        setErrorMsg(error.response.data.message);
+      } else {
+        setErrorMsg("Something went wrong");
+      }
     }
   };
   return (
@@ -117,6 +127,16 @@ const TeacherHeader = () => {
               <Button type="submit" className="mt-7 py-5">
                 Create classroom
               </Button>
+              {successMsg && (
+                <motion.div className="mt-5  rounded-sm px-3 py-2 bg-green-300 text-black text-center">
+                  {successMsg}
+                </motion.div>
+              )}
+              {errorMsg && (
+                <div className="px-3 py-2 bg-red-300 text-black">
+                  {errorMsg}
+                </div>
+              )}
             </form>
           </motion.div>
         )}
