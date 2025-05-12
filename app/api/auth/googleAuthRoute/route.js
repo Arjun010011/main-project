@@ -30,7 +30,7 @@ export async function POST(req) {
       const token = jwt.sign(
         { id: userExist._id, email: userExist.email, role: "teacher" },
         process.env.JWT_SECRET,
-        { expiresIn: "9d" },
+        { expiresIn: "9d" }
       );
       const cookie = serialize("teacherToken", token, {
         httpOnly: true,
@@ -51,7 +51,7 @@ export async function POST(req) {
           headers: {
             "Set-Cookie": cookie,
           },
-        },
+        }
       );
     }
     if (role === "student") {
@@ -62,7 +62,7 @@ export async function POST(req) {
 
         user = new student({
           email,
-          fullName,
+          name: fullName,
           image,
           password: hashedPassword,
           role, //student or teacher based on frontend
@@ -74,7 +74,7 @@ export async function POST(req) {
       const token = jwt.sign(
         { id: userExist._id, email: userExist.email, role: "student" },
         process.env.JWT_SECRET,
-        { expiresIn: "9d" },
+        { expiresIn: "9d" }
       );
       const cookie = serialize("studentToken", token, {
         httpOnly: true,
@@ -95,10 +95,9 @@ export async function POST(req) {
           headers: {
             "Set-Cookie": cookie,
           },
-        },
+        }
       );
     }
-    return new Response(JSON.stringify({ email: email }), { status: 200 });
   } catch (error) {
     console.error("soemthing went wrong", error);
     return new Response(
@@ -107,7 +106,7 @@ export async function POST(req) {
         errormsg: error,
         status: 500,
       }),
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

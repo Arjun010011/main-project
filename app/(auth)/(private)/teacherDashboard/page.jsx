@@ -15,11 +15,13 @@ const page = () => {
         transiton={{ duration: 3 }}
       >
         <TeacherHeader />
-        {classrooms.map((cls) => (
-          <div key={cls._id} className="bg-black text-white">
-            {cls.className}
-          </div>
-        ))}
+        <div className="flex flex-col gap-4">
+          {classrooms.map((cls) => (
+            <div key={cls._id} className="bg-black text-white">
+              {cls.className}
+            </div>
+          ))}
+        </div>
       </motion.div>
       {userInfo?.fullName}
     </div>
