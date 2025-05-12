@@ -23,6 +23,7 @@ const TeacherHeader = () => {
   };
   const handleSubmit = async (e) => {
     try {
+      console.log(classrooms);
       setLoading(true);
       e.preventDefault();
       const updatedClassroomInfo = {
@@ -36,12 +37,13 @@ const TeacherHeader = () => {
       );
       if (classRoom.status === 201) {
         setErrorMsg(null);
+
+        setSuccessMsg(classRoom.data.message);
+        insertClassrooms(classRoom.data.classroomInfo);
         setTimeout(() => {
           setPlusClick(false);
           setSuccessMsg(null);
         }, 2000);
-        setSuccessMsg(classRoom.data.message);
-        insertClassrooms(classRoom.data.classroomInfo);
       } else {
         setErrorMsg(classRoom.data.message);
       }
@@ -49,14 +51,19 @@ const TeacherHeader = () => {
     } catch (error) {
       setLoading(false);
       setSuccessMsg(null);
-      if (error.response.data.message) {
+      if (error?.response?.data?.message) {
         setErrorMsg(error.response.data.message);
         setTimeout(() => {
           setPlusClick(false);
           setErrorMsg(null);
         }, 2000);
       } else {
+        console.error(error);
         setErrorMsg("Something went wrong");
+        setTimeout(() => {
+          setPlusClick(false);
+          setErrorMsg(null);
+        }, 2000);
       }
     }
   };
@@ -74,7 +81,7 @@ const TeacherHeader = () => {
             <Plus size={20} />
           </div>
           <Image
-            src={teacherInfo.image || "/logo.png"}
+            src={teacherInfo?.image || "/logo.png"}
             height={40}
             width={40}
             alt="logo"
