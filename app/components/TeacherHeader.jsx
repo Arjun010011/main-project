@@ -7,11 +7,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 const TeacherHeader = () => {
-  const { insertClassrooms, setSuccessMsg, setErrorMsg } = storeUser();
+  const { insertClassrooms } = storeUser();
   const teacherInfo = storeUser((state) => state.teacherInfo);
+  const [loading, setLoading] = useState(false);
   const classrooms = storeUser((state) => state.classrooms);
-  const successMsg = storeUser((state) => state.successMsg);
-  const errorMsg = storeUser((state) => state.errorMsg);
+  const [successMsg, setSuccessMsg] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
   const [classroomInfo, setClassroomInfo] = useState({});
 
   const [plusClick, setPlusClick] = useState(false);
@@ -22,6 +23,7 @@ const TeacherHeader = () => {
   };
   const handleSubmit = async (e) => {
     try {
+      setLoading(true);
       e.preventDefault();
       const updatedClassroomInfo = {
         ...classroomInfo,
@@ -33,14 +35,26 @@ const TeacherHeader = () => {
         updatedClassroomInfo
       );
       if (classRoom.status === 201) {
+        setErrorMsg(null);
+        setTimeout(() => {
+          setPlusClick(false);
+          setSuccessMsg(null);
+        }, 2000);
         setSuccessMsg(classRoom.data.message);
         insertClassrooms(classRoom.data.classroomInfo);
       } else {
         setErrorMsg(classRoom.data.message);
       }
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
+      setSuccessMsg(null);
       if (error.response.data.message) {
         setErrorMsg(error.response.data.message);
+        setTimeout(() => {
+          setPlusClick(false);
+          setErrorMsg(null);
+        }, 2000);
       } else {
         setErrorMsg("Something went wrong");
       }
@@ -124,8 +138,8 @@ const TeacherHeader = () => {
                 id="sectionName"
                 onChange={handleChange}
               />
-              <Button type="submit" className="mt-7 py-5">
-                Create classroom
+              <Button type="submit" className="mt-7 py-5" disabled={loading}>
+                {loading ? "Loading" : "create classroom"}
               </Button>
               {successMsg && (
                 <motion.div className="mt-5  rounded-sm px-3 py-2 bg-green-300 text-black text-center">
@@ -133,7 +147,7 @@ const TeacherHeader = () => {
                 </motion.div>
               )}
               {errorMsg && (
-                <div className="px-3 py-2 bg-red-300 text-black">
+                <div className=" mt-5 px-3 py-2 bg-red-300 text-black">
                   {errorMsg}
                 </div>
               )}

@@ -29,5 +29,6 @@ const studentSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-export const student =
-  mongoose.models.student || mongoose.model("student", studentSchema);
+
+export default mongoose.models.student ||
+  mongoose.model("student", studentSchema);
