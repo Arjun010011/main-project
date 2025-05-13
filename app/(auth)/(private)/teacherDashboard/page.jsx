@@ -3,10 +3,25 @@
 import storeUser from "@/lib/store/userStore";
 import { motion } from "framer-motion";
 import TeacherHeader from "@/app/components/TeacherHeader";
+import { useEffect } from "react";
+import axios from "axios";
 const page = () => {
-  const { userInfo, randomBg } = storeUser();
+  const { teacherInfo, randomBg, getClassRooms } = storeUser();
   const classrooms = storeUser((state) => state.classrooms);
   console.log(classrooms);
+  useEffect(() => {
+    fetchClassrooms();
+  }, []);
+  const fetchClassrooms = async () => {
+    const teacherEmail = {
+      email: teacherInfo.email,
+    };
+    const classRooms = await axios.post(
+      "/api/classRoom/getClass",
+      teacherEmail,
+    );
+    getClassRooms(classRooms.data.classRooms);
+  };
   return (
     <div>
       <motion.div
@@ -42,7 +57,7 @@ const page = () => {
           )}
         </div>
       </motion.div>
-      {userInfo?.fullName}
+      {teacherInfo?.fullName}
     </div>
   );
 };
