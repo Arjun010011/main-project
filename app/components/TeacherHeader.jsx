@@ -32,8 +32,8 @@ const TeacherHeader = () => {
       };
       setClassroomInfo(updatedClassroomInfo);
       const classRoom = await axios.post(
-        "/api/createClassroom",
-        updatedClassroomInfo
+        "/api/classRoom/createClassroom",
+        updatedClassroomInfo,
       );
       if (classRoom.status === 201) {
         setErrorMsg(null);
@@ -53,6 +53,7 @@ const TeacherHeader = () => {
       setSuccessMsg(null);
       if (error?.response?.data?.message) {
         setErrorMsg(error.response.data.message);
+
         setTimeout(() => {
           setPlusClick(false);
           setErrorMsg(null);
