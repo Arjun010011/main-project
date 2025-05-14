@@ -30,15 +30,19 @@ const page = () => {
         transiton={{ duration: 3 }}
       >
         <TeacherHeader />
-        <div className="flex flex-col gap-4 min-md:flex-row">
-          <p className="font-bold mx-5 ">All classrooms</p>
+
+        <p className="font-bold mx-5 ">All classrooms</p>
+        <div
+          className="flex flex-col max-sm:gap-5  min-md:flex-row flex-wrap  
+          "
+        >
           {classrooms ? (
             classrooms.map((cls) => {
               let bg = randomBg();
               return (
                 <div
                   key={cls._id}
-                  className={`mx-5 px-5 pb-17 pt-3  rounded-md shadow-md min-md:w-[400px] flex flex-col`}
+                  className={`mx-4 px-5 pb-17 pt-3 hover:scale-105 hover:shadow-2xl transition-transform duration-300 ease-in-out   rounded-md shadow-md min-w-[300px] h-[150px] flex flex-col min-md:mt-5`}
                   style={{
                     backgroundImage: `url(${bg})`,
                     backgroundSize: "cover",

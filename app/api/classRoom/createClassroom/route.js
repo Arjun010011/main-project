@@ -10,7 +10,7 @@ export async function POST(req) {
         JSON.stringify({ message: "ClassName or teacherEmail is not present" }),
         {
           status: 400,
-        }
+        },
       );
     }
     let classRoomExist = await Classroom.findOne({ className });
@@ -21,7 +21,7 @@ export async function POST(req) {
         }),
         {
           status: 409,
-        }
+        },
       );
     }
     const newClass = await new Classroom({
@@ -38,17 +38,17 @@ export async function POST(req) {
       }),
       {
         status: 201,
-      }
+      },
     );
   } catch (error) {
-    console.error("soemthing went wrong", error);
+    console.error("something went wrong", error);
     return new Response(
       JSON.stringify({
         message: "something went wrong",
         errormsg: error,
         status: 500,
       }),
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -7,7 +7,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 const TeacherHeader = () => {
-  const { insertClassrooms } = storeUser();
   const teacherInfo = storeUser((state) => state.teacherInfo);
   const [loading, setLoading] = useState(false);
   const classrooms = storeUser((state) => state.classrooms);
@@ -39,7 +38,6 @@ const TeacherHeader = () => {
         setErrorMsg(null);
 
         setSuccessMsg(classRoom.data.message);
-        insertClassrooms(classRoom.data.classroomInfo);
         setTimeout(() => {
           setPlusClick(false);
           setSuccessMsg(null);
