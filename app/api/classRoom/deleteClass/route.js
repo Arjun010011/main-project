@@ -5,7 +5,7 @@ export async function DELETE(req) {
   try {
     await connectDB();
     const body = await req.json();
-    const id = body._id;
+    const id = body.id;
     if (!mongoose.isValidObjectId(id)) {
       return NextResponse.json(
         { message: "Invalid ID format" },
