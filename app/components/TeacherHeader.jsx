@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import axios from "axios";
 const TeacherHeader = () => {
   const teacherInfo = storeUser((state) => state.teacherInfo);
+  const getClassRooms = storeUser((state) => state.getClassRooms);
   const [loading, setLoading] = useState(false);
   const classrooms = storeUser((state) => state.classrooms);
   const [successMsg, setSuccessMsg] = useState(null);
@@ -20,6 +21,17 @@ const TeacherHeader = () => {
     const { id, value } = e.target;
     setClassroomInfo((prev) => ({ ...prev, [id]: value }));
   };
+  const fetchClassrooms = async () => {
+    const teacherEmail = {
+      email: teacherInfo.email,
+    };
+    const classRooms = await axios.post(
+      "/api/classRoom/getClass",
+      teacherEmail,
+    );
+    getClassRooms(classRooms.data.classRooms);
+  };
+
   const handleSubmit = async (e) => {
     try {
       console.log(classrooms);
@@ -36,7 +48,7 @@ const TeacherHeader = () => {
       );
       if (classRoom.status === 201) {
         setErrorMsg(null);
-
+        fetchClassrooms();
         setSuccessMsg(classRoom.data.message);
         setTimeout(() => {
           setPlusClick(false);

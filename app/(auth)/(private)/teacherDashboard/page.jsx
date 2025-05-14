@@ -32,6 +32,7 @@ const page = () => {
       if (res.status === 200) {
         console.log("deleted the classroom successfully");
       }
+      fetchClassrooms();
     } catch (error) {
       console.error(error);
     }
