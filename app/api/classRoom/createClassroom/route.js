@@ -13,7 +13,7 @@ export async function POST(req) {
         },
       );
     }
-    let classRoomExist = await Classroom.findOne({ className });
+    let classRoomExist = await Classroom.findOne({ className, teacherEmail });
     if (classRoomExist) {
       return new Response(
         JSON.stringify({

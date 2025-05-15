@@ -3,16 +3,24 @@
 import storeUser from "@/lib/store/userStore";
 import { motion } from "framer-motion";
 import TeacherHeader from "@/app/components/TeacherHeader";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { Trash2 } from "lucide-react";
+import { Trash2, Pen } from "lucide-react";
+import EditClassroom from "@/app/components/EditClassroom";
 const page = () => {
   const { teacherInfo, randomBg, getClassRooms } = storeUser();
   const classrooms = storeUser((state) => state.classrooms);
+  const [showEdit, setShowEdit] = useState(false);
   console.log(classrooms);
+
+  //used to partial reload the page whenever a classs is created or deleteted or updated
+
   useEffect(() => {
     fetchClassrooms();
   }, []);
+
+  //used to fetch classroom data
+
   const fetchClassrooms = async () => {
     const teacherEmail = {
       email: teacherInfo.email,
@@ -23,6 +31,9 @@ const page = () => {
     );
     getClassRooms(classRooms.data.classRooms);
   };
+
+  // used to delete classroom
+
   const deleteClassRoom = async (e) => {
     try {
       const id = e.currentTarget.dataset.key;
@@ -65,14 +76,25 @@ const page = () => {
                   }}
                 >
                   <div className="flex  justify-between flex-row-reverse">
-                    <button
-                      type="button"
-                      className="cursor-pointer"
-                      data-key={cls._id}
-                      onClick={deleteClassRoom}
-                    >
-                      <Trash2 size={20} />
-                    </button>
+                    <div className="flex flex-col gap-2">
+                      <button
+                        type="button"
+                        className="cursor-pointer"
+                        data-key={cls._id}
+                        onClick={deleteClassRoom}
+                      >
+                        <Trash2 size={20} />
+                      </button>
+                      <button
+                        type="button"
+                        className="cursor-pointer"
+                        data-key={cls._id}
+                        onClick={() => setShowEdit(true)}
+                      >
+                        <Pen size={20} />
+                      </button>
+                    </div>
+
                     <p className="font-bold text-xl text-black ">
                       {cls.className}
                     </p>
@@ -87,6 +109,7 @@ const page = () => {
         </div>
       </motion.div>
       {teacherInfo?.fullName}
+      {showEdit && <EditClassroom onClose={() => setShowEdit(false)} />}
     </div>
   );
 };
