@@ -67,7 +67,7 @@ const page = () => {
               let bg = randomBg();
               return (
                 <div
-                  key={cls._id}
+                  key={cls.id}
                   className={`mx-4 px-5 pb-17 pt-3 hover:scale-105 hover:shadow-2xl transition-transform duration-300 ease-in-out   rounded-md shadow-md min-w-[300px] h-[150px] flex flex-col min-md:mt-5 relative `}
                   style={{
                     backgroundImage: `url(${bg})`,

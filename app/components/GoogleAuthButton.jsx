@@ -10,7 +10,6 @@ export const GoogleAuthButton = ({
 }) => {
   const { setTeacherInfo, setStudentInfo } = storeUser();
   const router = useRouter();
-  const theRole = role;
   const handleClick = async () => {
     try {
       const result = await signInWithPopup(auth, provider);
@@ -18,16 +17,16 @@ export const GoogleAuthButton = ({
       const sendUser = await axios.post("/api/auth/googleAuthRoute", {
         email: user.email,
         fullName: user.displayName,
-        role: theRole,
+        role: role,
         image: user.photoURL,
       });
-      if (sendUser.status === 200 && theRole === "student") {
+      if (sendUser.status === 200 && role === "student") {
         setStudentInfo(sendUser.data.user);
         setTimeout(() => {
           router.push("/studentDashboard");
         }, 1000);
       }
-      if (sendUser.status === 200 && theRole === "teacher") {
+      if (sendUser.status === 200 && role === "teacher") {
         setTeacherInfo(sendUser.data.user);
         setTimeout(() => {
           router.push("/teacherDashboard");

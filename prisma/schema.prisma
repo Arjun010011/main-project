@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  teacher
+  student
+}
+
+model Teacher {
+  id         String      @id @default(uuid())
+  fullName   String
+  email      String      @unique
+  password   String
+  role       Role
+  image      String      @default("https://static.vecteezy.com/system/resources/thumbnails/020/765/399/small_2x/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg")
+  classrooms Classroom[] // 1-to-many relation with Classroom
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Classroom {
+  id          String  @id @default(uuid())
+  className   String
+  subjectName String
+  sectionName String
+  teacherId   String
+  Teacher     Teacher @relation(fields: [teacherId], references: [id]) // Required relation
+
+  students Student[] @relation("StudentClassrooms") // Many-to-many with Student
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([className, teacherId], name: "className_teacherId") // Composite unique constraint
+}
+
+model Student {
+  id         String      @id @default(uuid())
+  fullName   String
+  email      String      @unique
+  password   String
+  image      String      @default("https://static.vecteezy.com/system/resources/thumbnails/020/765/399/small_2x/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg")
+  classrooms Classroom[] @relation("StudentClassrooms") // many-to-many relation
+  role       Role
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}

@@ -1,52 +1,58 @@
-import { connectDB } from "@/lib/mongoose";
-import { Classroom } from "@/models/classroom";
+import prisma from "@/lib/prisma";
+
 export async function POST(req) {
   try {
-    await connectDB();
-    const { className, subjectName, sectionName, teacherEmail } =
-      await req.json();
-    if (!className || !teacherEmail) {
+    const { className, subjectName, sectionName, teacherId } = await req.json();
+
+    if (!className || !teacherId) {
       return new Response(
-        JSON.stringify({ message: "ClassName or teacherEmail is not present" }),
-        {
-          status: 400,
-        },
+        JSON.stringify({ message: "Class name or teacher ID is missing" }),
+        { status: 400 },
       );
     }
-    let classRoomExist = await Classroom.findOne({ className, teacherEmail });
+
+    // Check if classroom exists using individual fields
+    const classRoomExist = await prisma.classroom.findFirst({
+      where: {
+        className,
+        teacherId,
+      },
+    });
+
     if (classRoomExist) {
       return new Response(
         JSON.stringify({
-          message: "classroom with the same name already exist",
+          message: "Classroom with the same name already exists",
         }),
-        {
-          status: 409,
-        },
+        { status: 409 },
       );
     }
-    const newClass = await new Classroom({
-      className,
-      subjectName,
-      sectionName,
-      teacherEmail,
-    }).save();
-    console.log(newClass);
+
+    const newClass = await prisma.classroom.create({
+      data: {
+        className,
+        subjectName,
+        sectionName,
+        teacherId,
+      },
+    });
+
+    console.log("Created classroom:", newClass);
+
     return new Response(
       JSON.stringify({
-        message: "classroom created successfully !!",
+        message: "Classroom created successfully!",
         classroomInfo: newClass,
       }),
-      {
-        status: 201,
-      },
+      { status: 201 },
     );
   } catch (error) {
-    console.error("something went wrong", error);
+    console.error("Something went wrong:", error);
+
     return new Response(
       JSON.stringify({
-        message: "something went wrong",
-        errormsg: error,
-        status: 500,
+        message: "Internal Server Error",
+        error: error.message,
       }),
       { status: 500 },
     );

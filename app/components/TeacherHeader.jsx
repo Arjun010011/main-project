@@ -39,7 +39,7 @@ const TeacherHeader = () => {
       e.preventDefault();
       const updatedClassroomInfo = {
         ...classroomInfo,
-        teacherEmail: teacherInfo.email,
+        teacherId: teacherInfo.id,
       };
       setClassroomInfo(updatedClassroomInfo);
       const classRoom = await axios.post(

@@ -1,37 +1,43 @@
-import { connectDB } from "@/lib/mongoose";
+import prisma from "@/lib/prisma"; // import prisma client instance
 import crypto from "crypto";
 import bcryptjs from "bcryptjs";
 import { serialize } from "cookie";
 import jwt from "jsonwebtoken";
-import student from "@/models/student.js";
-import teacher from "@/models/teacher.js";
+
 export async function POST(req) {
   try {
-    await connectDB();
     const { email, role, fullName, image } = await req.json();
     let user;
+
     if (role === "teacher") {
-      let userExist = await teacher.findOne({ email });
+      // Check if teacher exists
+      let userExist = await prisma.teacher.findUnique({
+        where: { email },
+      });
+
       if (!userExist) {
         const randomPassword = crypto.randomBytes(16).toString("hex");
         const hashedPassword = bcryptjs.hashSync(randomPassword, 10);
 
-        user = new teacher({
-          email,
-          fullName,
-          image,
-          password: hashedPassword,
-          role, //student or teacher based on frontend
-          authProvider: "google",
+        user = await prisma.teacher.create({
+          data: {
+            email,
+            fullName,
+            image,
+            password: hashedPassword,
+            role: "teacher",
+            // no authProvider field in schema; add if needed
+          },
         });
-        await user.save();
         userExist = user;
       }
+
       const token = jwt.sign(
-        { id: userExist._id, email: userExist.email, role: "teacher" },
+        { id: userExist.id, email: userExist.email, role: "teacher" },
         process.env.JWT_SECRET,
-        { expiresIn: "9d" }
+        { expiresIn: "9d" },
       );
+
       const cookie = serialize("teacherToken", token, {
         httpOnly: true,
         path: "/",
@@ -39,7 +45,10 @@ export async function POST(req) {
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
       });
-      const { password, ...passLessUser } = userExist.toObject();
+
+      // Remove password before returning user
+      const { password, ...passLessUser } = userExist;
+
       return new Response(
         JSON.stringify({
           message: "user authenticated successfully",
@@ -47,35 +56,41 @@ export async function POST(req) {
         }),
         {
           status: 200,
-
           headers: {
             "Set-Cookie": cookie,
           },
-        }
+        },
       );
     }
+
     if (role === "student") {
-      let userExist = await student.findOne({ email });
+      // Check if student exists
+      let userExist = await prisma.student.findUnique({
+        where: { email },
+      });
+
       if (!userExist) {
         const randomPassword = crypto.randomBytes(16).toString("hex");
         const hashedPassword = bcryptjs.hashSync(randomPassword, 10);
 
-        user = new student({
-          email,
-          name: fullName,
-          image,
-          password: hashedPassword,
-          role, //student or teacher based on frontend
-          authProvider: "google",
+        user = await prisma.student.create({
+          data: {
+            email,
+            fullName,
+            password: hashedPassword,
+            image,
+            role: "student",
+          },
         });
-        await user.save();
         userExist = user;
       }
+
       const token = jwt.sign(
-        { id: userExist._id, email: userExist.email, role: "student" },
+        { id: userExist.id, email: userExist.email, role: "student" },
         process.env.JWT_SECRET,
-        { expiresIn: "9d" }
+        { expiresIn: "9d" },
       );
+
       const cookie = serialize("studentToken", token, {
         httpOnly: true,
         path: "/",
@@ -83,7 +98,9 @@ export async function POST(req) {
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
       });
-      const { password, ...passLessUser } = userExist.toObject();
+
+      const { password, ...passLessUser } = userExist;
+
       return new Response(
         JSON.stringify({
           message: "user authenticated successfully",
@@ -91,22 +108,21 @@ export async function POST(req) {
         }),
         {
           status: 200,
-
           headers: {
             "Set-Cookie": cookie,
           },
-        }
+        },
       );
     }
   } catch (error) {
-    console.error("soemthing went wrong", error);
+    console.error("something went wrong", error);
     return new Response(
       JSON.stringify({
         message: "something went wrong",
-        errormsg: error,
+        errormsg: error.message || error,
         status: 500,
       }),
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
