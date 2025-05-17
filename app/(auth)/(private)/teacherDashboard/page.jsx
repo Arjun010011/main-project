@@ -3,79 +3,121 @@
 import storeUser from "@/lib/store/userStore";
 import { motion } from "framer-motion";
 import TeacherHeader from "@/app/components/TeacherHeader";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { Trash2, Pen } from "lucide-react";
 import EditClassroom from "@/app/components/EditClassroom";
-const page = () => {
+import { supabase } from "@/utils/supabaseClient";
+
+const Page = () => {
   const { teacherInfo, randomBg, getClassRooms } = storeUser();
   const classrooms = storeUser((state) => state.classrooms);
   const [showEdit, setShowEdit] = useState(false);
-  console.log(classrooms);
 
-  //used to partial reload the page whenever a classs is created or deleteted or updated
+  // Fetch classrooms
+  const fetchClassrooms = useCallback(async () => {
+    try {
+      const teacherEmail = { email: teacherInfo.email };
+      const { data } = await axios.post(
+        "/api/classRoom/getClass",
+        teacherEmail,
+      );
+      console.log("Fetched classrooms:", data.classRooms);
+      getClassRooms(data.classRooms);
+    } catch (error) {
+      console.error("Error fetching classrooms:", error);
+    }
+  }, [teacherInfo.email, getClassRooms]);
 
+  // Set up real-time subscription and initial fetch
   useEffect(() => {
+    if (!teacherInfo.email) {
+      console.log("No teacher email, skipping subscription");
+      return;
+    }
+
+    // Fetch initial classrooms
     fetchClassrooms();
-  }, []);
 
-  //used to fetch classroom data
+    // Subscribe to real-time changes on the classroom table
+    const channel = supabase
+      .channel("classroom-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "classroom" },
+        (payload) => {
+          console.log("Classroom change received:", payload);
+          if (payload.eventType === "INSERT") {
+            // Check if the new classroom belongs to the teacher
+            if (payload.new.teacher_email === teacherInfo.email) {
+              console.log("Inserting new classroom:", payload.new);
+              getClassRooms([...classrooms, payload.new]);
+            }
+          } else if (payload.eventType === "UPDATE") {
+            fetchClassrooms(); // Refetch to ensure consistency
+          } else if (payload.eventType === "DELETE") {
+            console.log("Deleting classroom with id:", payload.old.id);
+            getClassRooms(
+              classrooms.filter((cls) => cls.id !== payload.old.id),
+            );
+          }
+        },
+      )
+      .subscribe((status) => {
+        console.log("Subscription status:", status);
+        if (status === "SUBSCRIBED") {
+          console.log("Successfully subscribed to classroom changes");
+        } else if (status === "CLOSED" || status === "CHANNEL_ERROR") {
+          console.error("Subscription failed with status:", status);
+        }
+      });
 
-  const fetchClassrooms = async () => {
-    const teacherEmail = {
-      email: teacherInfo.email,
+    // Clean up subscription on unmount
+    return () => {
+      console.log("Cleaning up subscription");
+      supabase.removeChannel(channel);
     };
-    const classRooms = await axios.post(
-      "/api/classRoom/getClass",
-      teacherEmail,
-    );
-    getClassRooms(classRooms.data.classRooms);
-  };
+  }, [teacherInfo.email, fetchClassrooms, classrooms, getClassRooms]);
 
-  // used to delete classroom
-
+  // Delete classroom
   const deleteClassRoom = async (e) => {
     try {
       const id = e.currentTarget.dataset.key;
       const res = await axios.delete("/api/classRoom/deleteClass", {
-        data: { id: id },
+        data: { id },
       });
       if (res.status === 200) {
-        console.log("deleted the classroom successfully");
+        console.log("Deleted classroom successfully");
       }
-      fetchClassrooms();
     } catch (error) {
-      console.error(error);
+      console.error("Error deleting classroom:", error);
     }
   };
+
   return (
     <div>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transiton={{ duration: 3 }}
+        transition={{ duration: 3 }}
       >
         <TeacherHeader />
-
-        <p className="font-bold mx-5 ">All classrooms</p>
-        <div
-          className="flex flex-col max-sm:gap-5  min-md:flex-row flex-wrap  
-          "
-        >
+        <p className="font-bold mx-5">All classrooms</p>
+        <div className="flex flex-col max-sm:gap-5 min-md:flex-row flex-wrap">
           {classrooms ? (
             classrooms.map((cls) => {
               let bg = randomBg();
               return (
                 <div
                   key={cls.id}
-                  className={`mx-4 px-5 pb-17 pt-3 hover:scale-105 hover:shadow-2xl transition-transform duration-300 ease-in-out   rounded-md shadow-md min-w-[300px] h-[150px] flex flex-col min-md:mt-5 relative `}
+                  className="mx-4 px-5 pb-17 pt-3 hover:scale-105 hover:shadow-2xl transition-transform duration-300 ease-in-out rounded-md shadow-md min-w-[300px] h-[150px] flex flex-col min-md:mt-5 relative"
                   style={{
                     backgroundImage: `url(${bg})`,
                     backgroundSize: "cover",
                     backgroundColor: "black",
                   }}
                 >
-                  <div className="flex  justify-between flex-row-reverse">
+                  <div className="flex justify-between flex-row-reverse">
                     <div className="flex flex-col gap-2">
                       <button
                         type="button"
@@ -94,8 +136,7 @@ const page = () => {
                         <Pen size={20} />
                       </button>
                     </div>
-
-                    <p className="font-bold text-xl text-black ">
+                    <p className="font-bold text-xl text-black">
                       {cls.className}
                     </p>
                   </div>
@@ -114,4 +155,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;
