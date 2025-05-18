@@ -36,7 +36,7 @@ const TeacherHeader = () => {
   const handleSubmit = async (e) => {
     try {
       console.log(classrooms);
-      const image = randomBg();
+      let image = randomBg();
       console.log(image);
       setLoading(true);
       e.preventDefault();
