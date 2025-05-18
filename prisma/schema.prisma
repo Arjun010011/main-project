@@ -27,14 +27,14 @@ model Teacher {
 }
 
 model Classroom {
-  id          String  @id @default(uuid())
+  id          String    @id @default(uuid())
   className   String
   subjectName String
   sectionName String
   teacherId   String
-  Teacher     Teacher @relation(fields: [teacherId], references: [id]) // Required relation
-
-  students Student[] @relation("StudentClassrooms") // Many-to-many with Student
+  Teacher     Teacher   @relation(fields: [teacherId], references: [id]) // Required relation
+  image       String    @default("https://png.pngtree.com/background/20210709/original/pngtree-cartoon-yellow-background-school-season-campus-poster-picture-image_925356.jpg")
+  students    Student[] @relation("StudentClassrooms") // Many-to-many with Student
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

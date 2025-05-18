@@ -1,19 +1,13 @@
-import { connectDB } from "@/lib/mongoose";
-import { Classroom } from "@/models/classroom";
-import mongoose from "mongoose";
+import prisma from "@/lib/prisma";
+
 export async function DELETE(req) {
   try {
-    await connectDB();
-    const body = await req.json();
-    const id = body.id;
-    if (!mongoose.isValidObjectId(id)) {
-      return NextResponse.json(
-        { message: "Invalid ID format" },
-        { status: 400 },
-      );
-    }
-    const deleteClass = await Classroom.findOneAndDelete({
-      _id: id,
+    const { id } = await req.json();
+
+    const deleteClass = await prisma.classroom.delete({
+      where: {
+        id,
+      },
     });
     if (!deleteClass) {
       return new Response(JSON.stringify({ message: "classroom not found" }), {

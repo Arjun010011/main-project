@@ -2,7 +2,8 @@ import prisma from "@/lib/prisma";
 
 export async function POST(req) {
   try {
-    const { className, subjectName, sectionName, teacherId } = await req.json();
+    const { className, subjectName, sectionName, teacherId, image } =
+      await req.json();
 
     if (!className || !teacherId) {
       return new Response(
@@ -34,6 +35,7 @@ export async function POST(req) {
         subjectName,
         sectionName,
         teacherId,
+        image,
       },
     });
 

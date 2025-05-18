@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import axios from "axios";
 const TeacherHeader = () => {
+  const { randomBg } = storeUser();
   const teacherInfo = storeUser((state) => state.teacherInfo);
   const getClassRooms = storeUser((state) => state.getClassRooms);
   const [loading, setLoading] = useState(false);
@@ -35,11 +36,14 @@ const TeacherHeader = () => {
   const handleSubmit = async (e) => {
     try {
       console.log(classrooms);
+      const image = randomBg();
+      console.log(image);
       setLoading(true);
       e.preventDefault();
       const updatedClassroomInfo = {
         ...classroomInfo,
         teacherId: teacherInfo.id,
+        image,
       };
       setClassroomInfo(updatedClassroomInfo);
       const classRoom = await axios.post(

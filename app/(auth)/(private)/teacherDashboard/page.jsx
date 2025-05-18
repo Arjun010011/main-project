@@ -10,7 +10,7 @@ import EditClassroom from "@/app/components/EditClassroom";
 import { supabase } from "@/utils/supabaseClient";
 
 const Page = () => {
-  const { teacherInfo, randomBg, getClassRooms } = storeUser();
+  const { teacherInfo, getClassRooms } = storeUser();
   const classrooms = storeUser((state) => state.classrooms);
   const [showEdit, setShowEdit] = useState(false);
 
@@ -22,7 +22,6 @@ const Page = () => {
         "/api/classRoom/getClass",
         teacherEmail,
       );
-      console.log("Fetched classrooms:", data.classRooms);
       getClassRooms(data.classRooms);
     } catch (error) {
       console.error("Error fetching classrooms:", error);
@@ -46,35 +45,24 @@ const Page = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "classroom" },
         (payload) => {
-          console.log("Classroom change received:", payload);
           if (payload.eventType === "INSERT") {
             // Check if the new classroom belongs to the teacher
             if (payload.new.teacher_email === teacherInfo.email) {
-              console.log("Inserting new classroom:", payload.new);
               getClassRooms([...classrooms, payload.new]);
             }
           } else if (payload.eventType === "UPDATE") {
             fetchClassrooms(); // Refetch to ensure consistency
           } else if (payload.eventType === "DELETE") {
-            console.log("Deleting classroom with id:", payload.old.id);
             getClassRooms(
               classrooms.filter((cls) => cls.id !== payload.old.id),
             );
           }
         },
       )
-      .subscribe((status) => {
-        console.log("Subscription status:", status);
-        if (status === "SUBSCRIBED") {
-          console.log("Successfully subscribed to classroom changes");
-        } else if (status === "CLOSED" || status === "CHANNEL_ERROR") {
-          console.error("Subscription failed with status:", status);
-        }
-      });
+      .subscribe();
 
     // Clean up subscription on unmount
     return () => {
-      console.log("Cleaning up subscription");
       supabase.removeChannel(channel);
     };
   }, [teacherInfo.email, fetchClassrooms, classrooms, getClassRooms]);
@@ -106,7 +94,7 @@ const Page = () => {
         <div className="flex flex-col max-sm:gap-5 min-md:flex-row flex-wrap">
           {classrooms ? (
             classrooms.map((cls) => {
-              let bg = randomBg();
+              let bg = cls.image;
               return (
                 <div
                   key={cls.id}
@@ -122,7 +110,7 @@ const Page = () => {
                       <button
                         type="button"
                         className="cursor-pointer"
-                        data-key={cls._id}
+                        data-key={cls.id}
                         onClick={deleteClassRoom}
                       >
                         <Trash2 size={20} />
