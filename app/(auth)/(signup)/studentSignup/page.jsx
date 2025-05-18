@@ -39,6 +39,9 @@ const page = () => {
         }, 1000);
       }
     } catch (error) {
+      if (error?.response?.data?.message) {
+        setErrorMsg(error?.response?.data?.message);
+      }
       setLoading(false);
       console.error("error", error);
       setErrorMsg(error.message);
@@ -104,7 +107,7 @@ const page = () => {
             <div className="flex gap-2 mt-5">
               <input type="checkbox" required />
               <p className="font-extralight text-sm">
-                I agree to the{" "}
+                I agree to the
                 <span className="font-bold">terms of service</span> and
                 <span className="font-bold"> privacy policy </span>
               </p>

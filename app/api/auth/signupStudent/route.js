@@ -1,12 +1,10 @@
-import student from "@/models/student.js";
-import { connectDB } from "@/lib/mongoose";
+import prisma from "@/lib/prisma";
 import bcryptjs from "bcryptjs";
 export async function POST(req) {
   try {
-    await connectDB();
     const { fullName, email, password } = await req.json();
     const role = "student";
-    const userExist = await student.findOne({ email });
+    const userExist = await prisma.student.findUnique({ where: { email } });
     if (userExist) {
       return new Response(
         JSON.stringify({ message: "user already exists", status: 500 }),
@@ -14,13 +12,14 @@ export async function POST(req) {
       );
     }
     const hashedPassword = bcryptjs.hashSync(password, 10);
-    const user = await new student({
-      fullName,
-      email,
-      password: hashedPassword,
-      role,
+    const user = await prisma.student.create({
+      data: {
+        fullName,
+        email,
+        password: hashedPassword,
+        role,
+      },
     });
-    await user.save();
     return new Response(
       JSON.stringify({
         message: "User created successfully",

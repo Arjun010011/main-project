@@ -1,13 +1,11 @@
-import teacher from "@/models/teacher.js";
-import { connectDB } from "@/lib/mongoose";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
+import prisma from "@/lib/prisma";
 import { serialize } from "cookie";
 export async function POST(req) {
   try {
-    await connectDB();
     const { email, password } = await req.json();
-    const userExist = await teacher.findOne({ email });
+    const userExist = await prisma.teacher.findUnique({ where: { email } });
     if (userExist) {
       const check = await bcryptjs.compare(password, userExist.password);
 

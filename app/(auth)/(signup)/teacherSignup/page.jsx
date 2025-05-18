@@ -39,9 +39,11 @@ const page = () => {
         }, 1000);
       }
     } catch (error) {
+      if (error?.response?.data?.message) {
+        setErrorMsg(error?.response?.data?.message);
+      }
       setLoading(false);
       console.error("error", error);
-      setErrorMsg(error.message);
     }
   };
   return (
