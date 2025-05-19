@@ -13,13 +13,13 @@ const Page = () => {
   const { teacherInfo, getClassRooms } = storeUser();
   const classrooms = storeUser((state) => state.classrooms);
   const [showEdit, setShowEdit] = useState(false);
-
+  const [id, setId] = useState(null);
   // Fetch classrooms
   const fetchClassrooms = useCallback(async () => {
     try {
       const teacherEmail = { email: teacherInfo.email };
       const { data } = await axios.post(
-        "/api/classRoom/getClass",
+        "/api/classRoom/getAllClass",
         teacherEmail,
       );
       getClassRooms(data.classRooms);
@@ -118,8 +118,11 @@ const Page = () => {
                       <button
                         type="button"
                         className="cursor-pointer"
-                        data-key={cls._id}
-                        onClick={() => setShowEdit(true)}
+                        data-key={cls.id}
+                        onClick={() => {
+                          setShowEdit(true);
+                          setId(cls.id);
+                        }}
                       >
                         <Pen size={20} />
                       </button>
@@ -138,7 +141,7 @@ const Page = () => {
         </div>
       </motion.div>
       {teacherInfo?.fullName}
-      {showEdit && <EditClassroom onClose={() => setShowEdit(false)} />}
+      {showEdit && <EditClassroom onClose={() => setShowEdit(false)} id={id} />}
     </div>
   );
 };
