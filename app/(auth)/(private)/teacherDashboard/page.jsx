@@ -8,7 +8,7 @@ import axios from "axios";
 import { Trash2, Pen } from "lucide-react";
 import EditClassroom from "@/app/components/EditClassroom";
 import { supabase } from "@/utils/supabaseClient";
-
+import Link from "next/link";
 const Page = () => {
   const { teacherInfo, getClassRooms } = storeUser();
   const classrooms = storeUser((state) => state.classrooms);
@@ -127,9 +127,12 @@ const Page = () => {
                         <Pen size={20} />
                       </button>
                     </div>
-                    <p className="font-bold text-xl text-black">
-                      {cls.className}
-                    </p>
+
+                    <Link href={`/teacherDashboard/${cls.id}`} key={cls.id}>
+                      <p className="font-bold text-xl text-black">
+                        {cls.className}
+                      </p>
+                    </Link>
                   </div>
                   total student 0
                 </div>
