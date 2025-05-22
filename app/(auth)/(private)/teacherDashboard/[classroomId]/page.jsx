@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "next/navigation";
+import TeacherHeader from "@/app/components/TeacherHeader";
 export default function classRoomPage() {
   const { classroomId } = useParams();
   console.log(classroomId);
@@ -19,5 +20,10 @@ export default function classRoomPage() {
     classRoomInfo();
     console.log(info);
   }, [info]);
-  return <div>{info.className}</div>;
+  return (
+    <div>
+      <TeacherHeader />
+      <p>{info.className}</p>
+    </div>
+  );
 }

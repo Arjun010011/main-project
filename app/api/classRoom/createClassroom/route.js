@@ -1,10 +1,10 @@
 import prisma from "@/lib/prisma";
-
+import { nanoid } from "nanoid";
 export async function POST(req) {
   try {
     const { className, subjectName, sectionName, teacherId, image } =
       await req.json();
-
+    const code = nanoid(6);
     if (!className || !teacherId) {
       return new Response(
         JSON.stringify({ message: "Class name or teacher ID is missing" }),
@@ -36,6 +36,7 @@ export async function POST(req) {
         sectionName,
         teacherId,
         image,
+        code,
       },
     });
 

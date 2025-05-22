@@ -22,6 +22,7 @@ model Teacher {
 
 model Classroom {
   id          String    @id @default(uuid())
+  code        String    @unique
   className   String
   subjectName String?
   sectionName String?
