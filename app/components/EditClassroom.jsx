@@ -16,12 +16,14 @@ const EditClassroom = ({ onClose, id }) => {
   useEffect(() => {
     const fetchClass = async () => {
       try {
+        setLoading(true);
         const data = { id: id };
         const incomingData = await axios.post("/api/classRoom/getClass", data);
         console.log(incomingData);
         if (incomingData) {
           setClassroomInfo(incomingData.data.data);
         }
+        setLoading(false);
       } catch (error) {
         if (error?.reponse?.data?.message) {
           setErrorMsg(error?.response?.data?.message);
@@ -112,7 +114,7 @@ const EditClassroom = ({ onClose, id }) => {
             onChange={handleChange}
           />
           <Button type="submit" className="mt-7 py-5" disabled={loading}>
-            {loading ? "Loading" : "create classroom"}
+            {loading ? "Loading" : "Edit classroom"}
           </Button>
           {successMsg && (
             <motion.div className="mt-5  rounded-sm px-3 py-2 bg-green-300 text-black text-center">
