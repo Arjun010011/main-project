@@ -1,5 +1,8 @@
-const page = () => {
-  return <div>hello world</div>;
-};
-
-export default page;
+import StudentHeader from "@/app/components/StudentHeader";
+export default function StudentDashboard() {
+  return (
+    <div>
+      <StudentHeader />
+    </div>
+  );
+}

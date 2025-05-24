@@ -9,6 +9,7 @@ export const GoogleAuthButton = ({
   role = "student",
 }) => {
   const { setTeacherInfo, setStudentInfo } = storeUser();
+  const studentInfo = storeUser((state) => state.studentInfo);
   const router = useRouter();
   const handleClick = async () => {
     try {
