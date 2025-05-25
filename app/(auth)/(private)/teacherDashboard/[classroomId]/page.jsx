@@ -5,39 +5,113 @@ import axios from "axios";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import TeacherHeader from "@/app/components/TeacherHeader";
-export default function classRoomPage() {
+import ClassroomStudents from "@/app/components/ClassroomStudents";
+
+export default function ClassRoomPage() {
   const { classroomId } = useParams();
   const [info, setInfo] = useState({});
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const classRoomInfo = async () => {
-      const data = await axios.post("/api/classRoom/getClass", {
-        id: classroomId,
-      });
-      if (data) {
-        setInfo(data.data.data);
+      try {
+        const data = await axios.post("/api/classRoom/getClass", {
+          id: classroomId,
+        });
+        if (data) {
+          setInfo(data.data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching classroom info:", error);
+      } finally {
+        setLoading(false);
       }
     };
     classRoomInfo();
+  }, [classroomId]);
 
-    console.log(info);
-  }, [info]);
-  return (
-    <div className="w-full h-full">
-      <TeacherHeader />
-      <div className="w-[100%] h-[100%] flex items-center justify-center p-5 flex-col gap-5 ">
-        <div
-          className="bg-cover  h-[20vh] w-[95vw] border-1 border-black shadow-md rounded-xl flex items-center justify-center  flex-col min-md:w-[60vw] "
-          style={{ backgroundImage: `url(${info.image})` }}
-        >
-          <p className="font-bold text-xl uppercase">{info.className}</p>
-          <p className="font-semibold text-md italic">{info.subjectName}</p>
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <TeacherHeader />
+        <div className="flex items-center justify-center min-h-[calc(100vh-80px)]">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         </div>
-        <div className="w-full">
-          <div className="w-full shadow-md p-5 text-blue flex items-center justify-center border-1 border-blue-300 rounded-md text-blue-500 font-bold text-xl min-md:w-[400px]">
-            <span className="font-light text-xl text-black">
-              Classroom code :
-            </span>
-            {info.code}
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <TeacherHeader />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="space-y-8">
+          {/* Classroom Banner */}
+          <div
+            className="relative h-[300px] rounded-2xl overflow-hidden shadow-xl"
+            style={{
+              backgroundImage: `url(${info.image})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          >
+            <div className="absolute inset-0 p-8 flex items-end">
+              <div>
+                <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                  {info.className}
+                </h1>
+                <p className="text-xl text-gray-800">{info.subjectName}</p>
+                {info.sectionName && (
+                  <p className="text-lg text-gray-700 mt-1">
+                    Section: {info.sectionName}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Classroom Code */}
+          <div className="bg-white rounded-xl shadow-md p-6">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-blue-50 rounded-lg">
+                  <svg
+                    className="w-6 h-6 text-blue-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500">
+                    Classroom Code
+                  </h3>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {info.code}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(info.code);
+                }}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200"
+              >
+                Copy Code
+              </button>
+            </div>
+          </div>
+
+          {/* Students List */}
+          <div className="bg-white rounded-xl shadow-md overflow-hidden">
+            <ClassroomStudents classroomId={classroomId} />
           </div>
         </div>
       </div>

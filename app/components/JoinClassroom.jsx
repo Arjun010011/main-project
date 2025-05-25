@@ -1,0 +1,86 @@
+"use client";
+
+import { useState } from "react";
+import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import axios from "axios";
+import storeUser from "@/lib/store/userStore";
+
+const JoinClassroom = ({ onClose }) => {
+  const [loading, setLoading] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [classCode, setClassCode] = useState("");
+  const studentInfo = storeUser((state) => state.studentInfo);
+
+  const handleSubmit = async (e) => {
+    try {
+      e.preventDefault();
+      setLoading(true);
+      setErrorMsg("");
+      setSuccessMsg("");
+
+      const response = await axios.post("/api/classRoom/joinClassroom", {
+        code: classCode,
+        studentId: studentInfo.id,
+      });
+
+      setSuccessMsg(response.data.message);
+      setTimeout(() => {
+        onClose();
+      }, 2000);
+    } catch (error) {
+      setErrorMsg(error.response?.data?.message || "Failed to join classroom");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="absolute top-0 w-[100vw] h-[100vh] flex items-center justify-center z-0">
+      <div className="absolute w-full h-full top-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)]">
+        <div
+          className="absolute w-full h-full top-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-5"
+          onClick={onClose}
+        ></div>
+        <form
+          className="flex flex-col px-10 py-10 bg-gray-100 z-50 w-auto h-auto rounded-lg md:w-[480px]"
+          onSubmit={handleSubmit}
+        >
+          <div className="flex justify-between items-center">
+            <p className="font-bold text-xl">Join a Classroom</p>
+            <X size={25} onClick={onClose} className="hover:cursor-pointer" />
+          </div>
+          <label htmlFor="classCode" className="mt-5">
+            Classroom Code <span className="text-gray-400">*required</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Enter classroom code"
+            className="border-3 border-gray-200 rounded-lg px-2 py-2 mt-2 w-[70vw] md:w-full"
+            id="classCode"
+            value={classCode}
+            onChange={(e) => setClassCode(e.target.value)}
+            required
+          />
+          <Button type="submit" className="mt-7 py-5" disabled={loading}>
+            {loading ? "Joining..." : "Join Classroom"}
+          </Button>
+          {successMsg && (
+            <motion.div className="mt-5 rounded-sm px-3 py-2 bg-green-300 text-black text-center">
+              {successMsg}
+            </motion.div>
+          )}
+          {errorMsg && (
+            <div className="mt-5 px-3 py-2 bg-red-300 text-black">
+              {errorMsg}
+            </div>
+          )}
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default JoinClassroom;
