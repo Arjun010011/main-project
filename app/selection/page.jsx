@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 const page = () => {
   return (
-    <div className="max-w-full overflow-x-hidden">
+    <div className="max-w-full overflow-x-hidden dark:bg-gray-800">
       <Header />
       <motion.div
         initial={{ opacity: 0 }}
@@ -31,23 +31,23 @@ const page = () => {
             experience.
           </p>
         </div>
-        <div className="p-5 flex flex-col gap-5 md:flex-row md:px-20 md:flex md:items-center md:justify-center ">
-          <div className="border border-black rounded-lg p-5 flex flex-col gap-3  md:pr-50">
+        <div className="p-5 flex flex-col gap-5 md:flex-row md:px-20 md:flex md:items-center md:justify-center  ">
+          <div className="border border-black rounded-lg p-5 flex flex-col gap-3  md:pr-50 dark:border-1 dark:border-white">
             <div className="p-5 bg-slate-100 w-fit rounded-full">
-              <GraduationCapIcon size={30} />
+              <GraduationCapIcon size={30} className="dark:text-black" />
             </div>
             <p className="text-4xl font-extrabold">Student</p>
             <ul>
               <li className="flex  gap-2 font-extralight">
-                <Check size={20} />
+                <Check size={20} className="dark:text-white" />
                 Track your learning progress
               </li>
               <li className="flex  gap-2  font-extralight">
-                <Check size={20} />
+                <Check size={20} className="dark:text-white" />
                 Access study materials
               </li>
               <li className="flex  gap-2 font-extralight">
-                <Check size={20} />
+                <Check size={20} className="dark:text-white" />
                 Connect with teachers
               </li>
             </ul>
@@ -55,22 +55,22 @@ const page = () => {
               <Button className="mt-5 md:w-[200px]">Signup as a Student</Button>
             </Link>
           </div>
-          <div className="border border-black rounded-lg p-5 flex flex-col gap-3 md:pr-50">
+          <div className="border border-black rounded-lg p-5 flex flex-col gap-3 md:pr-50 dark:border-1 dark:border-white">
             <div className="p-5 bg-slate-100 w-fit rounded-full">
-              <GroupIcon size={30} />
+              <GroupIcon size={30} className="dark:text-black" />
             </div>
             <p className="text-4xl font-extrabold">Teacher</p>
             <ul>
               <li className="flex  gap-2 font-extralight">
-                <Check size={20} />
+                <Check size={20} className="dark:text-white" />
                 Monitor student progress
               </li>
               <li className="flex  gap-2  font-extralight">
-                <Check size={20} />
+                <Check size={20} className="dark:text-white" />
                 Create course content
               </li>
               <li className="flex  gap-2 font-extralight">
-                <Check size={20} />
+                <Check size={20} className="dark:text-white" />
                 Advanced analytics tools
               </li>
             </ul>
@@ -84,8 +84,8 @@ const page = () => {
             Platform Features
           </p>
           <div className="p-5 flex flex-col gap-5 md:flex-row md:my-10">
-            <div className="p-5 border border-black rounded-lg flex flex-col gap-3">
-              <TrendingUpIcon size={30} />
+            <div className="p-5 border border-black rounded-lg flex flex-col gap-3 dark:border-1 dark:border-white">
+              <TrendingUpIcon size={30} className="dark:text-white" />
               <p className="text-2xl font-extrabold">
                 Performance and analytics
               </p>
@@ -94,16 +94,16 @@ const page = () => {
                 analytics.
               </p>
             </div>
-            <div className="p-5 border border-black rounded-lg flex flex-col gap-3">
-              <UserIcon size={30} />
+            <div className="p-5 border border-black rounded-lg flex flex-col gap-3 dark:border-1 dark:border-white">
+              <UserIcon size={30} className="dark:text-white" />
               <p className="text-2xl font-extrabold">Interactive Learning</p>
               <p className="font-extralight">
                 Engage in collaborative learning experiences with peers and
                 educators.
               </p>
             </div>
-            <div className="p-5 border border-black rounded-lg flex flex-col gap-3">
-              <TrophyIcon size={30} />
+            <div className="p-5 border border-black rounded-lg flex flex-col gap-3 dark:border-1 dark:border-white">
+              <TrophyIcon size={30} className="dark:text-white" />
               <p className="text-2xl font-extrabold">Achievement System</p>
               <p className="font-extralight">
                 Earn badges and certificates as you progress through your

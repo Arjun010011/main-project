@@ -83,11 +83,12 @@ const Page = () => {
   };
 
   return (
-    <div>
+    <div className="dark:bg-gray-800 h-[100vh]">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 3 }}
+        className="dark:bg-gray-800"
       >
         <TeacherHeader />
         <p className="font-bold mx-5">All classrooms</p>

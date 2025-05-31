@@ -56,7 +56,7 @@ const page = () => {
       transition={{ duration: 1 }}
       className="w-full h-[100vh] flex items-center justify-center shadow-md "
     >
-      <div className="flex flex-col items-center justify-center p-7  border border-slate-800 mx-5  rounded-lg md:flex-row gap-2 md:p-0">
+      <div className="flex flex-col items-center justify-center p-7  border border-slate-800 mx-5  rounded-lg md:flex-row gap-2 md:p-0 ">
         <div className="hidden md:block">
           <Image
             src="/signup.png"

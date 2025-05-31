@@ -1,15 +1,41 @@
 {
   "name": "media",
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "description": "Next.js + Electron app",
+  "main": "media/main.js",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "electron": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && electron .\"",
+    "dist": "npm run build && electron-builder"
+  },
+  "build": {
+    "appId": "com.yourcompany.media",
+    "productName": "MediaApp",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "media/**/*",
+      "next.config.js",
+      "prisma/**/*",
+      "package.json",
+      "!dist",
+      "!node_modules/.cache"
+    ],
+    "linux": {
+      "target": [
+        "deb"
+      ],
+      "category": "Utility"
+    }
   },
   "dependencies": {
     "@prisma/client": "^6.8.2",
+    "@radix-ui/react-dropdown-menu": "^2.1.15",
     "@radix-ui/react-slot": "^1.2.0",
     "@supabase/supabase-js": "^2.49.4",
     "axios": "^1.8.4",
@@ -25,6 +51,7 @@
     "mongoose": "^8.13.2",
     "nanoid": "^5.1.5",
     "next": "15.3.0",
+    "next-themes": "^0.4.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "shadcn": "^2.4.0",
@@ -34,11 +61,15 @@
     "zustand": "^5.0.4"
   },
   "devDependencies": {
+    "electron": "^36.3.2",
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "electron-builder": "^26.0.12",
     "eslint": "^9",
     "eslint-config-next": "15.3.0",
     "prisma": "^6.8.2",
-    "tailwindcss": "^4"
+    "tailwindcss": "^4",
+    "concurrently": "^8.2.2",
+    "wait-on": "^7.0.1"
   }
 }

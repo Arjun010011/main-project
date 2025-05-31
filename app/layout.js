@@ -1,3 +1,4 @@
+import { ThemeProvider } from "@/components/ui/ThemeProvider";
 import "./globals.css";
 export const metadata = {
   title: "Floki",
@@ -11,7 +12,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }

@@ -2,8 +2,8 @@ import Image from "next/image";
 
 const Footer = () => {
   return (
-    <div className="flex flex-col gap-10 bg-slate-100">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 w-full text-center items-center justify-center bg-slate-100 p-10 gap-2">
+    <div className="flex flex-col gap-10 bg-slate-100 dark:bg-gray-900">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 w-full text-center items-center justify-center bg-slate-100 p-10 gap-2 dark:bg-gray-900">
         <div className="">
           <div className="flex justify-center flex-col w-[100%]">
             <Image src="/logo.png" width={70} height={70} alt="logo" />
@@ -26,7 +26,7 @@ const Footer = () => {
           <p className="font-extralight">Contact </p>
         </div>
       </div>
-      <div className="w-full items-center justify-center flex bg-slate-100 mb-10">
+      <div className="w-full items-center justify-center flex bg-slate-100 mb-10 dark:bg-gray-900">
         <p>&copy; 2025 ExamPrep AI. All rights reserved.</p>
       </div>
     </div>

@@ -18,7 +18,7 @@ const StudentClassrooms = () => {
           "/api/classRoom/getStudentClassrooms",
           {
             studentId: studentInfo.id,
-          }
+          },
         );
         setClassrooms(response.data.classrooms);
       } catch (error) {
@@ -35,7 +35,7 @@ const StudentClassrooms = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[200px]">
+      <div className="flex items-center justify-center min-h-[200px] dark:bg-gray-900">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
@@ -43,8 +43,8 @@ const StudentClassrooms = () => {
 
   if (classrooms.length === 0) {
     return (
-      <div className="text-center p-8 bg-white rounded-lg shadow-sm max-w-2xl mx-auto">
-        <p className="text-gray-600 text-lg">
+      <div className="text-center p-8 bg-white rounded-lg shadow-sm max-w-2xl mx-auto dark:bg-gray-900">
+        <p className="dark:text-gray-200 text-gray-600 text-lg">
           You haven't joined any classrooms yet.
         </p>
         <p className="text-sm text-gray-500 mt-2">

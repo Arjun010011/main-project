@@ -1,5 +1,6 @@
 "use client";
 
+import { ModeToggle } from "@/components/ui/ModeToggle";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -14,16 +15,25 @@ const Header = () => {
     exit: { x: "150%" },
   };
   return (
-    <header className="flex w-[100vw] justify-between items-center px-20 max-md:px-10 overflow-x-hidden">
-      <Image src="/logo.png" height={70} width={70} alt="logo" />
+    <header className="flex w-[100vw] justify-between items-center px-20 max-md:px-10 overflow-x-hidden dark:bg-gray-800">
+      <div className="flex gap-2 items-center justify-center flex-row-reverse">
+        <div className="w-auto h-auto p-2">
+          <ModeToggle />
+        </div>
+        <Image src="/logo.png" height={70} width={70} alt="logo" />
+      </div>
       <div
-        className={`${open ? "bg-white" : "bg-transparent"} flex flex-col absolute right-0 top-0  p-5 h-full md:static md:flex-row  `}
+        className={`${open ? "bg-white fixed" : "bg-transparent"} flex flex-col  right-0 top-0  p-5 h-full md:static md:flex-row dark:bg-gray-800    `}
       >
         <button
           className={`md:hidden text-black absolute right-5 `}
           onClick={() => setOpen(!open)}
         >
-          {open ? <X size={30} /> : <Menu size={30} />}
+          {open ? (
+            <X size={30} className="dark:text-white" />
+          ) : (
+            <Menu size={30} className="dark:text-white" />
+          )}
         </button>
         <motion.ul
           initial="hidden"
@@ -31,7 +41,7 @@ const Header = () => {
           exit="hidden"
           variants={variant}
           transition={{ type: "tween", duration: "0.5" }}
-          className={`${open ? "block" : "hidden"} flex flex-col gap-2 py-5 pr-10 pl-2 mt-7 md:hidden`}
+          className={`${open ? "block" : "hidden"} flex flex-col gap-2 py-5 pr-10 pl-2 mt-7 md:hidden dark:bg-gray-800`}
         >
           <Link href="/">
             <li>Home</li>
