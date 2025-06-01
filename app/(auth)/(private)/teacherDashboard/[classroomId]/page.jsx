@@ -32,7 +32,7 @@ export default function ClassRoomPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 ">
         <TeacherHeader />
         <div className="flex items-center justify-center min-h-[calc(100vh-80px)]">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -42,7 +42,7 @@ export default function ClassRoomPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
       <TeacherHeader />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
@@ -71,7 +71,7 @@ export default function ClassRoomPage() {
           </div>
 
           {/* Classroom Code */}
-          <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="bg-white rounded-xl shadow-md p-6 dark:bg-gray-900">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <div className="p-3 bg-blue-50 rounded-lg">
@@ -90,10 +90,10 @@ export default function ClassRoomPage() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">
+                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-200">
                     Classroom Code
                   </h3>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
                     {info.code}
                   </p>
                 </div>
@@ -110,7 +110,7 @@ export default function ClassRoomPage() {
           </div>
 
           {/* Students List */}
-          <div className="bg-white rounded-xl shadow-md overflow-hidden">
+          <div className="bg-white rounded-xl shadow-md overflow-hidden dark:text-gray-800">
             <ClassroomStudents classroomId={classroomId} />
           </div>
         </div>

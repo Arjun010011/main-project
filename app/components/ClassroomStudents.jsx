@@ -15,7 +15,7 @@ const ClassroomStudents = ({ classroomId }) => {
           "/api/classRoom/getClassroomStudents",
           {
             classroomId,
-          }
+          },
         );
         setStudents(response.data.students);
       } catch (error) {
@@ -36,8 +36,8 @@ const ClassroomStudents = ({ classroomId }) => {
 
   if (students.length === 0) {
     return (
-      <div className="text-center p-4">
-        <p className="text-gray-600">
+      <div className="text-center p-4 dark:text-gray-800">
+        <p className="text-gray-600 dark:text-gray-200">
           No students have joined this classroom yet.
         </p>
       </div>
@@ -45,13 +45,15 @@ const ClassroomStudents = ({ classroomId }) => {
   }
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Students ({students.length})</h2>
+    <div className="p-4 dark:bg-gray-900">
+      <h2 className="text-xl font-bold mb-4 dark:text-white">
+        Students ({students.length})
+      </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {students.map((student) => (
           <div
             key={student.id}
-            className="bg-white rounded-lg shadow-md p-4 flex items-center gap-4"
+            className="bg-white rounded-lg shadow-md p-4 flex items-center gap-4 dark:bg-gray-500"
           >
             <Image
               src={student.image}
@@ -61,9 +63,13 @@ const ClassroomStudents = ({ classroomId }) => {
               className="rounded-full"
             />
             <div>
-              <h3 className="font-semibold">{student.fullName}</h3>
-              <p className="text-sm text-gray-600">{student.email}</p>
-              <p className="text-xs text-gray-500">
+              <h3 className="font-semibold dark:text-white">
+                {student.fullName}
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-200">
+                {student.email}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-300">
                 Joined: {new Date(student.createdAt).toLocaleDateString()}
               </p>
             </div>

@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { ModeToggle } from "@/components/ui/ModeToggle";
 const TeacherHeader = () => {
   const { randomBg } = storeUser();
   const teacherInfo = storeUser((state) => state.teacherInfo);
@@ -15,7 +16,6 @@ const TeacherHeader = () => {
   const [successMsg, setSuccessMsg] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [classroomInfo, setClassroomInfo] = useState({});
-
   const [plusClick, setPlusClick] = useState(false);
   const handleChange = (e) => {
     e.preventDefault();
@@ -95,6 +95,7 @@ const TeacherHeader = () => {
           >
             <Plus size={20} />
           </div>
+          <ModeToggle />
           <Image
             src={teacherInfo?.image || "/logo.png"}
             height={40}

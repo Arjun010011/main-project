@@ -114,7 +114,7 @@ const Page = () => {
                         data-key={cls.id}
                         onClick={deleteClassRoom}
                       >
-                        <Trash2 size={20} />
+                        <Trash2 size={20} className="dark:text-gray-900" />
                       </button>
                       <button
                         type="button"
@@ -125,7 +125,7 @@ const Page = () => {
                           setId(cls.id);
                         }}
                       >
-                        <Pen size={20} />
+                        <Pen size={20} className="dark:text-gray-900" />
                       </button>
                     </div>
 
@@ -135,7 +135,7 @@ const Page = () => {
                       </p>
                     </Link>
                   </div>
-                  total student 0
+                  <p className="dark:text-black">total student 0</p>
                 </div>
               );
             })
