@@ -72,7 +72,7 @@ const EditClassroom = ({ onClose, id }) => {
           onClick={onClose}
         ></div>
         <form
-          className="flex flex-col  px-10  py-10 bg-gray-100  z-50 w-auto h-auto rounded-lg md:w-[480px] "
+          className="flex flex-col  px-10  py-10 bg-gray-100  z-50 w-auto h-auto rounded-lg md:w-[480px] dark:bg-gray-900 "
           onSubmit={handleSubmit}
         >
           <div className="flex justify-between items-center ">
