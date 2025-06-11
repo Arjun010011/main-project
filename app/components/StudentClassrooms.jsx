@@ -44,7 +44,7 @@ const StudentClassrooms = () => {
   if (classrooms.length === 0) {
     return (
       <div className="text-center p-8 bg-white rounded-lg shadow-sm max-w-2xl mx-auto dark:bg-gray-900">
-        <p className="dark:text-gray-200 text-gray-600 text-lg">
+        <p className="text-gray-200 text-lg">
           You haven't joined any classrooms yet.
         </p>
         <p className="text-sm text-gray-500 mt-2">

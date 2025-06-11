@@ -42,7 +42,7 @@ const Header = () => {
             exit="hidden"
             variants={variant}
             transition={{ type: "tween", duration: "0.5" }}
-            className={`fixed flex flex-col gap-2 py-5 pr-10  pl-7 h-[100vh]  mt-7 md:hidden dark:bg-gray-800`}
+            className={`fixed flex flex-col gap-2 py-5 pr-10  pl-7 h-[100vh]  mt-7 md:hidden dark:bg-gray-800 bg-white`}
           >
             <Link href="/">
               <li>Home</li>

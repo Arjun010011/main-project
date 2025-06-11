@@ -65,14 +65,14 @@ const EditClassroom = ({ onClose, id }) => {
     }
   };
   return (
-    <div className=" absolute top-0 w-[100vw] h-[100vh] flex items-center justify-center z-0">
+    <div className=" fixed h-[100vh]  w-[100vw]  flex items-center justify-center   ">
       <div className=" absolute w-full h-full top-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)]">
         <div
-          className=" absolute w-full h-full top-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-5"
+          className=" absolute w-full h-full top-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-[20] "
           onClick={onClose}
         ></div>
         <form
-          className="flex flex-col  px-10  py-10 bg-gray-100  z-50 w-auto h-auto rounded-lg md:w-[480px] dark:bg-gray-900 "
+          className="flex flex-col   px-10  py-10 bg-gray-100  z-50 w-auto h-auto rounded-lg md:w-[480px] dark:bg-gray-900 "
           onSubmit={handleSubmit}
         >
           <div className="flex justify-between items-center ">

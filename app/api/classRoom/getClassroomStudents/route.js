@@ -7,7 +7,7 @@ export async function POST(req) {
     if (!classroomId) {
       return new Response(
         JSON.stringify({ message: "Classroom ID is required" }),
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -37,7 +37,7 @@ export async function POST(req) {
         message: "Successfully fetched classroom students",
         students: classroom.students,
       }),
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error fetching classroom students:", error);
@@ -46,7 +46,7 @@ export async function POST(req) {
         message: "Internal server error",
         error: error.message,
       }),
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
