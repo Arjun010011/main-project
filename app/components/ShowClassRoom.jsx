@@ -2,12 +2,13 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Link from "next/link";
 import { Trash2, Pen } from "lucide-react";
-import EditClassroom from "@/app/components/EditClassroom";
-const showClassRoom = ({ cls }) => {
-  const [showEdit, setShowEdit] = useState(false);
-  const [id, setId] = useState("");
+const showClassRoom = ({ cls, onSend }) => {
   const [studentCount, setStudentCount] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const sendData = () => {
+    onSend({ id: cls.id, show: true });
+  };
   //delete classroom
   const deleteClassRoom = async (e) => {
     try {
@@ -66,16 +67,12 @@ const showClassRoom = ({ cls }) => {
             >
               <Trash2 size={20} className="dark:text-gray-900" />
             </button>
-            <button
-              type="button"
-              className="cursor-pointer"
-              data-key={cls.id}
-              onClick={() => {
-                setShowEdit(true);
-                setId(cls.id);
-              }}
-            >
-              <Pen size={20} className="dark:text-gray-900" />
+            <button type="button" className="cursor-pointer">
+              <Pen
+                size={20}
+                className="dark:text-gray-900"
+                onClick={() => sendData()}
+              />
             </button>
           </div>
 
@@ -84,11 +81,6 @@ const showClassRoom = ({ cls }) => {
           </Link>
         </div>
         <p className="dark:text-black">Number of students:{studentCount}</p>
-      </div>
-      <div className="fixed top-0 left-0">
-        {showEdit && (
-          <EditClassroom onClose={() => setShowEdit(false)} id={id} />
-        )}
       </div>
     </div>
   );

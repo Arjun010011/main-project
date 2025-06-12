@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 export default function Home() {
   return (
-    <div>
+    <div className="w-full h-auto overflow-hidden">
       <Header />
       <motion.div
         initial={{ opacity: 0 }}

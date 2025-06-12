@@ -1,15 +1,22 @@
 "use client";
-
+import EditClassroom from "@/app/components/EditClassroom";
 import storeUser from "@/lib/store/userStore";
 import { motion } from "framer-motion";
 import TeacherHeader from "@/app/components/TeacherHeader";
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import axios from "axios";
 import { supabase } from "@/utils/supabaseClient";
 import ShowClassRoom from "@/app/components/ShowClassRoom";
 const Page = () => {
+  const [showEdit, setShowEdit] = useState(false);
+  const [id, setId] = useState(null);
   const { teacherInfo, getClassRooms } = storeUser();
   const classrooms = storeUser((state) => state.classrooms);
+
+  const sendInfo = (data) => {
+    setId(data.id);
+    setShowEdit(data.show);
+  };
   // Fetch classrooms
   const fetchClassrooms = useCallback(async () => {
     try {
@@ -78,13 +85,19 @@ const Page = () => {
         <div className="flex flex-col gap-5 min-md:flex-row px-5 flex-wrap ">
           {classrooms && classrooms.length !== 0 ? (
             classrooms.map((cls) => {
-              return <ShowClassRoom key={cls.id} cls={cls} />;
+              return <ShowClassRoom key={cls.id} cls={cls} onSend={sendInfo} />;
             })
           ) : (
             <div className=" w-full h-[80vh] flex items-center justify-center  text-black dark:text-white text-center">
               Create your First classroom now... <br />
               By clicking the plus icon.
             </div>
+          )}
+        </div>
+
+        <div className="fixed top-0 left-0">
+          {showEdit && (
+            <EditClassroom onClose={() => setShowEdit(false)} id={id} />
           )}
         </div>
       </motion.div>
