@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma"; // import prisma client instance
+import prisma from "@/lib/prisma";
 import crypto from "crypto";
 import bcryptjs from "bcryptjs";
 import { serialize } from "cookie";
