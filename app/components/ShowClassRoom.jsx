@@ -50,7 +50,7 @@ const showClassRoom = ({ cls, onSend }) => {
     <div className="flex w-fit mt-5 h-fit max-md:justify-center ">
       <div
         key={cls.id}
-        className=" px-5 pb-17 pt-3 hover:scale-105 hover:shadow-2xl transition-transform duration-300 ease-in-out rounded-md shadow-md min-w-[430px] h-[150px] flex flex-col min-md:mt-5 relative"
+        className=" px-5 pb-17 pt-3 hover:scale-105 hover:shadow-2xl transition-transform duration-300 ease-in-out rounded-md shadow-md max-w-[450px] min-w-[300px] h-[150px] flex flex-col min-md:mt-5 relative"
         style={{
           backgroundImage: `url(${cls.image})`,
           backgroundSize: "cover",

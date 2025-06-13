@@ -120,7 +120,7 @@ const Page = () => {
             <GraduationCap size={40} />
           </div>
         </div>
-        <div className="flex flex-col gap-5 min-md:flex-row  flex-wrap w-full items-center justify-center ">
+        <div className="flex flex-col gap-5 min-md:flex-row  flex-wrap w-full items-center justify-center overflow-hidden ">
           {classrooms && classrooms.length !== 0 ? (
             classrooms.map((cls) => {
               return <ShowClassRoom key={cls.id} cls={cls} onSend={sendInfo} />;
