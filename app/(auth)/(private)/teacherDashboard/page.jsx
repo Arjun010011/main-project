@@ -1,4 +1,5 @@
 "use client";
+import { GraduationCap } from "lucide-react";
 import EditClassroom from "@/app/components/EditClassroom";
 import storeUser from "@/lib/store/userStore";
 import { motion } from "framer-motion";
@@ -78,11 +79,48 @@ const Page = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 3 }}
-        className="dark:bg-gray-800"
+        className="dark:bg-gray-800 "
       >
         <TeacherHeader />
-        <p className="font-bold mx-5">All classrooms</p>
-        <div className="flex flex-col gap-5 min-md:flex-row px-5 flex-wrap ">
+        <div className="min-md:ml-12 ml-2">
+          <p className="font-bold text-2xl mx-5">Dashboard</p>
+          <p className="mx-5 my-2 italic text-light">Manage your classrooms</p>
+        </div>
+        <div className="w-auto h-auto flex items-center justify-center min-md:gap-44 gap-5">
+          <div className="border-1 dark:border-white border-black  px-7 py-3 flex gap-3 rounded-md min-md:min-w-[300px] items-center justify-center min-md:text-xl">
+            <div className="flex flex-col">
+              <p className="font-bold">total classes</p>
+              <p className="pl-10">{classrooms.length}</p>
+            </div>
+            <GraduationCap size={40} className="min-md:hidden" />
+            <GraduationCap size={50} className="max-md:hidden" />
+          </div>
+
+          <div className="border-1 dark:border-white border-black  px-7 py-3 flex gap-3 rounded-md min-md:min-w-[300px] items-center justify-center min-md:text-xl">
+            <div className="flex flex-col">
+              <p className="font-bold">total Students</p>
+              <p className="pl-10">{classrooms.length}</p>
+            </div>
+            <GraduationCap size={40} />
+          </div>
+
+          <div className="border-1 dark:border-white border-black  px-7 py-3 min-md:flex gap-3 rounded-md min-md:min-w-[300px] items-center justify-center min-md:text-xl hidden ">
+            <div className="flex flex-col">
+              <p className="font-bold">Question papers created</p>
+              <p className="pl-10">{classrooms.length}</p>
+            </div>
+            <GraduationCap size={40} />
+          </div>
+
+          <div className="border-1 dark:border-white border-black  px-7 py-3 min-md:flex gap-3 rounded-md min-md:min-w-[300px] items-center justify-center min-md:text-xl hidden">
+            <div className="flex flex-col">
+              <p className="font-bold">Test conducted</p>
+              <p className="pl-10">{classrooms.length}</p>
+            </div>
+            <GraduationCap size={40} />
+          </div>
+        </div>
+        <div className="flex flex-col gap-5 min-md:flex-row  flex-wrap w-full items-center justify-center ">
           {classrooms && classrooms.length !== 0 ? (
             classrooms.map((cls) => {
               return <ShowClassRoom key={cls.id} cls={cls} onSend={sendInfo} />;

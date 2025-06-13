@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Image from "next/image";
 import { useParams } from "next/navigation";
 import TeacherHeader from "@/app/components/TeacherHeader";
 import ClassroomStudents from "@/app/components/ClassroomStudents";
