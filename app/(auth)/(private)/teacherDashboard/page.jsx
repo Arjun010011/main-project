@@ -86,10 +86,10 @@ const Page = () => {
           <p className="font-bold text-2xl mx-5">Dashboard</p>
           <p className="mx-5 my-2 italic text-light">Manage your classrooms</p>
         </div>
-        <div className="w-auto h-auto flex items-center justify-center min-md:gap-44 gap-5">
+        <div className="w-auto h-auto flex items-center justify-center min-md:gap-44 gap-5 max-sm:px-5 text-sm">
           <div className="border-1 dark:border-white border-black  px-7 py-3 flex gap-3 rounded-md min-md:min-w-[300px] items-center justify-center min-md:text-xl">
             <div className="flex flex-col">
-              <p className="font-bold">total classes</p>
+              <p className="font-bold ">total classes</p>
               <p className="pl-10">{classrooms.length}</p>
             </div>
             <GraduationCap size={40} className="min-md:hidden" />
