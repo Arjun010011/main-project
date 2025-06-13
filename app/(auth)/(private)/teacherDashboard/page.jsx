@@ -83,39 +83,44 @@ const Page = () => {
       >
         <TeacherHeader />
         <div className="min-md:ml-12 ml-2">
-          <p className="font-bold text-2xl mx-5">Dashboard</p>
-          <p className="mx-5 my-2 italic text-light">Manage your classrooms</p>
+          <p className="font-bold text-2xl min-md:mx-20 mx-5">Dashboard</p>
+          <p className="min-md:mx-20 my-2 italic text-light mx-5">
+            Manage your classrooms
+          </p>
         </div>
-        <div className="w-auto h-auto flex items-center justify-center min-md:gap-44 gap-5 max-sm:px-5 text-sm">
-          <div className="border-1 dark:border-white border-black  px-7 py-3 flex gap-3 rounded-md min-md:min-w-[300px] items-center justify-center min-md:text-xl">
+        <div className="w-auto h-auto flex items-center justify-center min-md:gap-44 gap-2 max-sm:px-25 text-sm mt-5 text-black">
+          <div className="border-1 shadow-sm   px-7 py-7 flex  rounded-md min-md:min-w-[270px] items-center justify-between min-md:text-xl bg-gradient-to-r from-blue-100 to-blue-300 ">
             <div className="flex flex-col">
-              <p className="font-bold ">total classes</p>
-              <p className="pl-10">{classrooms.length}</p>
-            </div>
-            <GraduationCap size={40} className="min-md:hidden" />
-            <GraduationCap size={50} className="max-md:hidden" />
-          </div>
-
-          <div className="border-1 dark:border-white border-black  px-7 py-3 flex gap-3 rounded-md min-md:min-w-[300px] items-center justify-center min-md:text-xl">
-            <div className="flex flex-col">
-              <p className="font-bold">total Students</p>
-              <p className="pl-10">{classrooms.length}</p>
+              <p className="whitespace-nowrap">total classes</p>
+              <p className=" font-bold pl-10 pt-3 text-xl">
+                {classrooms.length}
+              </p>
             </div>
             <GraduationCap size={40} />
           </div>
 
-          <div className="border-1 dark:border-white border-black  px-7 py-3 min-md:flex gap-3 rounded-md min-md:min-w-[300px] items-center justify-center min-md:text-xl hidden ">
+          <div className="  px-7 py-7 flex gap-3 shadow-sm rounded-md min-md:min-w-[270px] items-center justify-between min-md:text-xl bg-gradient-to-r from-green-100 to-green-300">
             <div className="flex flex-col">
-              <p className="font-bold">Question papers created</p>
-              <p className="pl-10">{classrooms.length}</p>
+              <p className="whitespace-nowrap">total Students</p>
+              <p className=" font-bold pl-10 pt-3 text-xl">
+                {classrooms.length}
+              </p>
             </div>
             <GraduationCap size={40} />
           </div>
 
-          <div className="border-1 dark:border-white border-black  px-7 py-3 min-md:flex gap-3 rounded-md min-md:min-w-[300px] items-center justify-center min-md:text-xl hidden">
+          <div className="  px-7 py-7 shadow-sm min-md:flex gap-3 rounded-md min-md:min-w-[300px] items-center justify-between min-md:text-xl hidden bg-gradient-to-r from-red-100 to-red-300 ">
             <div className="flex flex-col">
-              <p className="font-bold">Test conducted</p>
-              <p className="pl-10">{classrooms.length}</p>
+              <p className="">papers created</p>
+              <p className="font-bold pl-10">{classrooms.length}</p>
+            </div>
+            <GraduationCap size={40} />
+          </div>
+
+          <div className="  px-7 py-7 min-md:flex shadow-sm gap-3 rounded-md min-md:min-w-[300px] items-center justify-between min-md:text-xl hidden bg-gradient-to-r from-yellow-100 to-yellow-300">
+            <div className="flex flex-col">
+              <p className="">Test conducted</p>
+              <p className=" font-bold pl-10">{classrooms.length}</p>
             </div>
             <GraduationCap size={40} />
           </div>

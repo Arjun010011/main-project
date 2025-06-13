@@ -36,7 +36,7 @@ const ClassroomStudents = ({ classroomId }) => {
 
   if (students.length === 0) {
     return (
-      <div className="text-center p-4 dark:text-gray-800">
+      <div className="text-center p-4 dark:bg-gray-600 ">
         <p className="text-gray-600 dark:text-gray-200">
           No students have joined this classroom yet.
         </p>
@@ -53,7 +53,7 @@ const ClassroomStudents = ({ classroomId }) => {
         {students.map((student) => (
           <div
             key={student.id}
-            className="bg-white rounded-lg shadow-md p-4 flex items-center gap-4 dark:bg-gray-500"
+            className="bg-gray-200 rounded-lg shadow-md p-4 flex items-center gap-4 dark:bg-gray-500"
           >
             <Image
               src={student.image}
