@@ -21,8 +21,13 @@ export async function POST(req) {
           sameSite: "lax",
           secure: process.env.NODE_ENV === "production",
         });
+
+        const { password, ...passLessUser } = userExist;
         return new Response(
-          JSON.stringify({ message: "user authenticated successfully" }),
+          JSON.stringify({
+            message: "user authenticated successfully",
+            user: passLessUser,
+          }),
           {
             status: 200,
             headers: {

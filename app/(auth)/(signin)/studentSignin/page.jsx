@@ -35,7 +35,7 @@ const page = () => {
       if (sendUser.status === 200) {
         setLoading(false);
         setMessage(sendUser.data.message);
-        setStudentInfo(sendUser);
+        setStudentInfo(sendUser.data.user);
         setTimeout(() => {
           router.push("/studentDashboard");
         }, 1000);

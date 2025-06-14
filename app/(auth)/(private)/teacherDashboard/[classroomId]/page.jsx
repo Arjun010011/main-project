@@ -48,7 +48,7 @@ export default function ClassRoomPage() {
         <TeacherSidebar />
         <div className="w-full h-[95vh] min-lg:ml-[15vw]  flex   flex-col items-center px-5">
           {/* Classroom Banner */}
-          <div className="relative w-full min-w-[200px]  max-w-[900px] min-md:h-[200px] rounded-2xl overflow-hidden shadow-xl bg-blue-100 border-1 border-blue-300 h-[100px] max-sm:flex max-sm:items-center max-sm:w-full    ">
+          <div className=" w-full min-w-[200px]  max-w-[900px] min-md:h-[200px] rounded-2xl overflow-hidden shadow-xl bg-blue-100 border-1 border-blue-300 h-[100px] max-sm:flex max-sm:items-center max-sm:w-full    ">
             <div className="  p-8 min-md:flex items-center justify-between">
               <div className="hidden min-md:block">
                 <h1 className="text-4xl font-bold text-gray-900 mb-2">
