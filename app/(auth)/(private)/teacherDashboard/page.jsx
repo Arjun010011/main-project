@@ -88,41 +88,45 @@ const Page = () => {
             Manage your classrooms
           </p>
         </div>
-        <div className="w-auto h-auto flex items-center justify-center min-md:gap-44 gap-2 max-sm:px-25 text-sm mt-5 text-black">
-          <div className="border-1 shadow-sm   px-7 py-7 flex  rounded-md min-md:min-w-[270px] items-center justify-between min-md:text-xl bg-gradient-to-r from-blue-100 to-blue-300 ">
+        <div className=" h-full flex items-center justify-center min-md:gap-44 gap-2 text-sm mt-5 text-black  w-full px-5   ">
+          <div className="shadow-sm  px-4 py-3 flex  rounded-md  items-center justify-between text-xl bg-gradient-to-r from-blue-100 to-blue-300 w-full max-w-[280px] ">
             <div className="flex flex-col">
-              <p className="whitespace-nowrap">total classes</p>
+              <p className="whitespace-nowrap max-sm:text-sm">total classes</p>
+              <p className=" font-bold pl-10 pt-3 text-xl max-sm:text-lg">
+                {classrooms.length}
+              </p>
+            </div>
+            <GraduationCap className="text-sm" />
+          </div>
+
+          <div className="shadow-sm  px-4 py-3 flex  rounded-md  items-center justify-between text-xl bg-gradient-to-r from-blue-100 to-blue-300 w-full max-w-[280px] ">
+            <div className="flex flex-col">
+              <p className="whitespace-nowrap max-sm:text-sm">total Students</p>
+              <p className=" font-bold pl-10 pt-3 text-xl max-sm:text-lg">
+                {classrooms.length}
+              </p>
+            </div>
+            <GraduationCap className="text-sm" />
+          </div>
+
+          <div className="shadow-sm  px-4 py-3 flex  rounded-md  items-center justify-between text-xl bg-gradient-to-r from-blue-100 to-blue-300 w-full max-w-[280px] max-sm:hidden ">
+            <div className="flex flex-col">
+              <p className="whitespace-nowrap">papers created</p>
+              <p className="font-bold pl-10 pt-3 text-xl">
+                {classrooms.length}
+              </p>
+            </div>
+            <GraduationCap size={35} />
+          </div>
+
+          <div className="shadow-sm  px-4 py-3 flex  rounded-md  items-center justify-between text-xl bg-gradient-to-r from-blue-100 to-blue-300 w-full max-w-[280px] max-sm:hidden ">
+            <div className="flex flex-col">
+              <p className="whitespace-nowrap">Test conducted</p>
               <p className=" font-bold pl-10 pt-3 text-xl">
                 {classrooms.length}
               </p>
             </div>
-            <GraduationCap size={40} />
-          </div>
-
-          <div className="  px-7 py-7 flex gap-3 shadow-sm rounded-md min-md:min-w-[270px] items-center justify-between min-md:text-xl bg-gradient-to-r from-green-100 to-green-300">
-            <div className="flex flex-col">
-              <p className="whitespace-nowrap">total Students</p>
-              <p className=" font-bold pl-10 pt-3 text-xl">
-                {classrooms.length}
-              </p>
-            </div>
-            <GraduationCap size={40} />
-          </div>
-
-          <div className="  px-7 py-7 shadow-sm min-md:flex gap-3 rounded-md min-md:min-w-[300px] items-center justify-between min-md:text-xl hidden bg-gradient-to-r from-red-100 to-red-300 ">
-            <div className="flex flex-col">
-              <p className="">papers created</p>
-              <p className="font-bold pl-10">{classrooms.length}</p>
-            </div>
-            <GraduationCap size={40} />
-          </div>
-
-          <div className="  px-7 py-7 min-md:flex shadow-sm gap-3 rounded-md min-md:min-w-[300px] items-center justify-between min-md:text-xl hidden bg-gradient-to-r from-yellow-100 to-yellow-300">
-            <div className="flex flex-col">
-              <p className="">Test conducted</p>
-              <p className=" font-bold pl-10">{classrooms.length}</p>
-            </div>
-            <GraduationCap size={40} />
+            <GraduationCap size={35} />
           </div>
         </div>
         <div className="flex flex-col gap-5 min-md:flex-row  flex-wrap w-full items-center justify-center overflow-hidden ">

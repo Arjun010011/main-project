@@ -5,7 +5,7 @@ import axios from "axios";
 import { useParams } from "next/navigation";
 import TeacherHeader from "@/app/components/TeacherHeader";
 import ClassroomStudents from "@/app/components/ClassroomStudents";
-
+import TeacherSidebar from "../_components/TeacherSidebar";
 export default function ClassRoomPage() {
   const [buttonColor, setButtonColor] = useState("#1E90FF");
   const { classroomId } = useParams();
@@ -44,10 +44,11 @@ export default function ClassRoomPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
       <TeacherHeader />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-8">
+      <div className="flex w-full h-full items-center ">
+        <TeacherSidebar />
+        <div className="w-full h-[95vh] min-lg:ml-[15vw]  flex   flex-col items-center px-5">
           {/* Classroom Banner */}
-          <div className="relative min-md:h-[200px] rounded-2xl overflow-hidden shadow-xl bg-blue-100 border-1 border-blue-300 h-[100px] max-sm:flex max-sm:items-center   ">
+          <div className="relative w-full min-w-[200px]  max-w-[900px] min-md:h-[200px] rounded-2xl overflow-hidden shadow-xl bg-blue-100 border-1 border-blue-300 h-[100px] max-sm:flex max-sm:items-center max-sm:w-full    ">
             <div className="  p-8 min-md:flex items-center justify-between">
               <div className="hidden min-md:block">
                 <h1 className="text-4xl font-bold text-gray-900 mb-2">
@@ -80,9 +81,8 @@ export default function ClassRoomPage() {
               </div>
             </div>
           </div>
-
           {/* Students List */}
-          <div className="bg-white rounded-xl shadow-md overflow-hidden dark:bg-gray-800">
+          <div className="bg-white rounded-xl shadow-md overflow-hidden dark:text-gray-800 mt-5 max-w-[900px]  w-full">
             <ClassroomStudents classroomId={classroomId} />
           </div>
         </div>
