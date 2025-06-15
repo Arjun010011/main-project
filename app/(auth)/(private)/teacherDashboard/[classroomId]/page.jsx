@@ -42,10 +42,8 @@ export default function ClassRoomPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
-      <TeacherHeader />
-      <div className="flex w-full h-full items-center ">
-        <TeacherSidebar />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-800 ">
+      <div className="flex w-full h-full items-center pt-[100px]">
         <div className="w-full h-[95vh] min-lg:ml-[15vw]  flex   flex-col items-center px-5">
           {/* Classroom Banner */}
           <div className=" w-full min-w-[200px]  max-w-[900px] min-md:h-[200px] rounded-2xl overflow-hidden shadow-xl bg-blue-100 border-1 border-blue-300 h-[100px] max-sm:flex max-sm:items-center max-sm:w-full    ">

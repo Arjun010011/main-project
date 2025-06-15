@@ -74,7 +74,7 @@ const Page = () => {
   // Delete classroom
 
   return (
-    <div className="dark:bg-gray-800 h-[100vh]">
+    <div className="dark:bg-gray-800 h-[100vh] pt-[100px]">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

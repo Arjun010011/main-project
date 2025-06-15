@@ -83,7 +83,7 @@ const TeacherHeader = () => {
     }
   };
   return (
-    <div className="w-full h-full flex items-center justify-center flex-col ">
+    <div className="w-full  flex  h-[100px] fixed top-0 items-center justify-center flex-col ">
       <header className="flex p-5 w-full  items-center flex-row-reverse ">
         <div className="flex items-center gap-8  ">
           <div

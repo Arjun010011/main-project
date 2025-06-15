@@ -12,8 +12,10 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
+import { useParams } from "next/navigation";
 
 const teacherSidebar = () => {
+  const { classroomId } = useParams();
   const variant = {
     hidden: { x: "-150%" },
     visible: { x: "0%" },
@@ -35,7 +37,7 @@ const teacherSidebar = () => {
           exit="hidden"
           variants={variant}
           transition={{ type: "tween", duration: "0.5" }}
-          className="max-w-[300px] w-full h-[100vh]  bg-gray-50 fixed top-0 left-0   border-1 border-gray-200 dark:bg-gray-800  dark:border-gray-700  "
+          className="max-w-[250px] w-full h-[100vh]  bg-gray-50 fixed top-0 left-0   border-1 border-gray-200 dark:bg-gray-800  dark:border-gray-700  "
         >
           <ul className="mt-10 flex flex-col overflow-hidden px-3 text-start gap-5  font-md text-md ">
             <X
@@ -43,14 +45,18 @@ const teacherSidebar = () => {
               onClick={() => setOpen(false)}
               className="cursor-pointer"
             />
-            <li className="py-3 flex gap-2">
-              <LucideHome />
-              Dashboard
-            </li>
-            <li className="py-3 flex gap-2">
-              <FileTextIcon />
-              Create Question Paper
-            </li>
+            <Link href={`/teacherDashboard/${classroomId}`}>
+              <li className="py-3 flex gap-2">
+                <LucideHome />
+                Dashboard
+              </li>
+            </Link>
+            <Link href={`${classroomId}/createQuesitonPaper`}>
+              <li className="py-3 flex gap-2">
+                <FileTextIcon />
+                Create Question Paper
+              </li>
+            </Link>
             <li className="py-3 flex gap-2">
               <Folder />
               Existing question papers
