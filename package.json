@@ -46,6 +46,7 @@
     "firebase": "^11.6.0",
     "framer-motion": "^12.7.3",
     "jsonwebtoken": "^9.0.2",
+    "jspdf": "^3.0.1",
     "lucide-react": "^0.488.0",
     "mongodb": "^6.15.0",
     "mongoose": "^8.13.2",
@@ -61,15 +62,15 @@
     "zustand": "^5.0.4"
   },
   "devDependencies": {
-    "electron": "^36.3.2",
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "concurrently": "^8.2.2",
+    "electron": "^36.3.2",
     "electron-builder": "^26.0.12",
     "eslint": "^9",
     "eslint-config-next": "15.3.0",
     "prisma": "^6.8.2",
     "tailwindcss": "^4",
-    "concurrently": "^8.2.2",
     "wait-on": "^7.0.1"
   }
 }
