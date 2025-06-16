@@ -1,8 +1,14 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { FlaskConical, Calculator, AtomIcon } from "lucide-react";
+import { useState } from "react";
 
 function page() {
+  const [subject, setSubject] = useState({
+    physics: false,
+    chemistry: false,
+    mathematics: false,
+  });
   return (
     <div className=" bg-gray-50  min-h-screen  flex flex-col pt-[100px] dark:bg-gray-800 min-lg:pl-[270px]  px-5  items-center  overflow-x-hidden">
       <div className="flex flex-col w-full h-full ">
@@ -20,17 +26,47 @@ function page() {
           <p className="font-semibold  py-5">Select Subject</p>
           <div className=" flex  flex-1 justify-between gap-5 w-full max-md:flex-col ">
             <div className="flex-1 flex gap-2 italic font-medium border-1 border-b-gray-300  px-7 py-3 max-sm:px-3 rounded-md   ">
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                onClick={() =>
+                  subject.physics === false
+                    ? setSubject((subject) => ({ ...subject, physics: true }))
+                    : setSubject((subject) => ({ ...subject, physics: false }))
+                }
+              />
               <AtomIcon />
               Physics
             </div>
             <div className="flex-1 gap-2 italic font-medium border-1 border-b-gray-300  px-7 py-3 max-sm:px-3 rounded-md  flex">
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                onClick={() =>
+                  subject.chemistry === false
+                    ? setSubject((subject) => ({ ...subject, chemistry: true }))
+                    : setSubject((subject) => ({
+                        ...subject,
+                        chemistry: false,
+                      }))
+                }
+              />
               <FlaskConical />
               Chemistry
             </div>
             <div className="flex-1 gap-2 italic font-medium border-1 border-b-gray-300  px-7 py-3 max-sm:px-3 rounded-md  flex">
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                onClick={() =>
+                  subject.mathematics === false
+                    ? setSubject((subject) => ({
+                        ...subject,
+                        mathematics: true,
+                      }))
+                    : setSubject((subject) => ({
+                        ...subject,
+                        mathematics: false,
+                      }))
+                }
+              />
               <Calculator />
               Mathematics
             </div>
@@ -38,7 +74,7 @@ function page() {
         </div>
 
         {/* Physics configuration */}
-        <div className="mt-15 ">
+        <div className={`mt-15 ${subject.physics ? "block" : "hidden"} `}>
           <div className="flex gap-2 font-semibold text-md ">
             <AtomIcon />
             Physics configuration
@@ -68,7 +104,7 @@ function page() {
           </div>
         </div>
         {/* Mathematics configuration */}
-        <div className="mt-15 ">
+        <div className={`mt-15 ${subject.mathematics ? "block" : "hidden"} `}>
           <div className="flex gap-2 font-semibold text-md">
             <Calculator />
             Mathematics configuration
@@ -98,7 +134,7 @@ function page() {
           </div>
         </div>
         {/* Chemistry configuration */}
-        <div className="mt-15 ">
+        <div className={`mt-15 ${subject.chemistry ? "block" : "hidden"} `}>
           <div className="flex gap-2 font-semibold text-md">
             <FlaskConical />
             Chemistry configuration
