@@ -1,10 +1,15 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
+import { useParams } from "next/navigation";
 import { FlaskConical, Calculator, AtomIcon } from "lucide-react";
 import { useState } from "react";
 import { jsPDF } from "jspdf";
 function page() {
+  const params = useParams();
+  const classroomId = params.classroomId;
+  const [message, setMessage] = useState("");
+  const [errmsg, setErrmsg] = useState("");
   const [subject, setSubject] = useState({
     physics: false,
     chemistry: false,
@@ -37,11 +42,23 @@ function page() {
   const getQuestionPaper = async (e) => {
     try {
       e.preventDefault();
+      const sendData = {
+        classroomId: classroomId,
+        questionInput: quesitonParameters,
+      };
       const res = await axios.post(
         "/api/classRoom/question_generation",
-        quesitonParameters,
+        sendData,
       );
-      generateQuestionPaper(res.data.questionPaper);
+      console.log();
+      if (res.status === 200) {
+        setMessage(
+          "question paper created successfully,download it from print paper section",
+        );
+      }
+      if (res.status !== 200) {
+        setErrmsg("question paper is not created please try again later");
+      }
     } catch (error) {
       console.error(error);
     }
@@ -296,6 +313,16 @@ function page() {
           </Button>
         </div>
       </form>
+      {message && (
+        <div className="flex items-center text-center font-medium bg-green-500 text-white px-7 mt-5 py-3  shadow-md rounded-md">
+          {message}
+        </div>
+      )}
+      {errmsg && (
+        <div className="flex items-center text-center font-medium bg-red-500 text-white px-7 py-3 mt-5 shadow-md rounded-md">
+          {errmsg}
+        </div>
+      )}
     </div>
   );
 }
