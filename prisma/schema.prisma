@@ -66,8 +66,6 @@ model Questions {
   Option_D       String?
   Correct_Answer String?
   Explanation    String?
-
-  questionPaperLinks QuestionPaperQuestion[] // connects to the join table
 }
 
 model QuestionPaper {
@@ -84,6 +82,5 @@ model QuestionPaperQuestion {
   questionPaper   QuestionPaper @relation(fields: [questionPaperId], references: [id])
   questionPaperId String
 
-  question   Questions @relation(fields: [questionId], references: [id])
   questionId BigInt
 }
