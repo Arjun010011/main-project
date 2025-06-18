@@ -8,6 +8,11 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum Role {
+  teacher
+  student
+}
+
 model Teacher {
   id         String      @id @default(uuid())
   fullName   String
@@ -21,17 +26,18 @@ model Teacher {
 }
 
 model Classroom {
-  id          String    @id @default(uuid())
-  code        String    @unique
-  className   String
-  subjectName String?
-  sectionName String?
-  teacherId   String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  image       String    @default("https://png.pngtree.com/background/20210709/original/pngtree-cartoon-yellow-background-school-season-campus-poster-picture-image_925356.jpg")
-  Teacher     Teacher   @relation(fields: [teacherId], references: [id])
-  students    Student[] @relation("StudentClassrooms")
+  id            String          @id @default(uuid())
+  code          String          @unique
+  className     String
+  subjectName   String?
+  sectionName   String?
+  teacherId     String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  image         String          @default("https://png.pngtree.com/background/20210709/original/pngtree-cartoon-yellow-background-school-season-campus-poster-picture-image_925356.jpg")
+  Teacher       Teacher         @relation(fields: [teacherId], references: [id])
+  students      Student[]       @relation("StudentClassrooms")
+  QuestionPaper QuestionPaper[] @relation("classRoomQuestionPaper")
 
   @@unique([className, teacherId], name: "className_teacherId")
 }
@@ -48,7 +54,6 @@ model Student {
   classrooms Classroom[] @relation("StudentClassrooms")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Questions {
   id             BigInt   @id @default(autoincrement())
   created_at     DateTime @default(now()) @db.Timestamptz(6)
@@ -61,9 +66,24 @@ model Questions {
   Option_D       String?
   Correct_Answer String?
   Explanation    String?
+
+  questionPaperLinks QuestionPaperQuestion[] // connects to the join table
 }
 
-enum Role {
-  teacher
-  student
+model QuestionPaper {
+  id          String    @id @default(uuid())
+  createdAt   DateTime  @default(now())
+  classroomId String
+  classroom   Classroom @relation("classRoomQuestionPaper", fields: [classroomId], references: [id])
+
+  questions QuestionPaperQuestion[]
+}
+
+model QuestionPaperQuestion {
+  id              String        @id @default(uuid())
+  questionPaper   QuestionPaper @relation(fields: [questionPaperId], references: [id])
+  questionPaperId String
+
+  question   Questions @relation(fields: [questionId], references: [id])
+  questionId BigInt
 }
