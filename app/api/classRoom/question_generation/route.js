@@ -4,19 +4,19 @@ BigInt.prototype.toJSON = function () {
 };
 
 export async function POST(req) {
-  const params = await req.json();
-  if (!Array.isArray(params)) {
+  const { classroomId, questionInput } = await req.json();
+  if (!Array.isArray(questionInput)) {
     return new Response(
       JSON.stringify({ message: "the format is not in array" }),
       { status: 400 },
     );
   }
-  const questionPaper = [];
-  for (const param of params) {
+  const questionArray = [];
+  for (const param of questionInput) {
     const { subject, difficulty, number_of_questions } = param;
     if (!subject || !difficulty || !number_of_questions) {
       return new Response(
-        JSON.stringify({ message: "some fields are required" }),
+        JSON.stringify({ message: "some fields are missing" }),
         {
           status: 400,
         },
@@ -34,17 +34,29 @@ export async function POST(req) {
       difficulty,
       number_of_questions,
     );
-    questionPaper.push(...questions);
+    questionArray.push(...questions.map((q) => q.id));
   }
-  if (questionPaper.length === 0) {
+  if (questionArray.length === 0) {
     return new Response(JSON.stringify({ message: "nothing found" }), {
       status: 404,
     });
   }
+  const questionPaper = await prisma.questionPaper.create({
+    data: { classroomId },
+  });
+
+  const questionPaperQuestions = questionArray.map((qid) => ({
+    questionPaperId: questionPaper.id,
+    questionId: qid,
+  }));
+  await prisma.questionPaperQuestion.createMany({
+    data: questionPaperQuestions,
+  });
   return new Response(
     JSON.stringify({
-      message: "questions found",
-      questionPaper: questionPaper,
+      message: "questions paper created",
+      questionPaperId: questionPaper.id,
+      questionCount: questionArray.length,
     }),
     {
       status: 200,
