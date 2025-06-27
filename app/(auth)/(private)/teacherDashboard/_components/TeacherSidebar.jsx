@@ -51,16 +51,20 @@ const teacherSidebar = () => {
                 Dashboard
               </li>
             </Link>
-            <Link href={`${classroomId}/createQuesitonPaper`}>
+            <Link href={`/teacherDashboard/${classroomId}/createQuesitonPaper`}>
               <li className="py-3 flex gap-2">
                 <FileTextIcon />
                 Create Question Paper
               </li>
             </Link>
-            <li className="py-3 flex gap-2">
-              <Folder />
-              Existing question papers
-            </li>
+            <Link
+              href={`/teacherDashboard/${classroomId}/existingQuestionPaper`}
+            >
+              <li className="py-3 flex gap-2">
+                <Folder />
+                Existing question papers
+              </li>
+            </Link>
             <li className="py-3 flex gap-2">
               <Play />
               Live tests

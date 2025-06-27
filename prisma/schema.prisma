@@ -70,10 +70,11 @@ model Questions {
 }
 
 model QuestionPaper {
-  id          String    @id @default(uuid())
-  createdAt   DateTime  @default(now())
-  classroomId String
-  classroom   Classroom @relation("classRoomQuestionPaper", fields: [classroomId], references: [id])
+  id                String    @id @default(uuid())
+  createdAt         DateTime  @default(now())
+  classroomId       String
+  questionPaperName String
+  classroom         Classroom @relation("classRoomQuestionPaper", fields: [classroomId], references: [id])
 
   questions QuestionPaperQuestion[]
 }
