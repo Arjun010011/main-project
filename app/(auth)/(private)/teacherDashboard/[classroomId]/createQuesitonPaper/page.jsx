@@ -4,7 +4,7 @@ import axios from "axios";
 import { useParams } from "next/navigation";
 import { FlaskConical, Calculator, AtomIcon } from "lucide-react";
 import { useState } from "react";
-import { jsPDF } from "jspdf";
+// import { jsPDF } from "jspdf";
 function page() {
   const params = useParams();
   const classroomId = params.classroomId;
@@ -16,7 +16,7 @@ function page() {
     mathematics: false,
   });
   const [quesitonParameters, setQuestionParamters] = useState([]);
-
+  const [questionPaperName, setQuestionPaperName] = useState("");
   // collecting an array of question paper parameters
   const quesitonPaperData = (e) => {
     setQuestionParamters((quesitonParameters) => {
@@ -45,6 +45,7 @@ function page() {
       const sendData = {
         classroomId: classroomId,
         questionInput: quesitonParameters,
+        questionPaperName: questionPaperName,
       };
       const res = await axios.post(
         "/api/classRoom/question_generation",
@@ -145,6 +146,7 @@ function page() {
             type="text"
             required
             className="border-1 border-r-gray-200 p-2 rounded-md"
+            onChange={(e) => setQuestionPaperName(e.target.value)}
           />
         </div>
         <div className="">

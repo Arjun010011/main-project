@@ -83,7 +83,7 @@ const TeacherHeader = () => {
     }
   };
   return (
-    <div className="w-screen flex-1 flex  h-[100px] fixed top-0 items-center justify-center flex-col ">
+    <div className="w-screen flex-1 flex  h-[100px]  fixed top-0 items-center justify-center flex-col ">
       <header className="flex p-5 w-full  items-center flex-row-reverse ">
         <div className="flex items-center gap-8  ">
           <div
@@ -105,9 +105,9 @@ const TeacherHeader = () => {
         </div>
       </header>
       {plusClick && (
-        <div className=" absolute w-full h-full top-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)]">
+        <div className=" absolute  w-screen h-screen top-0  flex items-center justify-center ">
           <div
-            className=" absolute w-full h-full top-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-5"
+            className=" fixed w-full h-screen top-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] z-5"
             onClick={() => setPlusClick(false)}
           ></div>
           <form

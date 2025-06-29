@@ -8,11 +8,6 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-enum Role {
-  teacher
-  student
-}
-
 model Teacher {
   id         String      @id @default(uuid())
   fullName   String
@@ -36,8 +31,8 @@ model Classroom {
   updatedAt     DateTime        @updatedAt
   image         String          @default("https://png.pngtree.com/background/20210709/original/pngtree-cartoon-yellow-background-school-season-campus-poster-picture-image_925356.jpg")
   Teacher       Teacher         @relation(fields: [teacherId], references: [id])
-  students      Student[]       @relation("StudentClassrooms")
   QuestionPaper QuestionPaper[] @relation("classRoomQuestionPaper")
+  students      Student[]       @relation("StudentClassrooms")
 
   @@unique([className, teacherId], name: "className_teacherId")
 }
@@ -70,20 +65,23 @@ model Questions {
 }
 
 model QuestionPaper {
-  id                String    @id @default(uuid())
-  createdAt         DateTime  @default(now())
+  id                String                  @id @default(uuid())
+  createdAt         DateTime                @default(now())
   classroomId       String
   questionPaperName String
-  classroom         Classroom @relation("classRoomQuestionPaper", fields: [classroomId], references: [id])
-
-  questions QuestionPaperQuestion[]
+  classroom         Classroom               @relation("classRoomQuestionPaper", fields: [classroomId], references: [id])
+  questions         QuestionPaperQuestion[]
 }
 
 model QuestionPaperQuestion {
   id              String        @id @default(uuid())
-  questionPaper   QuestionPaper @relation(fields: [questionPaperId], references: [id])
   questionPaperId String
+  questionId      BigInt
+  question        Questions     @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionPaper   QuestionPaper @relation(fields: [questionPaperId], references: [id])
+}
 
-  question   Questions @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  questionId BigInt
+enum Role {
+  teacher
+  student
 }

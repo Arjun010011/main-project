@@ -4,7 +4,7 @@ BigInt.prototype.toJSON = function () {
 };
 
 export async function POST(req) {
-  const { classroomId, questionInput } = await req.json();
+  const { classroomId, questionInput, questionPaperName } = await req.json();
   if (!Array.isArray(questionInput)) {
     return new Response(
       JSON.stringify({ message: "the format is not in array" }),
@@ -37,12 +37,15 @@ export async function POST(req) {
     questionArray.push(...questions.map((q) => q.id));
   }
   if (questionArray.length === 0) {
-    return new Response(JSON.stringify({ message: "nothing found" }), {
-      status: 404,
-    });
+    return new Response(
+      JSON.stringify({ message: "the quesitons array is empty" }),
+      {
+        status: 404,
+      },
+    );
   }
   const questionPaper = await prisma.questionPaper.create({
-    data: { classroomId },
+    data: { classroomId, questionPaperName },
   });
 
   const questionPaperQuestions = questionArray.map((qid) => ({
