@@ -3,17 +3,16 @@ BigInt.prototype.toJSON = function () {
   return this.toString();
 };
 export async function POST(req) {
-  const { questionPaperId } = await req.json();
-  const questionPaperWithQuestions = await prisma.questionPaper.findUnique({
-    where: { id: questionPaperId },
-    include: {
-      questions: {},
-    },
+  const { classroomId } = await req.json();
+  const questionPaperDetails = await prisma.questionPaper.findMany({
+    where: { classroomId: classroomId },
   });
+  const totalPaper = questionPaperDetails.length;
   return new Response(
     JSON.stringify({
       message: "fetched the question paper succefully",
-      questionPaper: questionPaperWithQuestions,
+      questionPaperDetails,
+      totalPaper,
     }),
   );
 }
