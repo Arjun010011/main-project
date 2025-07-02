@@ -5,7 +5,7 @@ import axios from "axios";
 import { useParams } from "next/navigation";
 import TeacherHeader from "@/app/components/TeacherHeader";
 import ClassroomStudents from "@/app/components/ClassroomStudents";
-import TeacherSidebar from "../_components/TeacherSidebar";
+import { Loader } from "lucide-react";
 export default function ClassRoomPage() {
   const [buttonColor, setButtonColor] = useState("#1E90FF");
   const { classroomId } = useParams();
@@ -35,7 +35,7 @@ export default function ClassRoomPage() {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-800 ">
         <TeacherHeader />
         <div className="flex items-center justify-center min-h-[calc(100vh-80px)]">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          <Loader className="animate-spin" />
         </div>
       </div>
     );

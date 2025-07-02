@@ -46,13 +46,13 @@ const teacherSidebar = () => {
               className="cursor-pointer"
             />
             <Link href={`/teacherDashboard/${classroomId}`}>
-              <li className="py-3 flex gap-2">
+              <li className="py-3 flex gap-2 px-2 rounded-md hover:bg-gray-200 transition-colors duration-500 dark:hover:bg-gray-700">
                 <LucideHome />
                 Dashboard
               </li>
             </Link>
             <Link href={`/teacherDashboard/${classroomId}/createQuesitonPaper`}>
-              <li className="py-3 flex gap-2">
+              <li className="py-3 flex gap-2 px-2 rounded-md hover:bg-gray-200 transition-colors duration-500 dark:hover:bg-gray-700">
                 <FileTextIcon />
                 Create Question Paper
               </li>
@@ -60,16 +60,16 @@ const teacherSidebar = () => {
             <Link
               href={`/teacherDashboard/${classroomId}/existingQuestionPaper`}
             >
-              <li className="py-3 flex gap-2">
+              <li className="py-3 px-2 rounded-md flex gap-2 hover:bg-gray-200 transition-colors duration-500 dark:hover:bg-gray-700">
                 <Folder />
                 Existing question papers
               </li>
             </Link>
-            <li className="py-3 flex gap-2">
+            <li className="py-3 px-2 rounded-md flex gap-2 hover:bg-gray-200 transition-colors duration-500 dark:hover:bg-gray-700">
               <Play />
               Live tests
             </li>
-            <li className="py-3 flex gap-2">
+            <li className="py-3 px-2 rounded-md flex gap-2 hover:bg-gray-200 transition-colors duration-500 dark:hover:bg-gray-700">
               <PrinterIcon />
               Print Papers
             </li>

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
+import { Loader } from "lucide-react";
 export default function StudentLayout({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
   const router = useRouter();
@@ -37,7 +37,11 @@ export default function StudentLayout({ children }) {
   }, [isAuthenticated]);
 
   if (isAuthenticated === null) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center w-screen h-screen">
+        <Loader className="animate-spin" />
+      </div>
+    );
   }
 
   return <>{children}</>;
