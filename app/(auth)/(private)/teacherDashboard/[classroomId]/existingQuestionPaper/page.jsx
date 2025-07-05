@@ -6,6 +6,7 @@ import { Loader } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { jsPDF } from "jspdf";
+import DropDownTeacherMenu from "@/app/components/DropDownTeacherMenu";
 function page() {
   const params = useParams();
   const classroomId = params.classroomId;
@@ -31,7 +32,7 @@ function page() {
     const pageHeight = doc.internal.pageSize.getHeight();
     let y = 25;
 
-    // ===== Header =====
+    //  Header
     doc.setFont("times", "bold");
     doc.setFontSize(16);
     doc.text("KCET 2025 Question Paper", pageWidth / 2, 15, {
@@ -148,17 +149,23 @@ function page() {
                   className="p-5 w-full h-full max-h-[450px] max-w-[370px] border-1 border-gray-300 flex flex-col gap-6 rounded-lg  shadow-lg "
                   key={questionPaper.id}
                 >
-                  <div className="flex flex-col gap-2">
-                    <p>
-                      <span className="italic font-bold pr-1">Created at:</span>
-                      {date}
-                    </p>
-                    <p className="">
-                      <span className="italic font-bold pr-1">
-                        Question paper name:
-                      </span>
-                      {questionPaper.questionPaperName}
-                    </p>
+                  <div className="flex justify-between ">
+                    <div className="flex flex-col gap-2">
+                      <p>
+                        <span className="italic font-bold pr-1">
+                          Created at:
+                        </span>
+                        {date}
+                      </p>
+                      <p className="">
+                        <span className="italic font-bold pr-1">
+                          Question paper name:
+                        </span>
+                        {questionPaper.questionPaperName}
+                      </p>
+                    </div>
+
+                    <DropDownTeacherMenu />
                   </div>
                   <Button
                     className="w-full cursor-pointer"

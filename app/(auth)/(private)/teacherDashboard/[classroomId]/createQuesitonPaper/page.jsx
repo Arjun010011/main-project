@@ -4,7 +4,6 @@ import axios from "axios";
 import { useParams } from "next/navigation";
 import { FlaskConical, Calculator, AtomIcon } from "lucide-react";
 import { useState } from "react";
-// import { jsPDF } from "jspdf";
 function page() {
   const params = useParams();
   const classroomId = params.classroomId;
@@ -64,66 +63,6 @@ function page() {
       console.error(error);
     }
   };
-  // it creates the question paper pdf
-
-  // function generateQuestionPaper(questions) {
-  //   const doc = new jsPDF();
-  //
-  //   const subject = questions[0]?.Subject || "Subject";
-  //
-  //   // Title
-  //   doc.setFont("Helvetica", "bold");
-  //   doc.setFontSize(18);
-  //   doc.text("Sample School / College", 105, 20, { align: "center" });
-  //
-  //   doc.setFontSize(14);
-  //   doc.text(`Subject: ${subject}`, 20, 35);
-  //   doc.text("Duration: 1 Hour", 150, 35);
-  //
-  //   doc.setFont("Helvetica", "bold");
-  //   doc.setFontSize(16);
-  //   doc.text("Question Paper", 105, 50, { align: "center" });
-  //
-  //   doc.setLineWidth(0.5);
-  //   doc.line(20, 55, 190, 55);
-  //
-  //   // Questions
-  //   let y = 70;
-  //   doc.setFont("Helvetica", "normal");
-  //   doc.setFontSize(12);
-  //
-  //   questions.forEach((q, index) => {
-  //     const questionText = `${index + 1}. ${q.Question}`;
-  //     const options = [
-  //       `A. ${q.Option_A}`,
-  //       `B. ${q.Option_B}`,
-  //       `C. ${q.Option_C}`,
-  //       `D. ${q.Option_D}`,
-  //     ];
-  //
-  //     // Wrap long text
-  //     const questionLines = doc.splitTextToSize(questionText, 170);
-  //     doc.text(questionLines, 20, y);
-  //     y += questionLines.length * 8;
-  //
-  //     options.forEach((opt) => {
-  //       const optLines = doc.splitTextToSize(opt, 170);
-  //       doc.text(optLines, 30, y);
-  //       y += optLines.length * 8;
-  //     });
-  //
-  //     y += 5;
-  //
-  //     // Page break if needed
-  //     if (y > 260) {
-  //       doc.addPage();
-  //       y = 20;
-  //     }
-  //   });
-  //
-  //   // Save
-  //   doc.save(`${subject}_Question_Paper.pdf`);
-  // }
   return (
     <div className=" bg-gray-50  min-h-screen  flex flex-col pt-[100px] dark:bg-gray-800 min-lg:pl-[270px]  px-5  items-center  overflow-x-hidden">
       <div className="flex flex-col w-full h-full ">
