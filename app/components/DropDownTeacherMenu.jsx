@@ -5,7 +5,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreVertical } from "lucide-react";
-const DropDownTeacherMenu = () => {
+const DropDownTeacherMenu = ({ onDelete }) => {
   return (
     <div>
       <DropdownMenu>
@@ -13,7 +13,9 @@ const DropDownTeacherMenu = () => {
           <MoreVertical />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuItem className="bg-red-50">Delete</DropdownMenuItem>
+          <DropdownMenuItem className="bg-red-50" onClick={onDelete}>
+            Delete
+          </DropdownMenuItem>
           <DropdownMenuItem>Move to live test</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

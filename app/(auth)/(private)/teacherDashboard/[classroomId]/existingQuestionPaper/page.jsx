@@ -24,7 +24,7 @@ function page() {
     };
     fetchPaper();
   }, []);
-  //function to create the paper
+  //function to create the download paper
   function generateKCETPaper(questions) {
     const doc = new jsPDF();
 
@@ -125,6 +125,23 @@ function page() {
         <Loader className="animate-spin" />
       </div>
     );
+
+  //delete paper
+  const deletePaper = async (id) => {
+    try {
+      const delPaper = await axios.delete(
+        "/api/classroom/deleteQuestionPaper",
+        {
+          data: { paperId: id },
+        },
+      );
+      if (delPaper.status === 200) {
+        console.log("paperDeleted");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <div className="pt-[100px] min-lg:pl-[270px] pr-5 dark:bg-gray-800 max-sm:p-5 max-sm:pt-[100px] min-h-screen">
       <p className="font-bold text-3xl">Question Papers</p>
@@ -165,7 +182,9 @@ function page() {
                       </p>
                     </div>
 
-                    <DropDownTeacherMenu />
+                    <DropDownTeacherMenu
+                      onDelete={() => deletePaper(questionPaper.id)}
+                    />
                   </div>
                   <Button
                     className="w-full cursor-pointer"
