@@ -3,21 +3,31 @@ import { useEffect, useState } from "react";
 import { Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
+import { useParams } from "next/navigation";
+import axios from "axios";
 
 export default function LiveTestPage() {
-  // Simulated state for live test papers (replace with API integration later)
+  const params = useParams();
+  const classroomId = params.classroomId;
   const [liveTests, setLiveTests] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Placeholder for fetching live tests in the future
   useEffect(() => {
-    setLoading(true);
-    // Simulate fetch delay
-    setTimeout(() => {
-      setLiveTests([]); // Start with empty, replace with fetched data
-      setLoading(false);
-    }, 500);
-  }, []);
+    const fetchLiveTests = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.post("/api/classRoom/fetchLiveTests", {
+          classroomId,
+        });
+        setLiveTests(res.data.liveTests || []);
+      } catch (error) {
+        setLiveTests([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLiveTests();
+  }, [classroomId]);
 
   return (
     <div className="pt-[100px] min-lg:pl-[270px] pr-5 dark:bg-gray-800 max-sm:p-5 min-h-screen">
@@ -47,7 +57,7 @@ export default function LiveTestPage() {
             >
               <div className="flex flex-col gap-1">
                 <span className="font-bold text-lg text-black dark:text-white">
-                  {test.name}
+                  {test.questionPaperName}
                 </span>
                 <span className="text-xs text-gray-500 dark:text-gray-400">
                   Created:{" "}

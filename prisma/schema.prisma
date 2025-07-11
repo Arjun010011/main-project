@@ -69,6 +69,7 @@ model QuestionPaper {
   createdAt         DateTime                @default(now())
   classroomId       String
   questionPaperName String
+  isLiveTest        Boolean                 @default(false)
   classroom         Classroom               @relation("classRoomQuestionPaper", fields: [classroomId], references: [id])
   questions         QuestionPaperQuestion[]
 }

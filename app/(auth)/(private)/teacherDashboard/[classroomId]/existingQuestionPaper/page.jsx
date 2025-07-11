@@ -15,7 +15,7 @@ function page() {
   const [previewQuestions, setPreviewQuestions] = useState([]);
   const [previewPaperName, setPreviewPaperName] = useState("");
   const [previewLoading, setPreviewLoading] = useState(false);
-  const [liveTests, setLiveTests] = useState([]); // Simulated live tests
+  // const [liveTests, setLiveTests] = useState([]); // Simulated live tests
 
   useEffect(() => {
     const fetchPaper = async () => {
@@ -158,28 +158,20 @@ function page() {
       console.error(error);
     }
   };
-  // Move to live test handler (simulate for now)
-  const handleMoveToLiveTest = (paper) => {
-    // Remove from existing papers
-    setContent((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        questionPaperDetails: prev.questionPaperDetails.filter(
-          (p) => p.id !== paper.id
-        ),
-        totalPaper: prev.totalPaper - 1,
-      };
-    });
-    // Add to live tests
-    setLiveTests((prev) => [
-      {
-        id: paper.id,
-        questionPaperName: paper.questionPaperName,
-        createdAt: paper.createdAt,
-      },
-      ...prev,
-    ]);
+  // Move to live test handler (backend)
+  const handleMoveToLiveTest = async (paper) => {
+    try {
+      await axios.post("/api/classRoom/moveToLiveTest", {
+        questionPaperId: paper.id,
+      });
+      // Refresh the papers list
+      const data = await axios.post("/api/classRoom/fetchQuestionPapers", {
+        classroomId,
+      });
+      setContent(data.data);
+    } catch (error) {
+      console.error("Failed to move to live test", error);
+    }
   };
   if (!content)
     return (

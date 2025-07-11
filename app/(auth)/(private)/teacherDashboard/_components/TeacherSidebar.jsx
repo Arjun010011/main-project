@@ -65,10 +65,12 @@ const teacherSidebar = () => {
                 Existing question papers
               </li>
             </Link>
-            <li className="py-3 px-2 rounded-md flex gap-2 hover:bg-gray-200 transition-colors duration-500 dark:hover:bg-gray-700">
-              <Play />
-              Live tests
-            </li>
+            <Link href={`/teacherDashboard/${classroomId}/liveTest`}>
+              <li className="py-3 px-2 rounded-md flex gap-2 hover:bg-gray-200 transition-colors duration-500 dark:hover:bg-gray-700">
+                <Play />
+                Live tests
+              </li>
+            </Link>
             <li className="py-3 px-2 rounded-md flex gap-2 hover:bg-gray-200 transition-colors duration-500 dark:hover:bg-gray-700">
               <PrinterIcon />
               Print Papers
