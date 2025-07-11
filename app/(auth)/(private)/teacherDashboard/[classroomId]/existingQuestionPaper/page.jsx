@@ -11,6 +11,12 @@ function page() {
   const params = useParams();
   const classroomId = params.classroomId;
   const [content, setContent] = useState(null);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [previewQuestions, setPreviewQuestions] = useState([]);
+  const [previewPaperName, setPreviewPaperName] = useState("");
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [liveTests, setLiveTests] = useState([]); // Simulated live tests
+
   useEffect(() => {
     const fetchPaper = async () => {
       try {
@@ -67,7 +73,7 @@ function page() {
       options.forEach((opt) => {
         const optLines = doc.splitTextToSize(
           `${opt.label} ${opt.text}`,
-          pageWidth - 25,
+          pageWidth - 25
         );
         doc.text(optLines, 20, y);
         y += optLines.length * 6;
@@ -102,7 +108,7 @@ function page() {
       `${doc.internal.getNumberOfPages()}`,
       pageWidth / 2,
       pageHeight - 10,
-      { align: "center" },
+      { align: "center" }
     );
     doc.text("1B0616K22", pageWidth - 10, pageHeight - 10, { align: "right" });
   }
@@ -119,21 +125,31 @@ function page() {
       console.log(error);
     }
   };
-  if (!content)
-    return (
-      <div className="flex items-center justify-center w-screen h-screen">
-        <Loader className="animate-spin" />
-      </div>
-    );
 
+  // Preview handler
+  const handlePreview = async (paperId, paperName) => {
+    setPreviewLoading(true);
+    setShowPreviewModal(true);
+    setPreviewPaperName(paperName);
+    try {
+      const paperInfo = await axios.post("/api/classRoom/fetchQuestionPaper", {
+        questionPaperId: paperId,
+      });
+      setPreviewQuestions(paperInfo.data.questionPaper.questions || []);
+    } catch (error) {
+      setPreviewQuestions([]);
+    } finally {
+      setPreviewLoading(false);
+    }
+  };
   //delete paper
   const deletePaper = async (id) => {
     try {
       const delPaper = await axios.delete(
-        "/api/classroom/deleteQuestionPaper",
+        "/api/classRoom/deleteQuestionPaper",
         {
           data: { paperId: id },
-        },
+        }
       );
       if (delPaper.status === 200) {
         console.log("paperDeleted");
@@ -142,6 +158,36 @@ function page() {
       console.error(error);
     }
   };
+  // Move to live test handler (simulate for now)
+  const handleMoveToLiveTest = (paper) => {
+    // Remove from existing papers
+    setContent((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        questionPaperDetails: prev.questionPaperDetails.filter(
+          (p) => p.id !== paper.id
+        ),
+        totalPaper: prev.totalPaper - 1,
+      };
+    });
+    // Add to live tests
+    setLiveTests((prev) => [
+      {
+        id: paper.id,
+        questionPaperName: paper.questionPaperName,
+        createdAt: paper.createdAt,
+      },
+      ...prev,
+    ]);
+  };
+  if (!content)
+    return (
+      <div className="flex items-center justify-center w-screen h-screen">
+        <Loader className="animate-spin" />
+      </div>
+    );
+
   return (
     <div className="pt-[100px] min-lg:pl-[270px] pr-5 dark:bg-gray-800 max-sm:p-5 max-sm:pt-[100px] min-h-screen">
       <p className="font-bold text-3xl">Question Papers</p>
@@ -159,7 +205,7 @@ function page() {
             .map((questionPaper) => {
               const date = format(
                 questionPaper.createdAt,
-                "do MMMM yyyy,h:mm a",
+                "do MMMM yyyy,h:mm a"
               );
               return (
                 <div
@@ -184,6 +230,15 @@ function page() {
 
                     <DropDownTeacherMenu
                       onDelete={() => deletePaper(questionPaper.id)}
+                      onPreview={() =>
+                        handlePreview(
+                          questionPaper.id,
+                          questionPaper.questionPaperName
+                        )
+                      }
+                      onMoveToLiveTest={() =>
+                        handleMoveToLiveTest(questionPaper)
+                      }
                     />
                   </div>
                   <Button
@@ -197,6 +252,91 @@ function page() {
             })}
         </div>
       </div>
+      {/* Preview Modal */}
+      {showPreviewModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-sm">
+          <div className="relative bg-white dark:bg-gray-900 rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-0 border border-gray-200 dark:border-gray-800">
+            <button
+              className="absolute top-3 right-3 text-gray-700 dark:text-gray-200 hover:text-black dark:hover:text-white text-2xl font-bold z-10"
+              onClick={() => setShowPreviewModal(false)}
+              aria-label="Close preview"
+            >
+              ×
+            </button>
+            {/* KCET Paper Header */}
+            <div className="px-8 pt-8 pb-4 border-b border-gray-300 dark:border-gray-700 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-t-lg">
+              <h2 className="text-2xl font-bold text-center font-serif text-black dark:text-white tracking-wide mb-1">
+                KCET 2025 Question Paper
+              </h2>
+              <div className="flex flex-col items-center text-center">
+                <span className="text-base font-semibold text-gray-700 dark:text-gray-200 font-serif">
+                  PHYSICS (Code: A1)
+                </span>
+                <span className="text-sm text-gray-500 dark:text-gray-400 font-serif">
+                  Practice Paper
+                </span>
+                <span className="text-xs text-gray-400 dark:text-gray-500 font-mono mt-1">
+                  {previewPaperName}
+                </span>
+              </div>
+            </div>
+            <div className="px-8 py-6 font-serif bg-white dark:bg-gray-900">
+              {previewLoading ? (
+                <div className="flex justify-center items-center h-40">
+                  <Loader className="animate-spin text-black dark:text-white" />
+                </div>
+              ) : previewQuestions.length === 0 ? (
+                <div className="text-center text-gray-500 dark:text-gray-300">
+                  No questions found.
+                </div>
+              ) : (
+                <ol className="space-y-8">
+                  {previewQuestions.map((item, idx) => {
+                    const q = item.question;
+                    return (
+                      <li
+                        key={item.id}
+                        className="pb-4 border-b border-dashed border-gray-200 dark:border-gray-700 last:border-b-0"
+                      >
+                        <div className="mb-2 text-lg font-semibold text-black dark:text-white">
+                          {idx + 1}. {q.Question}
+                        </div>
+                        <ul className="pl-4 space-y-1">
+                          <li className="text-black dark:text-gray-200">
+                            A. {q.Option_A}
+                          </li>
+                          <li className="text-black dark:text-gray-200">
+                            B. {q.Option_B}
+                          </li>
+                          <li className="text-black dark:text-gray-200">
+                            C. {q.Option_C}
+                          </li>
+                          <li className="text-black dark:text-gray-200">
+                            D. {q.Option_D}
+                          </li>
+                        </ul>
+                        {q.Explanation && (
+                          <div className="mt-2 text-sm text-gray-600 dark:text-gray-400 italic">
+                            <span className="font-medium">Explanation:</span>{" "}
+                            {q.Explanation}
+                          </div>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ol>
+              )}
+            </div>
+            {/* KCET Paper Footer */}
+            <div className="px-8 py-4 border-t border-gray-200 dark:border-gray-700 bg-gradient-to-t from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-b-lg text-center font-serif text-gray-600 dark:text-gray-300 text-sm">
+              Space For Rough Work
+              <div className="mt-1 text-xs text-gray-400 dark:text-gray-500 font-mono">
+                A-1 | 1B0616K22
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
