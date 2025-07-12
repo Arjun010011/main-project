@@ -70,6 +70,14 @@ model QuestionPaper {
   classroomId       String
   questionPaperName String
   isLiveTest        Boolean                 @default(false)
+  // Live test status fields
+  status            TestStatus              @default(draft)
+  scheduledAt       DateTime?
+  startedAt         DateTime?
+  endedAt           DateTime?
+  duration          Int?                    // in minutes
+  totalMarks        Int?                    // total marks for the test
+  isActive          Boolean                 @default(false)
   classroom         Classroom               @relation("classRoomQuestionPaper", fields: [classroomId], references: [id])
   questions         QuestionPaperQuestion[]
 }
@@ -85,4 +93,11 @@ model QuestionPaperQuestion {
 enum Role {
   teacher
   student
+}
+
+enum TestStatus {
+  draft
+  scheduled
+  live
+  completed
 }

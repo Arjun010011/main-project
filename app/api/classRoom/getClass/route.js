@@ -18,7 +18,7 @@ export async function POST(req) {
     return new Response(
       JSON.stringify({
         message: "got classroom data successfully!!!",
-        data: classRoomInfo,
+        classRoomInfo: classRoomInfo,
       }),
       { status: 200 },
     );

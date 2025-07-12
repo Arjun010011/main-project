@@ -1,18 +1,18 @@
 "use client";
 import Image from "next/image";
 import storeUser from "@/lib/store/userStore";
-import { Menu, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 import JoinClassroom from "./JoinClassroom";
+import { ModeToggle } from "@/components/ui/ModeToggle";
 
 const StudentHeader = () => {
   const studentInfo = storeUser((state) => state.studentInfo);
   const [showJoinClassroom, setShowJoinClassroom] = useState(false);
 
   return (
-    <div className="w-full h-full flex items-center justify-center flex-col">
-      <header className="flex p-5 w-full items-center justify-between">
-        <Menu size={30} />
+    <div className="w-screen flex-1 flex h-[100px] fixed top-0 items-center justify-center flex-col">
+      <header className="flex p-5 w-full items-center flex-row-reverse">
         <div className="flex items-center gap-8">
           <div
             className="p-2 rounded-full hover:bg-gray-100 hover:cursor-pointer transition duration-300 ease-in-out"
@@ -20,6 +20,7 @@ const StudentHeader = () => {
           >
             <Plus size={20} />
           </div>
+          <ModeToggle />
           <Image
             src={studentInfo?.image || "/logo.png"}
             height={40}
@@ -29,7 +30,6 @@ const StudentHeader = () => {
           />
         </div>
       </header>
-      {studentInfo.fullName}
       {showJoinClassroom && (
         <JoinClassroom onClose={() => setShowJoinClassroom(false)} />
       )}

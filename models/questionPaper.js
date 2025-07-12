@@ -49,6 +49,25 @@ const questionPaperSchema = new mongoose.Schema(
       required: true,
       min: 1,
     },
+    // Live test status fields
+    status: {
+      type: String,
+      enum: ["draft", "scheduled", "live", "completed"],
+      default: "draft",
+    },
+    scheduledAt: {
+      type: Date,
+    },
+    startedAt: {
+      type: Date,
+    },
+    endedAt: {
+      type: Date,
+    },
+    isActive: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

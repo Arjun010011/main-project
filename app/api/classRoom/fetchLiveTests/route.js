@@ -10,7 +10,10 @@ export async function POST(req) {
       );
     }
     const liveTests = await prisma.questionPaper.findMany({
-      where: { classroomId, isLiveTest: true },
+      where: {
+        classroomId,
+        status: "live",
+      },
       orderBy: { createdAt: "desc" },
     });
     return new Response(
