@@ -67,7 +67,7 @@ export default function StudentClassroomPage() {
             <h1 className="font-bold text-3xl mb-2 text-black dark:text-white">
               Clasroom Name: {classroom?.className || "Classroom"}
             </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-300">
+            <div className="text-sm text-gray-600 dark:text-gray-300">
               <p>
                 Subject:{" "}
                 {classroom?.subjectName && `${classroom.subjectName}  `}
@@ -77,7 +77,7 @@ export default function StudentClassroomPage() {
                 {classroom?.sectionName && `${classroom.sectionName}  `}
               </p>
               <p>Classroom Code: {classroom?.code}</p>
-            </p>
+            </div>
           </div>
 
           <div className="mb-8">

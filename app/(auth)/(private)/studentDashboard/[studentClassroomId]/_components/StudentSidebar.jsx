@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  LucideHome,
-  FileTextIcon,
-  Folder,
-  Play,
-  Users,
-  Menu,
-  X,
-} from "lucide-react";
+import { Folder, Play, Users, Menu, X, FileTextIcon } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
