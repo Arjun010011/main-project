@@ -19,7 +19,7 @@ export default function ClassRoomPage() {
           id: classroomId,
         });
         if (data) {
-          setInfo(data.data.data);
+          setInfo(data.data.classRoomInfo);
         }
       } catch (error) {
         console.error("Error fetching classroom info:", error);

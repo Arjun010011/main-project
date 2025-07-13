@@ -52,8 +52,8 @@ export default function LiveTestPage() {
           prevTests.map((test) =>
             test.id === testId
               ? { ...test, status: "live", isLiveTest: true }
-              : test
-          )
+              : test,
+          ),
         );
 
         // Show success message (you can add a toast notification here)
@@ -80,8 +80,8 @@ export default function LiveTestPage() {
           prevTests.map((test) =>
             test.id === testId
               ? { ...test, status: "completed", isLiveTest: false }
-              : test
-          )
+              : test,
+          ),
         );
 
         // Show success message
@@ -146,7 +146,7 @@ export default function LiveTestPage() {
                   )}
                 </div>
                 <LiveTestDropdown
-                  onDelete={() => handleDelete(test.id)}
+                  onDelete={() => handleEndTest(test.id)}
                   onGoLive={() => handleGoLive(test.id)}
                   onEndTest={() => handleEndTest(test.id)}
                   onSchedule={() => handleSchedule(test)}

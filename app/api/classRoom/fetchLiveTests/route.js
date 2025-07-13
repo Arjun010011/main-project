@@ -6,19 +6,19 @@ export async function POST(req) {
     if (!classroomId) {
       return new Response(
         JSON.stringify({ message: "classroomId is required" }),
-        { status: 400 }
+        { status: 400 },
       );
     }
     const liveTests = await prisma.questionPaper.findMany({
       where: {
         classroomId,
-        status: "live",
+        isLiveTest: true,
       },
       orderBy: { createdAt: "desc" },
     });
     return new Response(
       JSON.stringify({ message: "Fetched live tests", liveTests }),
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     return new Response(
@@ -26,7 +26,7 @@ export async function POST(req) {
         message: "Error fetching live tests",
         error: error.message,
       }),
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
