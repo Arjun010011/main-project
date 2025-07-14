@@ -3,12 +3,13 @@ import { useEffect, useState } from "react";
 import { Loader, Clock, Award, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import StudentSidebar from "./_components/StudentSidebar";
 
 export default function StudentClassroomPage() {
   const params = useParams();
+  const router = useRouter();
   const studentClassroomId = params.studentClassroomId;
   const [liveTests, setLiveTests] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -29,7 +30,7 @@ export default function StudentClassroomPage() {
           "/api/classRoom/getActiveLiveTests",
           {
             classroomId: studentClassroomId,
-          },
+          }
         );
         setLiveTests(liveTestsRes.data.liveTests || []);
       } catch (error) {
@@ -45,9 +46,23 @@ export default function StudentClassroomPage() {
     }
   }, [studentClassroomId]);
 
-  const handleJoinTest = (testId) => {
-    // TODO: Navigate to test interface
-    console.log("Joining test:", testId);
+  const handleJoinTest = async (testId) => {
+    try {
+      // Verify test access before allowing the student to join
+      const response = await axios.post("/api/classRoom/verifyTestAccess", {
+        questionPaperId: testId,
+      });
+
+      if (response.data.success) {
+        // Access granted - navigate to test interface
+        console.log("Access granted for test:", testId);
+        router.push(`/studentDashboard/test/${testId}`);
+      }
+    } catch (error) {
+      console.error("Error joining test:", error);
+      const errorMessage = error.response?.data?.error || "Failed to join test";
+      alert(errorMessage);
+    }
   };
 
   const formatDuration = (minutes) => {
@@ -93,7 +108,8 @@ export default function StudentClassroomPage() {
               <div className="flex flex-col items-center justify-center h-40 text-gray-500 dark:text-gray-300">
                 <span className="text-lg">No tests available.</span>
                 <span className="text-sm mt-2">
-                  Check back later for tests in this classroom.
+                  You have either completed all available tests or there are no
+                  live tests in this classroom.
                 </span>
               </div>
             ) : (

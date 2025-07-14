@@ -8,6 +8,8 @@ import {
   PrinterIcon,
   Menu,
   X,
+  BarChart3,
+  Users,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
@@ -71,10 +73,18 @@ const teacherSidebar = () => {
                 Live tests
               </li>
             </Link>
-            <li className="py-3 px-2 rounded-md flex gap-2 hover:bg-gray-200 transition-colors duration-500 dark:hover:bg-gray-700">
-              <PrinterIcon />
-              Print Papers
-            </li>
+            <Link href={`/teacherDashboard/${classroomId}/analytics`}>
+              <li className="py-3 px-2 rounded-md flex gap-2 hover:bg-gray-200 transition-colors duration-500 dark:hover:bg-gray-700">
+                <BarChart3 />
+                Class Analytics
+              </li>
+            </Link>
+            <Link href={`/teacherDashboard/${classroomId}/studentAnalytics`}>
+              <li className="py-3 px-2 rounded-md flex gap-2 hover:bg-gray-200 transition-colors duration-500 dark:hover:bg-gray-700">
+                <Users />
+                Student Analytics
+              </li>
+            </Link>
           </ul>
         </motion.div>
       </AnimatePresence>

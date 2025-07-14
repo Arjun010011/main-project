@@ -38,15 +38,16 @@ model Classroom {
 }
 
 model Student {
-  id         String      @id @default(uuid())
-  email      String      @unique
-  password   String
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  fullName   String
-  image      String      @default("https://static.vecteezy.com/system/resources/thumbnails/020/765/399/small_2x/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg")
-  role       Role
-  classrooms Classroom[] @relation("StudentClassrooms")
+  id          String       @id @default(uuid())
+  email       String       @unique
+  password    String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  fullName    String
+  image       String       @default("https://static.vecteezy.com/system/resources/thumbnails/020/765/399/small_2x/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg")
+  role        Role
+  submissions Submission[]
+  classrooms  Classroom[]  @relation("StudentClassrooms")
 }
 
 model Questions {
@@ -70,16 +71,16 @@ model QuestionPaper {
   classroomId       String
   questionPaperName String
   isLiveTest        Boolean                 @default(false)
-  // Live test status fields
-  status            TestStatus              @default(draft)
+  duration          Int?
+  endedAt           DateTime?
+  isActive          Boolean                 @default(false)
   scheduledAt       DateTime?
   startedAt         DateTime?
-  endedAt           DateTime?
-  duration          Int?                    // in minutes
-  totalMarks        Int?                    // total marks for the test
-  isActive          Boolean                 @default(false)
+  status            TestStatus              @default(draft)
+  totalMarks        Int?
   classroom         Classroom               @relation("classRoomQuestionPaper", fields: [classroomId], references: [id])
   questions         QuestionPaperQuestion[]
+  submissions       Submission[]
 }
 
 model QuestionPaperQuestion {
@@ -88,6 +89,18 @@ model QuestionPaperQuestion {
   questionId      BigInt
   question        Questions     @relation(fields: [questionId], references: [id], onDelete: Cascade)
   questionPaper   QuestionPaper @relation(fields: [questionPaperId], references: [id])
+}
+
+model Submission {
+  id                 String        @id @default(uuid())
+  studentId          String
+  questionPaperId    String
+  answers            Json
+  totalMarksObtained Int
+  totalMarks         Int
+  submittedAt        DateTime      @default(now())
+  questionPaper      QuestionPaper @relation(fields: [questionPaperId], references: [id], onDelete: Cascade)
+  student            Student       @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }
 
 enum Role {

@@ -10,9 +10,9 @@ export async function POST(req) {
       const check = await bcryptjs.compare(password, userExist.password);
       if (check) {
         const token = jwt.sign(
-          { id: userExist._id, email: userExist.email, role: "student" },
+          { id: userExist.id, email: userExist.email, role: "student" },
           process.env.JWT_SECRET, // use a strong secret in .env
-          { expiresIn: "9d" },
+          { expiresIn: "9d" }
         );
         const cookie = serialize("studentToken", token, {
           httpOnly: true,
@@ -33,12 +33,12 @@ export async function POST(req) {
             headers: {
               "Set-Cookie": cookie,
             },
-          },
+          }
         );
       } else {
         return new Response(
           JSON.stringify({ message: "password did'nt match" }),
-          { status: 402 },
+          { status: 402 }
         );
       }
     }
@@ -50,7 +50,7 @@ export async function POST(req) {
         errormsg: error,
         status: 502,
       }),
-      { status: 501 },
+      { status: 501 }
     );
   }
 }

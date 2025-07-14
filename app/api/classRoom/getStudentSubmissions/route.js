@@ -60,51 +60,49 @@ export async function POST(request) {
       );
     }
 
-    // Find all live tests in the classroom using status field
-    const liveTests = await prisma.questionPaper.findMany({
-      where: {
-        classroomId: classroomId,
-        status: "live",
-        isActive: true,
-      },
-      select: {
-        id: true,
-        questionPaperName: true,
-        duration: true,
-        totalMarks: true,
-        startedAt: true,
-        createdAt: true,
-        status: true,
-        isLiveTest: true,
-      },
-    });
-
-    // Filter out tests that the student has already completed
-    const completedTestIds = await prisma.submission.findMany({
+    // Get student's submissions for this classroom
+    const submissions = await prisma.submission.findMany({
       where: {
         studentId: studentId,
-        questionPaperId: {
-          in: liveTests.map((test) => test.id),
+        questionPaper: {
+          classroomId: classroomId,
         },
       },
-      select: {
-        questionPaperId: true,
+      include: {
+        questionPaper: {
+          select: {
+            id: true,
+            questionPaperName: true,
+            duration: true,
+            totalMarks: true,
+            startedAt: true,
+            endedAt: true,
+          },
+        },
+      },
+      orderBy: {
+        submittedAt: "desc",
       },
     });
-
-    const completedIds = completedTestIds.map((sub) => sub.questionPaperId);
-    const availableTests = liveTests.filter(
-      (test) => !completedIds.includes(test.id)
-    );
 
     return NextResponse.json({
       success: true,
-      liveTests: availableTests,
+      submissions: submissions.map((sub) => ({
+        id: sub.id,
+        testName: sub.questionPaper.questionPaperName,
+        totalMarksObtained: sub.totalMarksObtained,
+        totalMarks: sub.totalMarks,
+        percentage: Math.round((sub.totalMarksObtained / sub.totalMarks) * 100),
+        submittedAt: sub.submittedAt,
+        testDuration: sub.questionPaper.duration,
+        testStartedAt: sub.questionPaper.startedAt,
+        testEndedAt: sub.questionPaper.endedAt,
+      })),
     });
   } catch (error) {
-    console.error("Error fetching live tests:", error);
+    console.error("Error fetching student submissions:", error);
     return NextResponse.json(
-      { error: "Failed to fetch live tests" },
+      { error: "Failed to fetch submissions" },
       { status: 500 }
     );
   }

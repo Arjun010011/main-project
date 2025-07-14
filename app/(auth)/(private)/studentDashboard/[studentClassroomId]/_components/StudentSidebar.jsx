@@ -1,6 +1,14 @@
 "use client";
 
-import { Folder, Play, Users, Menu, X, FileTextIcon } from "lucide-react";
+import {
+  Folder,
+  Play,
+  Users,
+  Menu,
+  X,
+  FileTextIcon,
+  Award,
+} from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
@@ -43,16 +51,12 @@ const StudentSidebar = () => {
                 Tests
               </li>
             </Link>
-            <Link href={`/studentDashboard/${studentClassroomId}/assignments`}>
+            <Link
+              href={`/studentDashboard/${studentClassroomId}/completedTests`}
+            >
               <li className="py-3 px-2 rounded-md flex gap-2 hover:bg-gray-200 transition-colors duration-500 dark:hover:bg-gray-700">
-                <Folder />
-                Assignments
-              </li>
-            </Link>
-            <Link href={`/studentDashboard/${studentClassroomId}/liveTests`}>
-              <li className="py-3 px-2 rounded-md flex gap-2 hover:bg-gray-200 transition-colors duration-500 dark:hover:bg-gray-700">
-                <Play />
-                Live Tests
+                <Award />
+                Completed Tests
               </li>
             </Link>
             <Link href={`/studentDashboard/${studentClassroomId}/classmates`}>
