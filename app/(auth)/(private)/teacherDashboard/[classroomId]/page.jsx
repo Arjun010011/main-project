@@ -15,7 +15,7 @@ export default function ClassRoomPage() {
   useEffect(() => {
     const classRoomInfo = async () => {
       try {
-        const data = await axios.post("/api/classRoom/getClass", {
+        const data = await axios.post("/api/classRoom/getClassTeacher", {
           id: classroomId,
         });
         if (data) {

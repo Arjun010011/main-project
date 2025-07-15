@@ -20,9 +20,12 @@ export default function StudentClassroomPage() {
       setLoading(true);
       try {
         // Fetch classroom details
-        const classroomRes = await axios.post("/api/classRoom/getClass", {
-          id: studentClassroomId,
-        });
+        const classroomRes = await axios.post(
+          "/api/classRoom/getClassStudent",
+          {
+            id: studentClassroomId,
+          },
+        );
         setClassroom(classroomRes.data.classRoomInfo);
 
         // Fetch live tests for this classroom
@@ -30,7 +33,7 @@ export default function StudentClassroomPage() {
           "/api/classRoom/getActiveLiveTests",
           {
             classroomId: studentClassroomId,
-          }
+          },
         );
         setLiveTests(liveTestsRes.data.liveTests || []);
       } catch (error) {

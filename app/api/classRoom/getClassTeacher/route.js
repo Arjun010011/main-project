@@ -6,12 +6,11 @@ export async function POST(req) {
     const { id } = await req.json();
 
     // Get the student token from cookies
-    const studentToken = req.cookies.get("studentToken")?.value;
-
-    if (!studentToken) {
+    const teacherToken = req.cookies.get("teacherToken")?.value;
+    if (!teacherToken) {
       return new Response(
         JSON.stringify({ message: "Authentication required" }),
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -22,32 +21,27 @@ export async function POST(req) {
     }
 
     // Verify the student token
-    let studentId;
+    let teacherId;
     try {
-      const decoded = jwt.verify(studentToken, process.env.JWT_SECRET);
-      if (decoded.role !== "student") {
+      const decoded = jwt.verify(teacherToken, process.env.JWT_SECRET);
+      if (decoded.role !== "teacher") {
         return new Response(
-          JSON.stringify({ message: "Access denied. Students only." }),
-          { status: 403 }
+          JSON.stringify({ message: "Access denied. teachers only." }),
+          { status: 403 },
         );
       }
-      studentId = decoded.id;
+      teacherId = decoded.id;
     } catch (error) {
       return new Response(
         JSON.stringify({ message: "Invalid authentication token" }),
-        { status: 401 }
+        { status: 401 },
       );
     }
 
     // Verify that the student belongs to this classroom
-    const classRoomInfo = await prisma.classroom.findFirst({
+    const classRoomInfo = await prisma.classroom.findUnique({
       where: {
-        id: id,
-        students: {
-          some: {
-            id: studentId,
-          },
-        },
+        id,
       },
     });
 
@@ -56,7 +50,7 @@ export async function POST(req) {
         JSON.stringify({
           message: "Access denied. You are not enrolled in this classroom.",
         }),
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -65,13 +59,13 @@ export async function POST(req) {
         message: "got classroom data successfully!!!",
         classRoomInfo: classRoomInfo,
       }),
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error(error);
     return new Response(
       JSON.stringify({ message: "internal server error", error: error }),
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

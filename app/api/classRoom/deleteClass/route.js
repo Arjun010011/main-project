@@ -20,8 +20,11 @@ export async function DELETE(req) {
     );
   } catch (error) {
     console.error("something went wrong", error);
-    return new Response(JSON.stringify({ message: "Internal server error" }), {
-      status: 500,
-    });
+    return new Response(
+      JSON.stringify({ message: "Internal server error", error: error }),
+      {
+        status: 500,
+      },
+    );
   }
 }

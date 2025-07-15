@@ -78,7 +78,7 @@ model QuestionPaper {
   startedAt         DateTime?
   status            TestStatus              @default(draft)
   totalMarks        Int?
-  classroom         Classroom               @relation("classRoomQuestionPaper", fields: [classroomId], references: [id])
+  classroom         Classroom               @relation("classRoomQuestionPaper", fields: [classroomId], references: [id], onDelete: Cascade)
   questions         QuestionPaperQuestion[]
   submissions       Submission[]
 }
@@ -88,7 +88,7 @@ model QuestionPaperQuestion {
   questionPaperId String
   questionId      BigInt
   question        Questions     @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  questionPaper   QuestionPaper @relation(fields: [questionPaperId], references: [id])
+  questionPaper   QuestionPaper @relation(fields: [questionPaperId], references: [id], onDelete: Cascade)
 }
 
 model Submission {
