@@ -38,7 +38,7 @@ export default function TestInterface() {
           "/api/classRoom/verifyTestAccess",
           {
             questionPaperId: testId,
-          }
+          },
         );
 
         if (!accessResponse.data.success) {
@@ -50,7 +50,7 @@ export default function TestInterface() {
           "/api/classRoom/fetchQuestionPaper",
           {
             questionPaperId: testId,
-          }
+          },
         );
 
         const testInfo = accessResponse.data.testInfo;
@@ -58,7 +58,7 @@ export default function TestInterface() {
 
         setTestData(testInfo);
         setQuestions(questionsData);
-        setTimeLeft(testInfo.duration * 60); // Convert minutes to seconds
+        setTimeLeft(testInfo.duraton ? testInfo.duration : 10 * 60); // Convert minutes to seconds
       } catch (error) {
         console.error("Error loading test:", error);
         const errorMessage =
@@ -140,7 +140,7 @@ export default function TestInterface() {
       if (response.data.success) {
         const submission = response.data.submission;
         alert(
-          `Test submitted successfully!\n\nScore: ${submission.totalMarksObtained}/${submission.totalMarks} (${submission.percentage}%)`
+          `Test submitted successfully!\n\nScore: ${submission.totalMarksObtained}/${submission.totalMarks} (${submission.percentage}%)`,
         );
         router.push("/studentDashboard");
       }
@@ -317,8 +317,8 @@ export default function TestInterface() {
                         isCurrent
                           ? "bg-blue-500 text-white"
                           : isAnswered
-                          ? "bg-green-500 text-white"
-                          : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+                            ? "bg-green-500 text-white"
+                            : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
                       }`}
                     >
                       {index + 1}

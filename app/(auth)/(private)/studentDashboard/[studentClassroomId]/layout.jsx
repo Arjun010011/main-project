@@ -16,7 +16,7 @@ export default function StudentClassLayout({ children }) {
     const verifyAccess = async () => {
       try {
         // Verify that the student has access to this classroom
-        await axios.post("/api/classRoom/getClass", {
+        await axios.post("/api/classRoom/getClassStudent", {
           id: studentClassroomId,
         });
         setIsAuthorized(true);

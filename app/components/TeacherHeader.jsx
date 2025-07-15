@@ -1,15 +1,26 @@
 "use client";
-import Image from "next/image";
 import storeUser from "@/lib/store/userStore";
-import { Menu, Plus, X } from "lucide-react";
+import { Plus, X } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { ModeToggle } from "@/components/ui/ModeToggle";
+import { AvatarImage, Avatar } from "@radix-ui/react-avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
+import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 const TeacherHeader = () => {
+  const router = useRouter();
   const { randomBg } = storeUser();
   const teacherInfo = storeUser((state) => state.teacherInfo);
+  const logout = storeUser((state) => state.logout);
   const getClassRooms = storeUser((state) => state.getClassRooms);
   const [loading, setLoading] = useState(false);
   const classrooms = storeUser((state) => state.classrooms);
@@ -17,6 +28,11 @@ const TeacherHeader = () => {
   const [errorMsg, setErrorMsg] = useState(null);
   const [classroomInfo, setClassroomInfo] = useState({});
   const [plusClick, setPlusClick] = useState(false);
+
+  const handleLogout = async () => {
+    logout();
+    router.push("/");
+  };
   const handleChange = (e) => {
     e.preventDefault();
     const { id, value } = e.target;
@@ -95,13 +111,35 @@ const TeacherHeader = () => {
             <Plus size={20} />
           </div>
           <ModeToggle />
-          <Image
-            src={teacherInfo?.image || "/logo.png"}
-            height={40}
-            width={40}
-            alt="logo"
-            className="rounded-full"
-          />
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <Avatar>
+                <AvatarImage
+                  src={teacherInfo?.image || "/logo.png"}
+                  width={40}
+                  height={40}
+                  className="rounded-full cursor-pointer"
+                />
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="mr-5">
+              <DropdownMenuLabel>
+                <button
+                  type="button"
+                  className="cursor-pointer"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Delete account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <Link href="/teacherDashboard">
+                <DropdownMenuLabel>Go to home</DropdownMenuLabel>
+              </Link>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
       {plusClick && (

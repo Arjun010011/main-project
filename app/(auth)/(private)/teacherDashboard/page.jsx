@@ -6,14 +6,21 @@ import { motion } from "framer-motion";
 import TeacherHeader from "@/app/components/TeacherHeader";
 import { useEffect, useCallback, useState } from "react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/utils/supabaseClient";
 import ShowClassRoom from "@/app/components/ShowClassRoom";
 const Page = () => {
+  const router = useRouter();
   const [showEdit, setShowEdit] = useState(false);
   const [id, setId] = useState(null);
   const { teacherInfo, getClassRooms } = storeUser();
   const classrooms = storeUser((state) => state.classrooms);
 
+  useEffect(() => {
+    if (teacherInfo === null) {
+      router.push("/");
+    }
+  }, [teacherInfo, router]);
   const sendInfo = (data) => {
     setId(data.id);
     setShowEdit(data.show);
@@ -30,11 +37,11 @@ const Page = () => {
     } catch (error) {
       console.error("Error fetching classrooms:", error);
     }
-  }, [teacherInfo.email, getClassRooms]);
+  }, [teacherInfo?.email, getClassRooms]);
 
   // Set up real-time subscription and initial fetch
   useEffect(() => {
-    if (!teacherInfo.email) {
+    if (!teacherInfo?.email) {
       console.log("No teacher email, skipping subscription");
       return;
     }
@@ -69,9 +76,7 @@ const Page = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [teacherInfo.email, fetchClassrooms, classrooms, getClassRooms]);
-
-  // Delete classroom
+  }, [teacherInfo?.email, fetchClassrooms, classrooms, getClassRooms]);
 
   return (
     <div className="dark:bg-gray-800 h-[100vh] pt-[100px]">
