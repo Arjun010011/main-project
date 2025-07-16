@@ -62,6 +62,7 @@ model Questions {
   Option_D              String?
   Correct_Answer        String?
   Explanation           String?
+  Chapter               String?
   QuestionPaperQuestion QuestionPaperQuestion[]
 }
 

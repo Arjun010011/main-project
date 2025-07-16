@@ -22,7 +22,7 @@ export async function POST(req) {
         },
       );
     }
-    const query = `SELECT id, "Question", "Option_A", "Option_B", "Option_C", "Option_D", "Correct_Answer", "Explanation","Difficulty","Subject"
+    const query = `SELECT id, "Question", "Option_A", "Option_B", "Option_C", "Option_D", "Correct_Answer", "Explanation","Difficulty","Subject","Chapter"
     FROM "Questions" 
     WHERE "Subject" = $1 AND "Difficulty" = $2 
     ORDER BY RANDOM()
