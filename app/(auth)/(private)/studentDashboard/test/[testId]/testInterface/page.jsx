@@ -373,7 +373,10 @@ export default function TestInterface() {
                       <button
                         key={option}
                         onClick={() =>
-                          handleAnswerSelect(currentQuestion.id, option)
+                          handleAnswerSelect(
+                            currentQuestion.id,
+                            "Option_" + option,
+                          )
                         }
                         className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 ${
                           isSelected
