@@ -8,106 +8,112 @@ BigInt.prototype.toJSON = function () {
 };
 
 export async function POST(req) {
-  const { classroomId, questionInput, questionPaperName, prompt } =
-    await req.json();
+  const { classroomId, questionPaperName, prompt } = await req.json();
 
-  if (!Array.isArray(questionInput)) {
+  // Validate basic input
+  if (!prompt || !classroomId || !questionPaperName) {
     return new Response(
       JSON.stringify({
-        message: "The format of questionInput is not an array.",
+        message: "Prompt, classroomId, and questionPaperName are required.",
       }),
       { status: 400 },
     );
   }
 
-  let keywordArray = [];
-  const questionArray = [];
+  let questionInput;
+  try {
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash-latest",
+    });
 
-  //If prompt is provided, extract keywords using Gemini AI
-  if (prompt) {
+    const content = `
+      From the following prompt, extract the required question structure as a JSON array.
+      Each item in the array should contain:
+      {
+        subject: string(Physics,Chemistry or Physics),
+        topic: string (optional),
+        difficulty: string (Easy | Medium | Hard),
+        number_of_questions: number
+      }
+      give the output as json nothing else is needed, you don't have to mention it as json give the output in "" not in '''
+      Prompt: """${prompt}"""
+    `;
+
+    const result = await model.generateContent(content);
+    const response = await result.response;
+    const responseText = await response.text();
+
+    const cleanText = responseText
+      .trim()
+      .replace(/^```json|```$/g, "")
+      .trim();
     try {
-      const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash-latest",
-      });
-
-      const result = await model.generateContent(
-        `From the following prompt, give a comma-separated list of keywords to filter a question database: ${prompt}`,
+      questionInput = JSON.parse(cleanText);
+    } catch (err) {
+      console.error("JSON parsing error:", err, responseText);
+      return new Response(
+        JSON.stringify({ message: "Failed to extract valid JSON from AI." }),
+        {
+          status: 400,
+        },
       );
-
-      const response = await result.response;
-      const keywordText = await response.text();
-      console.log(keywordText);
-      keywordArray = keywordText
-        .split(",")
-        .map((k) => k.trim().toLowerCase())
-        .filter(Boolean);
-
-      if (keywordArray.length === 0) {
-        return new Response(
-          JSON.stringify({
-            message: "The AI returned no keywords from the prompt.",
-          }),
-          { status: 400 },
-        );
-      }
-    } catch (error) {
-      if (error.message?.includes("503")) {
-        return new Response(
-          JSON.stringify({
-            message:
-              "Gemini service is currently unavailable. Try again later or omit the prompt.",
-          }),
-          { status: 503 },
-        );
-      } else {
-        return new Response(
-          JSON.stringify({ message: "Gemini error: " + error.message }),
-          { status: 500 },
-        );
-      }
     }
+
+    if (!Array.isArray(questionInput) || questionInput.length === 0) {
+      return new Response(
+        JSON.stringify({
+          message: "Prompt did not yield valid question data.",
+        }),
+        {
+          status: 400,
+        },
+      );
+    }
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ message: "Gemini error: " + error.message }),
+      {
+        status: 500,
+      },
+    );
   }
 
-  //Fetch questions from Prisma
+  const questionArray = [];
+
   for (const param of questionInput) {
-    const { subject, difficulty, number_of_questions } = param;
+    const { subject, topic, difficulty, number_of_questions } = param;
 
     if (!subject || !difficulty || !number_of_questions) {
       return new Response(
-        JSON.stringify({ message: "Some fields are missing." }),
-        { status: 400 },
+        JSON.stringify({ message: "Some fields are missing in parsed input." }),
+        {
+          status: 400,
+        },
       );
     }
 
-    // Keyword filter-based dynamic query
     let query;
     let questions;
 
     try {
-      if (keywordArray.length > 0) {
-        // Dynamic OR clauses for each keyword
-        const keywordConditions = keywordArray
-          .map((_, i) => `"Question" ILIKE $${i + 4}`)
-          .join(" OR ");
-
+      if (topic) {
+        // Filter by subject, difficulty, AND topic
         query = `
           SELECT id
           FROM "Questions"
-          WHERE "Subject" = $1 AND "Difficulty" = $2 AND (${keywordConditions})
+          WHERE "Subject" = $1 AND "Difficulty" = $2 AND "Question" ILIKE $4
           ORDER BY RANDOM()
           LIMIT $3
         `;
-
-        const params = [
+        questions = await prisma.$queryRawUnsafe(
+          query,
           subject,
           difficulty,
           number_of_questions,
-          ...keywordArray.map((k) => `%${k}%`),
-        ];
-
-        questions = await prisma.$queryRawUnsafe(query, ...params);
+          `%${topic}%`,
+        );
       } else {
-        // Normal subject + difficulty filter
+        // Filter by subject and difficulty only
         query = `
           SELECT id
           FROM "Questions"
@@ -126,21 +132,24 @@ export async function POST(req) {
       questionArray.push(...questions.map((q) => q.id));
     } catch (error) {
       return new Response(
-        JSON.stringify({ message: "Database error: " + error.message }),
+        JSON.stringify({
+          message: "Database error while fetching questions: " + error.message,
+        }),
         { status: 500 },
       );
     }
   }
 
-  //Check if any questions were fetched
   if (questionArray.length === 0) {
     return new Response(
-      JSON.stringify({ message: "The questions array is empty." }),
-      { status: 404 },
+      JSON.stringify({ message: "No questions matched the prompt." }),
+      {
+        status: 404,
+      },
     );
   }
 
-  //Create Question Paper
+  // Create the question paper
   let questionPaper;
   try {
     questionPaper = await prisma.questionPaper.create({
@@ -158,7 +167,7 @@ export async function POST(req) {
     );
   }
 
-  //Link Questions to Paper
+  // Link questions to question paper
   const questionPaperQuestions = questionArray.map((qid) => ({
     questionPaperId: questionPaper.id,
     questionId: qid,
@@ -177,10 +186,9 @@ export async function POST(req) {
     );
   }
 
-  //Success
   return new Response(
     JSON.stringify({
-      message: "Question paper created successfully!",
+      message: "Question paper created successfully from prompt!",
       questionPaperId: questionPaper.id,
       questionCount: questionArray.length,
     }),

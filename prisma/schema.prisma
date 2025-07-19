@@ -92,6 +92,15 @@ model QuestionPaperQuestion {
   questionPaper   QuestionPaper @relation(fields: [questionPaperId], references: [id], onDelete: Cascade)
 }
 
+model Analytics {
+  id            String  @default(uuid())
+  classroomId   String
+  questionPaper Json?
+  Answer        Json?
+  Ai_suggestion String?
+  student_Id    String  @id
+}
+
 model Submission {
   id                 String        @id @default(uuid())
   studentId          String

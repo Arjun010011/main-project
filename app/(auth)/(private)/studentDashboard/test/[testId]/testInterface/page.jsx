@@ -58,7 +58,7 @@ export default function TestInterface() {
 
         setTestData(testInfo);
         setQuestions(questionsData);
-        setTimeLeft(testInfo.duraton ? testInfo.duration : 10 * 60); // Convert minutes to seconds
+        setTimeLeft(testInfo.duraton ? testInfo.duration : 100 * 60); // Convert minutes to seconds
       } catch (error) {
         console.error("Error loading test:", error);
         const errorMessage =
