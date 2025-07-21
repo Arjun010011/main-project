@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import jwt from "jsonwebtoken";
-
 export async function POST(request) {
   try {
     const { questionPaperId, answers } = await request.json();
@@ -12,14 +11,14 @@ export async function POST(request) {
     if (!studentToken) {
       return NextResponse.json(
         { error: "Authentication required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
     if (!questionPaperId || !answers) {
       return NextResponse.json(
         { error: "Question paper ID and answers are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -30,14 +29,14 @@ export async function POST(request) {
       if (decoded.role !== "student") {
         return NextResponse.json(
           { error: "Access denied. Students only." },
-          { status: 403 }
+          { status: 403 },
         );
       }
       studentId = decoded.id;
     } catch (error) {
       return NextResponse.json(
         { error: "Invalid authentication token" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -69,7 +68,7 @@ export async function POST(request) {
     if (questionPaper.status !== "live" || !questionPaper.isActive) {
       return NextResponse.json(
         { error: "Test is not currently live" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -77,7 +76,7 @@ export async function POST(request) {
     if (questionPaper.classroom.students.length === 0) {
       return NextResponse.json(
         { error: "Access denied. You are not enrolled in this classroom." },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -92,7 +91,7 @@ export async function POST(request) {
     if (existingSubmission) {
       return NextResponse.json(
         { error: "You have already submitted this test" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -120,7 +119,6 @@ export async function POST(request) {
         marksObtained: marksObtained,
       });
     }
-
     // Create submission record
     const submission = await prisma.submission.create({
       data: {
@@ -132,6 +130,27 @@ export async function POST(request) {
         submittedAt: new Date(),
       },
     });
+    if (!answerDetails || !studentId) {
+      return new Response(
+        JSON.stringify({ message: "All field are required" }, { status: 500 }),
+      );
+    }
+    const data = await prisma.analytics.update({
+      where: {
+        student_Id: studentId,
+      },
+      data: {
+        Answer: answerDetails,
+      },
+    });
+    if (data) {
+      return new Response(
+        JSON.stringify({ message: "Answers fed succefully" }),
+        {
+          status: 200,
+        },
+      );
+    }
 
     return NextResponse.json({
       success: true,
@@ -141,7 +160,7 @@ export async function POST(request) {
         totalMarksObtained: submission.totalMarksObtained,
         totalMarks: submission.totalMarks,
         percentage: Math.round(
-          (submission.totalMarksObtained / submission.totalMarks) * 100
+          (submission.totalMarksObtained / submission.totalMarks) * 100,
         ),
         submittedAt: submission.submittedAt,
       },
@@ -150,7 +169,7 @@ export async function POST(request) {
     console.error("Error submitting test:", error);
     return NextResponse.json(
       { error: "Failed to submit test" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

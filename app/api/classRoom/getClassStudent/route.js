@@ -30,7 +30,9 @@ export async function POST(req) {
           { status: 403 },
         );
       }
+
       studentId = decoded.id;
+      console.log(studentId);
     } catch (error) {
       return new Response(
         JSON.stringify({ message: "Invalid authentication token" }),
@@ -49,7 +51,7 @@ export async function POST(req) {
         },
       },
     });
-
+    console.log(classRoomInfo);
     if (!classRoomInfo) {
       return new Response(
         JSON.stringify({
@@ -63,6 +65,7 @@ export async function POST(req) {
       JSON.stringify({
         message: "got classroom data successfully!!!",
         classRoomInfo: classRoomInfo,
+        studentId: studentId,
       }),
       { status: 200 },
     );

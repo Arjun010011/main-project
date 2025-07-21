@@ -12,14 +12,14 @@ export async function POST(request) {
     if (!studentToken) {
       return NextResponse.json(
         { error: "Authentication required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
     if (!questionPaperId) {
       return NextResponse.json(
         { error: "Question paper ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -30,14 +30,14 @@ export async function POST(request) {
       if (decoded.role !== "student") {
         return NextResponse.json(
           { error: "Access denied. Students only." },
-          { status: 403 }
+          { status: 403 },
         );
       }
       studentId = decoded.id;
     } catch (error) {
       return NextResponse.json(
         { error: "Invalid authentication token" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -55,7 +55,6 @@ export async function POST(request) {
         },
       },
     });
-
     if (!questionPaper) {
       return NextResponse.json({ error: "Test not found" }, { status: 404 });
     }
@@ -64,7 +63,7 @@ export async function POST(request) {
     if (questionPaper.status !== "live" || !questionPaper.isActive) {
       return NextResponse.json(
         { error: "Test is not currently live" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -72,7 +71,7 @@ export async function POST(request) {
     if (questionPaper.classroom.students.length === 0) {
       return NextResponse.json(
         { error: "Access denied. You are not enrolled in this classroom." },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -87,7 +86,7 @@ export async function POST(request) {
     if (existingSubmission) {
       return NextResponse.json(
         { error: "You have already completed this test." },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -106,7 +105,7 @@ export async function POST(request) {
     console.error("Error verifying test access:", error);
     return NextResponse.json(
       { error: "Failed to verify test access" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

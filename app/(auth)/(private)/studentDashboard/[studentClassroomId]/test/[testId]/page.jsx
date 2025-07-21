@@ -8,6 +8,7 @@ import axios from "axios";
 export default function TestPage() {
   const params = useParams();
   const router = useRouter();
+  const studentClassroomId = params.studentClassroomId;
   const testId = params.testId;
   const [testInfo, setTestInfo] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -128,7 +129,9 @@ export default function TestPage() {
             <Button
               className="px-8 py-3 text-lg"
               onClick={() => {
-                router.push(`/studentDashboard/test/${testId}/testInterface`);
+                router.push(
+                  `/studentDashboard/${studentClassroomId}/test/${testId}/testInterface`,
+                );
               }}
             >
               Start Test

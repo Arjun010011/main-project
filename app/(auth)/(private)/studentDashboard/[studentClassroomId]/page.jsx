@@ -59,7 +59,9 @@ export default function StudentClassroomPage() {
       if (response.data.success) {
         // Access granted - navigate to test interface
         console.log("Access granted for test:", testId);
-        router.push(`/studentDashboard/test/${testId}`);
+        router.push(
+          `/studentDashboard/${studentClassroomId}/test/${testId}`,
+        );
       }
     } catch (error) {
       console.error("Error joining test:", error);

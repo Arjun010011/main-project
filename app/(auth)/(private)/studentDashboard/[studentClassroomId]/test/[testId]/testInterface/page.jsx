@@ -11,12 +11,13 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
-
+import storeUser from "@/lib/store/userStore";
 export default function TestInterface() {
   const params = useParams();
   const router = useRouter();
   const testId = params.testId;
-
+  const clsId = params.studentClassroomId;
+  const studentInfo = storeUser((state) => state.studentInfo);
   const [testData, setTestData] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -52,10 +53,25 @@ export default function TestInterface() {
             questionPaperId: testId,
           },
         );
-
         const testInfo = accessResponse.data.testInfo;
         const questionsData = testResponse.data.questionPaper.questions || [];
+        const analyticsInput1 = (studentId, classroomId, questionsData) => {
+          try {
+            if (!studentId || !classroomId || !questionsData) {
+              console.log("enter all the credentials");
+              return;
+            }
+            const data = axios.post("/api/classRoom/AnalyticsInput1", {
+              questionPaper: questionsData,
+              classroomId: classroomId,
+              studentId: studentInfo.id,
+            });
+          } catch (error) {
+            console.log(error.message);
+          }
+        };
 
+        analyticsInput1(clsId, studentInfo.id, questionsData);
         setTestData(testInfo);
         setQuestions(questionsData);
         setTimeLeft(testInfo.duraton ? testInfo.duration : 100 * 60); // Convert minutes to seconds
