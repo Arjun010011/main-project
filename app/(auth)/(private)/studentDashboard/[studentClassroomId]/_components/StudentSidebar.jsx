@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  Folder,
-  Play,
-  Users,
-  Menu,
-  X,
-  FileTextIcon,
-  Award,
-} from "lucide-react";
+import { Users, Menu, X, FileTextIcon, Award } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";

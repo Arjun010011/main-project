@@ -30,7 +30,7 @@ export async function POST(req) {
       From the following prompt, extract the required question structure as a JSON array.
       Each item in the array should contain:
       {
-        subject: string(Physics,Chemistry or Mathematics),
+        subject: string(Physics,Chemistry or Maths don't sound it as mathmatics instead it is stored as maths in database so use Maths),
         topic: string (optional),
         difficulty: string (Easy | Medium | Hard),
         number_of_questions: number

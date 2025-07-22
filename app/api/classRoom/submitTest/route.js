@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import jwt from "jsonwebtoken";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 export async function POST(request) {
   try {
     const { questionPaperId, answers } = await request.json();
@@ -144,27 +145,55 @@ export async function POST(request) {
       },
     });
     if (data) {
-      return new Response(
-        JSON.stringify({ message: "Answers fed succefully" }),
-        {
-          status: 200,
+      const genAI = new GoogleGenerativeAI(process.env.GEMINI_KEY);
+      const data = await prisma.analytics.findUnique({
+        where: {
+          student_Id: studentId,
         },
-      );
-    }
+      });
+      const { questionPaper, Answer } = data;
 
-    return NextResponse.json({
-      success: true,
-      message: "Test submitted successfully",
-      submission: {
-        id: submission.id,
-        totalMarksObtained: submission.totalMarksObtained,
-        totalMarks: submission.totalMarks,
-        percentage: Math.round(
-          (submission.totalMarksObtained / submission.totalMarks) * 100,
-        ),
-        submittedAt: submission.submittedAt,
-      },
-    });
+      const model = genAI.getGenerativeModel({
+        model: "gemini-1.5-flash-latest",
+      });
+
+      const content = `
+I am providing the student's question paper and their answers in JSON format below. 
+Please analyze their performance, identify strengths and weaknesses, and suggest improvements.
+
+Question Paper JSON:
+${JSON.stringify(questionPaper, null, 2)}
+
+Answer JSON:
+${JSON.stringify(Answer, null, 2)}
+`;
+      const result = await model.generateContent(content);
+      const response = await result.response;
+      const responseText = await response.text();
+      const data1 = await prisma.analytics.update({
+        where: {
+          student_Id: studentId,
+        },
+        data: {
+          Ai_suggestion: responseText,
+        },
+      });
+      if (data1) {
+        return NextResponse.json({
+          success: true,
+          message: "Test submitted successfully",
+          submission: {
+            id: submission.id,
+            totalMarksObtained: submission.totalMarksObtained,
+            totalMarks: submission.totalMarks,
+            percentage: Math.round(
+              (submission.totalMarksObtained / submission.totalMarks) * 100,
+            ),
+            submittedAt: submission.submittedAt,
+          },
+        });
+      }
+    }
   } catch (error) {
     console.error("Error submitting test:", error);
     return NextResponse.json(
