@@ -138,7 +138,10 @@ export async function POST(request) {
     }
     const data = await prisma.analytics.update({
       where: {
-        student_Id: studentId,
+        test_Id_student_Id: {
+          student_Id: studentId,
+          test_Id: questionPaperId,
+        },
       },
       data: {
         Answer: answerDetails,
@@ -148,7 +151,10 @@ export async function POST(request) {
       const genAI = new GoogleGenerativeAI(process.env.GEMINI_KEY);
       const data = await prisma.analytics.findUnique({
         where: {
-          student_Id: studentId,
+          test_Id_student_Id: {
+            student_Id: studentId,
+            test_Id: questionPaperId,
+          },
         },
       });
       const { questionPaper, Answer } = data;
@@ -158,8 +164,8 @@ export async function POST(request) {
       });
 
       const content = `
+Your are an kcet examiner assistant ai who helps the students to know where the are doing better, worse and suggest improvements and practices and also give key point to be read on their prefered textbook which is ncert books.You should check the isCorrect to see how many are true and false to know the details.If anything seems wrong on that part you should give details about that in developer concern part if not you don't want to give it.
 I am providing the student's question paper and their answers in JSON format below. 
-Please analyze their performance, identify strengths and weaknesses, and suggest improvements.
 
 Question Paper JSON:
 ${JSON.stringify(questionPaper, null, 2)}
@@ -172,7 +178,10 @@ ${JSON.stringify(Answer, null, 2)}
       const responseText = await response.text();
       const data1 = await prisma.analytics.update({
         where: {
-          student_Id: studentId,
+          test_Id_student_Id: {
+            student_Id: studentId,
+            test_Id: questionPaperId,
+          },
         },
         data: {
           Ai_suggestion: responseText,

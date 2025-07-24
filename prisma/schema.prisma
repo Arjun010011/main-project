@@ -33,6 +33,7 @@ model Classroom {
   Teacher       Teacher         @relation(fields: [teacherId], references: [id])
   QuestionPaper QuestionPaper[] @relation("classRoomQuestionPaper")
   students      Student[]       @relation("StudentClassrooms")
+  Analytics     Analytics[]
 
   @@unique([className, teacherId], name: "className_teacherId")
 }
@@ -93,12 +94,16 @@ model QuestionPaperQuestion {
 }
 
 model Analytics {
-  id            String  @default(uuid())
-  classroomId   String
+  id            String    @id @default(uuid())
+  test_Id       String
+  Ai_suggestion String?
+  student_Id    String
   questionPaper Json?
   Answer        Json?
-  Ai_suggestion String?
-  student_Id    String  @id
+  classroomId   String
+  classroom     Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+
+  @@unique([test_Id, student_Id])
 }
 
 model Submission {

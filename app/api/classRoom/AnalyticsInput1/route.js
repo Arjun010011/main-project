@@ -3,7 +3,8 @@ import prisma from "@/lib/prisma";
 export async function POST(req) {
   console.log(Object.keys(prisma));
   try {
-    const { questionPaper, studentId, classroomId } = await req.json();
+    const { questionPaper, studentId, classroomId, testId } = await req.json();
+    console.log(classroomId);
     if (!questionPaper || !studentId || !classroomId) {
       return new Response(
         JSON.stringify({ message: "all field are required" }),
@@ -15,6 +16,7 @@ export async function POST(req) {
         questionPaper,
         student_Id: studentId,
         classroomId,
+        test_Id: testId,
       },
     });
     console.log(data);

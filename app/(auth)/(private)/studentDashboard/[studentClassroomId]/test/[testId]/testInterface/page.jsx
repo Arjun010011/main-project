@@ -57,14 +57,15 @@ export default function TestInterface() {
         const questionsData = testResponse.data.questionPaper.questions || [];
         const analyticsInput1 = (studentId, classroomId, questionsData) => {
           try {
-            if (!studentId || !classroomId || !questionsData) {
+            if (!studentId || !clsId || !questionsData) {
               console.log("enter all the credentials");
               return;
             }
             const data = axios.post("/api/classRoom/AnalyticsInput1", {
               questionPaper: questionsData,
-              classroomId: classroomId,
+              classroomId: clsId,
               studentId: studentInfo.id,
+              testId: testId,
             });
           } catch (error) {
             console.log(error.message);
