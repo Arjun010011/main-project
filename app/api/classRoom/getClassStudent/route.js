@@ -32,7 +32,6 @@ export async function POST(req) {
       }
 
       studentId = decoded.id;
-      console.log(studentId);
     } catch (error) {
       return new Response(
         JSON.stringify({ message: "Invalid authentication token" }),
@@ -51,7 +50,6 @@ export async function POST(req) {
         },
       },
     });
-    console.log(classRoomInfo);
     if (!classRoomInfo) {
       return new Response(
         JSON.stringify({

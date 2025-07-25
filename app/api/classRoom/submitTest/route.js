@@ -131,39 +131,32 @@ export async function POST(request) {
         submittedAt: new Date(),
       },
     });
-    if (!answerDetails || !studentId) {
-      return new Response(
-        JSON.stringify({ message: "All field are required" }, { status: 500 }),
-      );
-    }
-    const data = await prisma.analytics.update({
-      where: {
-        test_Id_student_Id: {
-          student_Id: studentId,
-          test_Id: questionPaperId,
-        },
-      },
-      data: {
-        Answer: answerDetails,
-      },
-    });
-    if (data) {
-      const genAI = new GoogleGenerativeAI(process.env.GEMINI_KEY);
-      const data = await prisma.analytics.findUnique({
-        where: {
-          test_Id_student_Id: {
-            student_Id: studentId,
-            test_Id: questionPaperId,
+    if (submission) {
+      const createAnalytics = await prisma.analytics.create({
+        data: {
+          questionPaper: questionPaper.questions,
+          submission: {
+            connect: {
+              id: submission.id,
+            },
           },
+          answer: answerDetails,
         },
       });
-      const { questionPaper, Answer } = data;
+      if (createAnalytics) {
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_KEY);
+        const data = await prisma.analytics.findUnique({
+          where: {
+            id: createAnalytics.id,
+          },
+        });
+        const { questionPaper, answer } = data;
 
-      const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash-latest",
-      });
+        const model = genAI.getGenerativeModel({
+          model: "gemini-1.5-flash-latest",
+        });
 
-      const content = `
+        const content = `
 Your are an kcet examiner assistant ai who helps the students to know where the are doing better, worse and suggest improvements and practices and also give key point to be read on their prefered textbook which is ncert books.You should check the isCorrect to see how many are true and false to know the details.If anything seems wrong on that part you should give details about that in developer concern part if not you don't want to give it.
 I am providing the student's question paper and their answers in JSON format below. 
 
@@ -171,36 +164,34 @@ Question Paper JSON:
 ${JSON.stringify(questionPaper, null, 2)}
 
 Answer JSON:
-${JSON.stringify(Answer, null, 2)}
+${JSON.stringify(answer, null, 2)}
 `;
-      const result = await model.generateContent(content);
-      const response = await result.response;
-      const responseText = await response.text();
-      const data1 = await prisma.analytics.update({
-        where: {
-          test_Id_student_Id: {
-            student_Id: studentId,
-            test_Id: questionPaperId,
+        const result = await model.generateContent(content);
+        const response = await result.response;
+        const responseText = await response.text();
+        const data1 = await prisma.analytics.update({
+          where: {
+            id: createAnalytics.id,
           },
-        },
-        data: {
-          Ai_suggestion: responseText,
-        },
-      });
-      if (data1) {
-        return NextResponse.json({
-          success: true,
-          message: "Test submitted successfully",
-          submission: {
-            id: submission.id,
-            totalMarksObtained: submission.totalMarksObtained,
-            totalMarks: submission.totalMarks,
-            percentage: Math.round(
-              (submission.totalMarksObtained / submission.totalMarks) * 100,
-            ),
-            submittedAt: submission.submittedAt,
+          data: {
+            Ai_suggestion: responseText,
           },
         });
+        if (data1) {
+          return NextResponse.json({
+            success: true,
+            message: "Test submitted successfully",
+            submission: {
+              id: submission.id,
+              totalMarksObtained: submission.totalMarksObtained,
+              totalMarks: submission.totalMarks,
+              percentage: Math.round(
+                (submission.totalMarksObtained / submission.totalMarks) * 100,
+              ),
+              submittedAt: submission.submittedAt,
+            },
+          });
+        }
       }
     }
   } catch (error) {
