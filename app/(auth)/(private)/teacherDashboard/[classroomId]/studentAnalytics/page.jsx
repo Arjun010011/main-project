@@ -452,9 +452,13 @@ export default function StudentAnalytics() {
                               <h4 className="font-semibold text-sm sm:text-base text-gray-800 dark:text-gray-200 mb-1">
                                 Test: {analyticsItem.questionPaperName}
                               </h4>
-                              <p className="text-gray-700 dark:text-gray-300 text-sm">
-                                {analyticsItem.aiSuggestion}
-                              </p>
+                              {/* CORRECTED LINE BELOW: Re-added the text-sm class */}
+                              <div
+                                className="text-gray-700 dark:text-gray-300 text-sm"
+                                dangerouslySetInnerHTML={{
+                                  __html: analyticsItem.aiSuggestion,
+                                }}
+                              />
                             </div>
                           ),
                       )}
