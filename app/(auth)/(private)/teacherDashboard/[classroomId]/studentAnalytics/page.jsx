@@ -28,6 +28,7 @@ import {
   ArrowUp,
   ArrowDown,
   Minus,
+  Brain, // Added Brain icon for AI suggestions
 } from "lucide-react";
 
 ChartJS.register(
@@ -67,6 +68,13 @@ export default function StudentAnalytics() {
 
       const data = await response.json();
       setStudents(data.students);
+      // If a student was already selected, re-select them to update their data
+      if (selectedStudent) {
+        const updatedSelected = data.students.find(
+          (s) => s.studentId === selectedStudent.studentId,
+        );
+        setSelectedStudent(updatedSelected);
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -141,6 +149,17 @@ export default function StudentAnalytics() {
           <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
             Individual student performance and progress tracking
           </p>
+        </div>
+
+        {/* Search Bar (Optional, but good for usability) */}
+        <div className="mb-6">
+          <input
+            type="text"
+            placeholder="Search students by name or email..."
+            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
 
         {/* Students Grid */}
@@ -408,6 +427,43 @@ export default function StudentAnalytics() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* --- */}
+
+            {/* AI Suggestions Section */}
+            {selectedStudent.detailedSubmissionAnalytics &&
+              selectedStudent.detailedSubmissionAnalytics.length > 0 && (
+                <Card>
+                  <CardHeader className="px-4 sm:px-6">
+                    <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                      <Brain className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-600" />
+                      AI Insights & Suggestions
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="px-4 sm:px-6">
+                    <div className="space-y-4">
+                      {selectedStudent.detailedSubmissionAnalytics.map(
+                        (analyticsItem) =>
+                          analyticsItem.aiSuggestion && ( // Only show if an AI suggestion exists
+                            <div
+                              key={analyticsItem.submissionId}
+                              className="border-b pb-3 last:border-b-0 last:pb-0"
+                            >
+                              <h4 className="font-semibold text-sm sm:text-base text-gray-800 dark:text-gray-200 mb-1">
+                                Test: {analyticsItem.questionPaperName}
+                              </h4>
+                              <p className="text-gray-700 dark:text-gray-300 text-sm">
+                                {analyticsItem.aiSuggestion}
+                              </p>
+                            </div>
+                          ),
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+            {/* --- */}
 
             {/* Test History Table */}
             {selectedStudent.performanceTrend.length > 0 && (

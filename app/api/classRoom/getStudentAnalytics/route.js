@@ -86,6 +86,7 @@ export async function GET(request) {
                 endedAt: true,
               },
             },
+            Analytics: true,
           },
           orderBy: {
             submittedAt: "asc",
@@ -108,7 +109,7 @@ export async function GET(request) {
       let lowestScore = 100;
       const testScores = [];
       const performanceTrend = [];
-
+      const detailedSubmissionAnalytics = [];
       submissions.forEach((submission, index) => {
         const percentage =
           (submission.totalMarksObtained / submission.totalMarks) * 100;
@@ -124,6 +125,13 @@ export async function GET(request) {
           date: submission.submittedAt,
           testId: submission.questionPaper.id,
         });
+        if (submission.Analytics) {
+          detailedSubmissionAnalytics.push({
+            submissionId: submission.id,
+            questionPaperName: submission.questionPaper.questionPaperName,
+            aiSuggestion: submission.Analytics.Ai_suggestion,
+          });
+        }
       });
 
       const averageScore =
@@ -159,6 +167,7 @@ export async function GET(request) {
         scoreDistribution,
         performanceTrend,
         participationRate: totalTests > 0 ? 100 : 0, // If they have submissions, they participated
+        detailedSubmissionAnalytics,
       };
     });
 
