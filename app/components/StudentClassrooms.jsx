@@ -1,37 +1,56 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import storeUser from "@/lib/store/userStore";
 import Image from "next/image";
 import Link from "next/link";
-
+import { supabase } from "@/utils/supabaseClient";
 const StudentClassrooms = () => {
-  const [classrooms, setClassrooms] = useState([]);
   const [loading, setLoading] = useState(true);
+  const classrooms = storeUser((state) => state.studentClassrooms);
+  const getStudentClassrooms = storeUser((state) => state.getStudentClassRooms);
   const studentInfo = storeUser((state) => state.studentInfo);
+  const fetchClassrooms = useCallback(async () => {
+    try {
+      const response = await axios.post("/api/classRoom/getStudentClassrooms", {
+        studentId: studentInfo.id,
+      });
+      getStudentClassrooms(response.data.classrooms);
+    } catch (error) {
+      console.error("Error fetching classrooms:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [studentInfo, getStudentClassrooms]);
 
   useEffect(() => {
-    const fetchClassrooms = async () => {
-      try {
-        const response = await axios.post(
-          "/api/classRoom/getStudentClassrooms",
-          {
-            studentId: studentInfo.id,
-          },
-        );
-        setClassrooms(response.data.classrooms);
-      } catch (error) {
-        console.error("Error fetching classrooms:", error);
-      } finally {
-        setLoading(false);
-      }
+    fetchClassrooms();
+    const channel = supabase
+      .channel("student-classrooms")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "student" },
+        (payload) => {
+          if (payload.eventType === "INSERT") {
+            // Check if the new classroom belongs to the teacher
+            if (payload.new.student_email === studentInfo.email) {
+              getStudentClassrooms([...classrooms, payload.new]);
+            }
+          } else if (payload.eventType === "UPDATE") {
+            fetchClassrooms(); // Refetch to ensure consistency
+          } else if (payload.eventType === "DELETE") {
+            getStudentClassrooms(
+              classrooms.filter((cls) => cls.id !== payload.old.id),
+            );
+          }
+        },
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
     };
-
-    if (studentInfo?.id) {
-      fetchClassrooms();
-    }
-  }, [studentInfo?.id]);
+  }, [classrooms]);
 
   if (loading) {
     return (

@@ -76,7 +76,7 @@ const Page = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [teacherInfo?.email, fetchClassrooms, classrooms, getClassRooms]);
+  }, [classrooms, teacherInfo.email]);
 
   return (
     <div className="dark:bg-gray-800 h-[100vh] pt-[100px]">
