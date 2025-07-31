@@ -12,7 +12,7 @@ function Page() {
 
   const [message, setMessage] = useState("");
   const [errmsg, setErrmsg] = useState("");
-  const [prompt, setPrompt] = useState(""); // ✅ Add prompt state
+  const [prompt, setPrompt] = useState("");
   const [questionPaperName, setQuestionPaperName] = useState("");
 
   const [subject, setSubject] = useState({
@@ -33,7 +33,7 @@ function Page() {
           item.difficulty === e.target.dataset.difficulty,
       );
       if (index !== -1) {
-        updated[index].number_of_questions = Number(e.target.value); // ✅ fixed typo
+        updated[index].number_of_questions = Number(e.target.value);
       } else {
         updated.push({
           subject: e.target.dataset.subject,
@@ -54,7 +54,7 @@ function Page() {
         classroomId,
         questionInput: quesitonParameters,
         questionPaperName,
-        prompt, // ✅ Send AI prompt
+        prompt,
       };
 
       const res = await axios.post(
@@ -66,6 +66,13 @@ function Page() {
         setMessage(
           "Question paper created successfully. You can download it from the 'Print Paper' section.",
         );
+        setPrompt("");
+        setQuestionPaperName("");
+        setSubject({
+          physics: false,
+          chemistry: false,
+          mathematics: false,
+        });
         setErrmsg("");
       } else {
         setErrmsg("Question paper creation failed. Please try again later.");
@@ -103,7 +110,8 @@ function Page() {
 
         <div className="mb-6">
           <p className="font-semibold mb-2">
-            (Optional) Add AI prompt to filter questions intelligently
+            Add AI prompt to filter questions intelligently(choose or for manual
+            input)
           </p>
           <textarea
             rows={3}
@@ -117,7 +125,11 @@ function Page() {
             </div>
           )}
         </div>
-
+        <div className="w-full flex items-center justify-center gap-3">
+          <div className="flex-grow border-t border-gray-300 dark:border-gray-700 rounded-full"></div>
+          <p className="dark:text-white text-black mx-auto">Or</p>
+          <div className="flex-grow border-t border-gray-300 dark:border-gray-700 rounded-full"></div>
+        </div>
         <div className="mb-6">
           <p className="font-semibold mb-3">Select Subjects</p>
           <div className="flex flex-wrap gap-4">

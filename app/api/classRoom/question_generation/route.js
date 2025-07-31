@@ -8,10 +8,12 @@ BigInt.prototype.toJSON = function () {
 };
 
 export async function POST(req) {
-  const { classroomId, questionPaperName, prompt } = await req.json();
+  const body = await req.json();
+  const { classroomId, questionPaperName, prompt } = body;
+  let { questionInput = [] } = body;
 
   // Validate basic input
-  if (!prompt || !classroomId || !questionPaperName) {
+  if (!classroomId || !questionPaperName) {
     return new Response(
       JSON.stringify({
         message: "Prompt, classroomId, and questionPaperName are required.",
@@ -20,13 +22,14 @@ export async function POST(req) {
     );
   }
 
-  let questionInput;
-  try {
-    const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash-latest",
-    });
+  let aiQuesitonInput;
+  if (questionInput.length === 0 && prompt) {
+    try {
+      const model = genAI.getGenerativeModel({
+        model: "gemini-1.5-flash-latest",
+      });
 
-    const content = `
+      const content = `
       From the following prompt, extract the required question structure as a JSON array.
       Each item in the array should contain:
       {
@@ -39,47 +42,47 @@ export async function POST(req) {
       Prompt: """${prompt}"""
     `;
 
-    const result = await model.generateContent(content);
-    const response = await result.response;
-    const responseText = await response.text();
+      const result = await model.generateContent(content);
+      const response = await result.response;
+      const responseText = await response.text();
 
-    const cleanText = responseText
-      .trim()
-      .replace(/^```json|```$/g, "")
-      .trim();
-    try {
-      questionInput = JSON.parse(cleanText);
-    } catch (err) {
-      console.error("JSON parsing error:", err, responseText);
+      const cleanText = responseText
+        .trim()
+        .replace(/^```json|```$/g, "")
+        .trim();
+      try {
+        aiQuesitonInput = JSON.parse(cleanText);
+      } catch (err) {
+        console.error("JSON parsing error:", err, responseText);
+        return new Response(
+          JSON.stringify({ message: "Failed to extract valid JSON from AI." }),
+          {
+            status: 400,
+          },
+        );
+      }
+
+      if (!Array.isArray(aiQuesitonInput) || aiQuesitonInput.length === 0) {
+        return new Response(
+          JSON.stringify({
+            message: "Prompt did not yield valid question data.",
+          }),
+          {
+            status: 400,
+          },
+        );
+      }
+    } catch (error) {
       return new Response(
-        JSON.stringify({ message: "Failed to extract valid JSON from AI." }),
+        JSON.stringify({ message: "Gemini error: " + error.message }),
         {
-          status: 400,
+          status: 500,
         },
       );
     }
-
-    if (!Array.isArray(questionInput) || questionInput.length === 0) {
-      return new Response(
-        JSON.stringify({
-          message: "Prompt did not yield valid question data.",
-        }),
-        {
-          status: 400,
-        },
-      );
-    }
-  } catch (error) {
-    return new Response(
-      JSON.stringify({ message: "Gemini error: " + error.message }),
-      {
-        status: 500,
-      },
-    );
   }
-
   const questionArray = [];
-
+  if (aiQuesitonInput) questionInput = aiQuesitonInput;
   for (const param of questionInput) {
     const { subject, topic, difficulty, number_of_questions } = param;
 
