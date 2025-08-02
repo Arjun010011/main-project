@@ -30,7 +30,7 @@ function Page() {
       const index = updated.findIndex(
         (item) =>
           item.subject === e.target.dataset.subject &&
-          item.difficulty === e.target.dataset.difficulty,
+          item.difficulty === e.target.dataset.difficulty
       );
       if (index !== -1) {
         updated[index].number_of_questions = Number(e.target.value);
@@ -59,12 +59,12 @@ function Page() {
 
       const res = await axios.post(
         "/api/classRoom/question_generation",
-        sendData,
+        sendData
       );
 
       if (res.status === 200) {
         setMessage(
-          "Question paper created successfully. You can download it from the 'Print Paper' section.",
+          "Question paper created successfully. You can download it from the 'Print Paper' section."
         );
         setPrompt("");
         setQuestionPaperName("");
@@ -125,12 +125,17 @@ function Page() {
             </div>
           )}
         </div>
-        <div className="w-full flex items-center justify-center gap-3">
+        <div
+          className={`w-full flex items-center justify-center gap-3 ${
+            prompt ? "hidden" : "block"
+          }`}
+        >
           <div className="flex-grow border-t border-gray-300 dark:border-gray-700 rounded-full"></div>
           <p className="dark:text-white text-black mx-auto">Or</p>
           <div className="flex-grow border-t border-gray-300 dark:border-gray-700 rounded-full"></div>
         </div>
-        <div className="mb-6">
+
+        <div className={`mb-6 ${prompt ? "hidden" : "block"}`}>
           <p className="font-semibold mb-3">Select Subjects</p>
           <div className="flex flex-wrap gap-4">
             {[
