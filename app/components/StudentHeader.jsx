@@ -26,7 +26,7 @@ const StudentHeader = () => {
             height={40}
             width={40}
             alt="logo"
-            className="rounded-full"
+            className="rounded-full text-white"
           />
         </div>
       </header>
