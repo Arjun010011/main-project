@@ -47,11 +47,21 @@ const Header = () => {
             <Link href="/">
               <li>Home</li>
             </Link>
-            <li>pricing</li>
-            <li>About</li>
-            <li>Features</li>
-            <li>FAQ</li>
-            <li>Contact</li>
+            <Link href="/Pricing">
+              <li>pricing</li>
+            </Link>
+            <Link href="/About">
+              <li>About</li>
+            </Link>
+            <Link href="/Features">
+              <li>Features</li>
+            </Link>
+            <Link href="/Faq">
+              <li>FAQ</li>
+            </Link>
+            <Link href="/Contact">
+              <li>Contact</li>
+            </Link>
             <Link href="/selection">
               <li className="mt-5 md:mt-0">
                 <Button variant="default">Get started</Button>
@@ -63,11 +73,21 @@ const Header = () => {
           <Link href="/">
             <li>Home</li>
           </Link>
-          <li>Pricing</li>
-          <li>About</li>
-          <li>Features</li>
-          <li>FAQ</li>
-          <li>Contact</li>
+          <Link href="/Pricing">
+            <li>pricing</li>
+          </Link>
+          <Link href="/About">
+            <li>About</li>
+          </Link>
+          <Link href="/Features">
+            <li>Features</li>
+          </Link>
+          <Link href="/Faq">
+            <li>FAQ</li>
+          </Link>
+          <Link href="/Contact">
+            <li>Contact</li>
+          </Link>
           <Link href="/selection">
             <li>
               <Button variant="default">Get started</Button>
