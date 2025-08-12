@@ -1,5 +1,6 @@
 "use client";
 import Header from "./components/Header";
+//testing
 import { Button } from "@/components/ui/button";
 import Footer from "./components/Footer";
 import { Wand2, TrendingUp, GraduationCap } from "lucide-react";
