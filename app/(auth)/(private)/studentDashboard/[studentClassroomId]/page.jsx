@@ -59,9 +59,7 @@ export default function StudentClassroomPage() {
       if (response.data.success) {
         // Access granted - navigate to test interface
         console.log("Access granted for test:", testId);
-        router.push(
-          `/studentDashboard/${studentClassroomId}/test/${testId}`,
-        );
+        router.push(`/studentDashboard/${studentClassroomId}/test/${testId}`);
       }
     } catch (error) {
       console.error("Error joining test:", error);
@@ -158,7 +156,7 @@ export default function StudentClassroomPage() {
                     </div>
 
                     <Button
-                      className="w-full  text-white"
+                      className="w-full  text-white dark:bg-gray-800 curosr-pointer"
                       onClick={() => handleJoinTest(test.id)}
                     >
                       Join Test

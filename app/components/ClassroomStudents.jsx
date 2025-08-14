@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
-
+import { Trash } from "lucide-react";
 const ClassroomStudents = ({ classroomId }) => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,6 +30,22 @@ const ClassroomStudents = ({ classroomId }) => {
     }
   }, [classroomId]);
 
+  const handleDeleteStudent = async (studentId) => {
+    try {
+      console.log(studentId);
+      const response = await axios.put("/api/classRoom/removeStudent", {
+        student_id: studentId,
+        classroomId,
+      });
+      if (response.status === 200) {
+        console.log("student deleted");
+      } else {
+        console.log("something went wrong");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   if (loading) {
     return <div className="text-center p-4">Loading students...</div>;
   }
@@ -53,25 +69,33 @@ const ClassroomStudents = ({ classroomId }) => {
         {students.map((student) => (
           <div
             key={student.id}
-            className="bg-gray-200 rounded-lg shadow-md p-4 flex items-center gap-4 dark:bg-gray-500"
+            className="flex items-center justify-between gap-4 rounded-lg bg-gray-200 p-4 shadow-md dark:bg-gray-500"
           >
-            <Image
-              src={student.image}
-              alt={student.fullName}
-              width={50}
-              height={50}
-              className="rounded-full"
-            />
-            <div>
-              <h3 className="font-semibold dark:text-white">
-                {student.fullName}
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-200">
-                {student.email}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-300">
-                Joined: {new Date(student.createdAt).toLocaleDateString()}
-              </p>
+            <div className="flex items-center gap-4">
+              <Image
+                src={student.image}
+                alt={student.fullName}
+                width={50}
+                height={50}
+                className="rounded-full"
+              />
+              <div>
+                <h3 className="font-semibold dark:text-white">
+                  {student.fullName}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-200">
+                  {student.email}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-300">
+                  Joined: {new Date(student.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+            <div
+              className="flex-shrink-0 cursor-pointer rounded-md bg-red-500 p-2 transition-colors duration-200 hover:bg-red-600"
+              onClick={() => handleDeleteStudent(student.id)}
+            >
+              <Trash color="white" size={20} />
             </div>
           </div>
         ))}
