@@ -9,7 +9,7 @@ export async function POST(req) {
         JSON.stringify({
           message: "Classroom code and student ID are required",
         }),
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -18,7 +18,6 @@ export async function POST(req) {
       where: { code },
       include: { students: true },
     });
-
     if (!classroom) {
       return new Response(JSON.stringify({ message: "Classroom not found" }), {
         status: 404,
@@ -27,13 +26,34 @@ export async function POST(req) {
 
     // Check if student is already in the classroom
     const isAlreadyJoined = classroom.students.some(
-      (student) => student.id === studentId
+      (student) => student.id === studentId,
     );
 
     if (isAlreadyJoined) {
       return new Response(
         JSON.stringify({ message: "Student is already in this classroom" }),
-        { status: 400 }
+        { status: 400 },
+      );
+    }
+
+    //check wether the student is blocked?
+    const blocked = await prisma.blockedStudent.findUnique({
+      where: {
+        unique_blocked_student_in_classroom: {
+          studentId: studentId,
+          classroomId: classroom.id,
+        },
+      },
+    });
+    if (blocked) {
+      return new Response(
+        JSON.stringify({
+          message:
+            "Your are blocked by the teacher please contact the admin for ublocking ",
+        }),
+        {
+          status: 403,
+        },
       );
     }
 
@@ -55,7 +75,7 @@ export async function POST(req) {
         message: "Successfully joined classroom",
         classroom: updatedClassroom,
       }),
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error joining classroom:", error);
@@ -64,7 +84,7 @@ export async function POST(req) {
         message: "Internal server error",
         error: error.message,
       }),
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
-import { Trash } from "lucide-react";
+import { ShieldBan, Trash } from "lucide-react";
 const ClassroomStudents = ({ classroomId }) => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -32,13 +32,29 @@ const ClassroomStudents = ({ classroomId }) => {
 
   const handleDeleteStudent = async (studentId) => {
     try {
-      console.log(studentId);
       const response = await axios.put("/api/classRoom/removeStudent", {
         student_id: studentId,
         classroomId,
       });
       if (response.status === 200) {
         console.log("student deleted");
+      } else {
+        console.log("something went wrong");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleBlockStudent = async (studentId) => {
+    try {
+      const response = await axios.post("/api/classRoom/blockStudent", {
+        studentId: studentId,
+        classroomId,
+      });
+      if (response.status === 200) {
+        console.log("student deleted");
+        handleDeleteStudent(studentId);
       } else {
         console.log("something went wrong");
       }
@@ -65,7 +81,7 @@ const ClassroomStudents = ({ classroomId }) => {
       <h2 className="text-xl font-bold mb-4 dark:text-white">
         Students ({students.length})
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-auto-fit gap-4">
         {students.map((student) => (
           <div
             key={student.id}
@@ -91,11 +107,19 @@ const ClassroomStudents = ({ classroomId }) => {
                 </p>
               </div>
             </div>
-            <div
-              className="flex-shrink-0 cursor-pointer rounded-md bg-red-500 p-2 transition-colors duration-200 hover:bg-red-600"
-              onClick={() => handleDeleteStudent(student.id)}
-            >
-              <Trash color="white" size={20} />
+            <div className="flex flex-row items-center justify-center gap-2">
+              <div
+                className="flex-shrink-0 cursor-pointer rounded-md bg-red-400 p-2 transition-colors duration-200 hover:bg-red-600"
+                onClick={() => handleDeleteStudent(student.id)}
+              >
+                <Trash color="white" size={20} />
+              </div>
+              <div
+                className="flex-shrink-0 cursor-pointer rounded-md bg-gray-300 p-2 transition-colors duration-200 hover:bg-gray-400"
+                onClick={() => handleBlockStudent(student.id)}
+              >
+                <ShieldBan color="white" size={20} />
+              </div>
             </div>
           </div>
         ))}

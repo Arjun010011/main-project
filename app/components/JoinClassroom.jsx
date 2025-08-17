@@ -25,7 +25,9 @@ const JoinClassroom = ({ onClose }) => {
         code: classCode,
         studentId: studentInfo.id,
       });
-
+      if (response.status === 403) {
+        setErrorMsg(response.data.message);
+      }
       setSuccessMsg(response.data.message);
       setTimeout(() => {
         onClose();
