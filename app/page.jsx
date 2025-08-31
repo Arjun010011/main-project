@@ -19,8 +19,8 @@ export default function Home() {
             Generate Smart <br /> Question paper In <br /> Seconds
           </p>
           <p className="font-extralight mt-7 text-center">
-            Advanced AI-powered platform designed specifically for <br /> JEE,
-            NEET, and CET exam preparation
+            Advanced AI-powered platform designed specifically for CET exam
+            preparation
           </p>
           <div className="my-15 flex gap-5 w-full justify-center">
             <Link href="/selection">

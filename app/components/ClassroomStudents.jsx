@@ -8,6 +8,21 @@ const ClassroomStudents = ({ classroomId }) => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const handleDeleteStudent = async (studentId) => {
+    try {
+      const response = await axios.put("/api/classRoom/removeStudent", {
+        student_id: studentId,
+        classroomId,
+      });
+      if (response.status === 200) {
+        console.log("student deleted");
+      } else {
+        console.log("something went wrong");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   useEffect(() => {
     const fetchStudents = async () => {
       try {
@@ -28,23 +43,7 @@ const ClassroomStudents = ({ classroomId }) => {
     if (classroomId) {
       fetchStudents();
     }
-  }, [classroomId]);
-
-  const handleDeleteStudent = async (studentId) => {
-    try {
-      const response = await axios.put("/api/classRoom/removeStudent", {
-        student_id: studentId,
-        classroomId,
-      });
-      if (response.status === 200) {
-        console.log("student deleted");
-      } else {
-        console.log("something went wrong");
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  }, [classroomId, handleDeleteStudent()]);
 
   const handleBlockStudent = async (studentId) => {
     try {
@@ -114,12 +113,12 @@ const ClassroomStudents = ({ classroomId }) => {
               >
                 <Trash color="white" size={20} />
               </div>
-              <div
-                className="flex-shrink-0 cursor-pointer rounded-md bg-gray-300 p-2 transition-colors duration-200 hover:bg-gray-400"
-                onClick={() => handleBlockStudent(student.id)}
-              >
-                <ShieldBan color="white" size={20} />
-              </div>
+              {/* <div */}
+              {/*   className="flex-shrink-0 cursor-pointer rounded-md bg-gray-300 p-2 transition-colors duration-200 hover:bg-gray-400" */}
+              {/*   onClick={() => handleBlockStudent(student.id)} */}
+              {/* > */}
+              {/*   <ShieldBan color="white" size={20} /> */}
+              {/* </div> */}
             </div>
           </div>
         ))}
