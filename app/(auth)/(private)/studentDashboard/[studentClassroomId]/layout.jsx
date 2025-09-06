@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, usePathname } from "next/navigation";
 import { Loader } from "lucide-react";
 import axios from "axios";
 import StudentHeader from "@/app/components/StudentHeader";
@@ -9,8 +9,16 @@ import StudentSidebar from "./_components/StudentSidebar";
 export default function StudentClassLayout({ children }) {
   const params = useParams();
   const router = useRouter();
+  const pathname = usePathname();
   const studentClassroomId = params.studentClassroomId;
   const [isAuthorized, setIsAuthorized] = useState(null);
+
+  // Check if current page is a test interface
+  const isTestPage =
+    pathname?.includes("/test/") ||
+    pathname?.includes("/testInterface") ||
+    pathname?.endsWith("/test") ||
+    params.testId; // If there's a testId param, it's likely a test page
 
   useEffect(() => {
     const verifyAccess = async () => {
@@ -27,7 +35,6 @@ export default function StudentClassLayout({ children }) {
         router.push("/studentDashboard");
       }
     };
-
     if (studentClassroomId) {
       verifyAccess();
     }
@@ -45,6 +52,12 @@ export default function StudentClassLayout({ children }) {
     return null; // Will redirect to dashboard
   }
 
+  // If it's a test page, render without header and sidebar
+  if (isTestPage) {
+    return <div className="w-full h-screen">{children}</div>;
+  }
+
+  // Normal layout with header and sidebar
   return (
     <div className="flex">
       <main className="flex-1">
