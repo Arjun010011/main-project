@@ -174,7 +174,7 @@ const Page = () => {
                 Your Classrooms
               </h2>
               <p className="text-slate-600 dark:text-slate-400">
-                Manage and organize your teaching spaces
+                Manage your teaching spaces
               </p>
             </div>
             {classrooms && classrooms.length !== 0 ? (
