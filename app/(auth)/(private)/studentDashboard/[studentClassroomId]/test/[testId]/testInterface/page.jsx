@@ -39,14 +39,17 @@ export default function TestInterface() {
   const [showTabWarning, setShowTabWarning] = useState(false);
   const [lastSwitchTime, setLastSwitchTime] = useState(null);
   const [autoSubmissionTriggered, setAutoSubmissionTriggered] = useState(false);
+  const [testLocked, setTestLocked] = useState(false); // New state to lock the test
   const warningTimeoutRef = useRef(null);
 
   // Final submission function
   const submitTestFinal = async () => {
     try {
       setIsSubmitting(true);
+      setTestLocked(true); // Lock the test immediately
       setShowSubmissionWarning(false);
       setShowTabWarning(false);
+
       const response = await axios.post("/api/classRoom/submitTest", {
         questionPaperId: testId,
         answers: answers,
@@ -67,6 +70,7 @@ export default function TestInterface() {
       alert(errorMessage);
     } finally {
       setIsSubmitting(false);
+      setTestLocked(false);
     }
   };
 
@@ -116,7 +120,7 @@ export default function TestInterface() {
 
   // Tab switching and focus monitoring
   useEffect(() => {
-    if (!testStarted) return;
+    if (!testStarted || testLocked) return;
 
     // Handle visibility change (tab switching)
     const handleVisibilityChange = () => {
@@ -127,9 +131,12 @@ export default function TestInterface() {
         setLastSwitchTime(new Date());
         setShowTabWarning(true);
 
-        // **SIMPLE AUTO-SUBMIT ON 3RD VIOLATION**
+        // **AUTO-SUBMIT ON 3RD VIOLATION + NAVIGATE TO LAST QUESTION**
         if (newCount >= 3 && !autoSubmissionTriggered) {
           setAutoSubmissionTriggered(true);
+          setTestLocked(true);
+          // Navigate to last question (where submit button is)
+          setCurrentQuestionIndex(questions.length - 1);
           submitTestFinal();
         }
 
@@ -160,9 +167,12 @@ export default function TestInterface() {
         setLastSwitchTime(new Date());
         setShowTabWarning(true);
 
-        // **SIMPLE AUTO-SUBMIT ON 3RD VIOLATION**
+        // **AUTO-SUBMIT ON 3RD VIOLATION + NAVIGATE TO LAST QUESTION**
         if (newCount >= 3 && !autoSubmissionTriggered) {
           setAutoSubmissionTriggered(true);
+          setTestLocked(true);
+          // Navigate to last question (where submit button is)
+          setCurrentQuestionIndex(questions.length - 1);
           submitTestFinal();
         }
       }
@@ -236,14 +246,23 @@ export default function TestInterface() {
         clearTimeout(warningTimeoutRef.current);
       }
     };
-  }, [testStarted, tabSwitchCount, autoSubmissionTriggered, submitTestFinal]);
+  }, [
+    testStarted,
+    tabSwitchCount,
+    autoSubmissionTriggered,
+    questions.length,
+    testLocked,
+    submitTestFinal,
+  ]);
 
   // Timer effect
   useEffect(() => {
-    if (!testStarted || !timeLeft) return;
+    if (!testStarted || !timeLeft || testLocked) return;
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
+          setTestLocked(true);
+          setCurrentQuestionIndex(questions.length - 1);
           submitTestFinal();
           return 0;
         }
@@ -251,7 +270,7 @@ export default function TestInterface() {
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, [testStarted, timeLeft, submitTestFinal]);
+  }, [testStarted, timeLeft, testLocked, questions.length, submitTestFinal]);
 
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
@@ -266,6 +285,7 @@ export default function TestInterface() {
   };
 
   const handleAnswerSelect = (questionId, selectedAnswer) => {
+    if (testLocked) return; // Prevent answer changes when locked
     setAnswers((prev) => ({
       ...prev,
       [questionId]: selectedAnswer,
@@ -273,30 +293,41 @@ export default function TestInterface() {
   };
 
   const handleNextQuestion = () => {
+    if (testLocked) return; // Prevent navigation when locked
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex((prev) => prev + 1);
     }
   };
 
   const handlePrevQuestion = () => {
+    if (testLocked) return; // Prevent navigation when locked
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex((prev) => prev - 1);
     }
   };
 
   const handleSubmitTest = async () => {
+    if (testLocked) return; // Prevent multiple submissions
+
     const unanswered = questions.filter((question) => !answers[question.id]);
     if (unanswered.length > 0) {
       setUnansweredQuestions(unanswered);
       setShowSubmissionWarning(true);
       return;
     }
+    setTestLocked(true);
     submitTestFinal();
   };
 
   const handleGoToUnanswered = (questionIndex) => {
+    if (testLocked) return; // Prevent navigation when locked
     setCurrentQuestionIndex(questionIndex);
     setShowSubmissionWarning(false);
+  };
+
+  const handleQuestionNavigation = (index) => {
+    if (testLocked) return; // Prevent navigation when locked
+    setCurrentQuestionIndex(index);
   };
 
   const startTest = () => {
@@ -403,7 +434,7 @@ export default function TestInterface() {
 
   return (
     <div
-      className="min-h-screen bg-gray-50 dark:bg-gray-800 select-none relative"
+      className={`min-h-screen bg-gray-50 dark:bg-gray-800 select-none relative ${testLocked ? "pointer-events-none" : ""}`}
       onContextMenu={(e) => e.preventDefault()}
       style={{
         WebkitTouchCallout: "none",
@@ -415,7 +446,7 @@ export default function TestInterface() {
       }}
     >
       {/* Simple Tab Switch Warning - Non-blocking */}
-      {showTabWarning && (
+      {showTabWarning && !testLocked && (
         <div className="fixed top-4 right-4 z-30 max-w-sm">
           <div className="bg-red-500 text-white p-3 rounded-lg shadow-lg animate-in slide-in-from-right-full duration-300">
             <div className="flex items-center gap-2">
@@ -430,7 +461,7 @@ export default function TestInterface() {
 
       {/* Simple Red Message at Bottom for Auto-Submission */}
       {autoSubmissionTriggered && (
-        <div className="fixed bottom-0 left-0 right-0 z-50">
+        <div className="fixed bottom-0 left-0 right-0 z-50 pointer-events-auto">
           <div className="bg-red-600 text-white text-center py-4 px-6">
             <div className="flex items-center justify-center gap-2">
               <AlertCircle size={20} />
@@ -442,8 +473,23 @@ export default function TestInterface() {
         </div>
       )}
 
+      {/* Test Locked Overlay */}
+      {testLocked && (
+        <div className="fixed inset-0 bg-black/30 z-40 flex items-center justify-center pointer-events-auto">
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl p-8 text-center max-w-md mx-4">
+            <Loader className="animate-spin mx-auto mb-4" size={32} />
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+              Submitting Test...
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300">
+              Please wait while your test is being submitted.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Submission Warning Modal */}
-      {showSubmissionWarning && (
+      {showSubmissionWarning && !testLocked && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl max-w-md w-full mx-4 animate-in zoom-in-95 duration-200">
             <div className="p-6">
@@ -587,11 +633,13 @@ export default function TestInterface() {
         </div>
       </div>
 
-      {/* Rest of your component remains the same */}
       <div className="max-w-6xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Question Navigation Panel */}
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-4 sticky top-4">
+            <div
+              className={`bg-white dark:bg-gray-900 rounded-lg shadow-lg p-4 sticky top-4 ${testLocked ? "opacity-50" : ""}`}
+            >
               <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
                 Question Navigator
               </h3>
@@ -602,13 +650,18 @@ export default function TestInterface() {
                   return (
                     <button
                       key={index}
-                      onClick={() => setCurrentQuestionIndex(index)}
-                      className={`w-8 h-8 rounded text-xs font-medium transition-all duration-200 cursor-pointer select-none ${
+                      onClick={() => handleQuestionNavigation(index)}
+                      disabled={testLocked}
+                      className={`w-8 h-8 rounded text-xs font-medium transition-all duration-200 select-none ${
+                        testLocked
+                          ? "cursor-not-allowed opacity-50"
+                          : "cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-600"
+                      } ${
                         isCurrent
                           ? "bg-blue-500 text-white shadow-md"
                           : isAnswered
                             ? "bg-green-500 text-white shadow-sm"
-                            : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+                            : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
                       }`}
                     >
                       {index + 1}
@@ -633,8 +686,11 @@ export default function TestInterface() {
             </div>
           </div>
 
+          {/* Main test content */}
           <div className="lg:col-span-3">
-            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8">
+            <div
+              className={`bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8 ${testLocked ? "opacity-50" : ""}`}
+            >
               <div className="mb-8">
                 <div className="flex items-center gap-2 mb-4">
                   <span className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm font-medium">
@@ -664,7 +720,12 @@ export default function TestInterface() {
                             "Option_" + option,
                           )
                         }
-                        className={`group w-full text-left p-4 rounded-lg border-2 transition-all duration-200 cursor-pointer select-none transform hover:scale-[1.02] active:scale-[0.98] ${
+                        disabled={testLocked}
+                        className={`group w-full text-left p-4 rounded-lg border-2 transition-all duration-200 select-none ${
+                          testLocked
+                            ? "cursor-not-allowed opacity-50"
+                            : "cursor-pointer transform hover:scale-[1.02] active:scale-[0.98]"
+                        } ${
                           isSelected
                             ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg shadow-blue-500/20 ring-2 ring-blue-500/30"
                             : "border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:shadow-md"
@@ -704,11 +765,12 @@ export default function TestInterface() {
                 </div>
               </div>
 
+              {/* Navigation */}
               <div className="flex justify-between items-center pt-6 border-t border-gray-200 dark:border-gray-700">
                 <Button
                   variant="outline"
                   onClick={handlePrevQuestion}
-                  disabled={currentQuestionIndex === 0}
+                  disabled={currentQuestionIndex === 0 || testLocked}
                   className="flex items-center gap-2 select-none"
                 >
                   <ArrowLeft size={16} />
@@ -718,14 +780,26 @@ export default function TestInterface() {
                   {currentQuestionIndex === questions.length - 1 ? (
                     <Button
                       onClick={handleSubmitTest}
-                      disabled={isSubmitting}
-                      className="bg-green-600 hover:bg-green-700 select-none"
+                      disabled={isSubmitting || testLocked}
+                      className={`select-none ${
+                        testLocked
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-green-600 hover:bg-green-700"
+                      }`}
                     >
-                      {isSubmitting ? "Submitting..." : "Submit Test"}
+                      {isSubmitting ? (
+                        <div className="flex items-center gap-2">
+                          <Loader size={16} className="animate-spin" />
+                          Submitting...
+                        </div>
+                      ) : (
+                        "Submit Test"
+                      )}
                     </Button>
                   ) : (
                     <Button
                       onClick={handleNextQuestion}
+                      disabled={testLocked}
                       className="flex items-center gap-2 select-none"
                     >
                       Next
