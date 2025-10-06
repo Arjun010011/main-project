@@ -12,7 +12,7 @@ export async function GET(request) {
     if (!classroomId) {
       return NextResponse.json(
         { error: "Classroom ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -22,7 +22,7 @@ export async function GET(request) {
     if (!teacherToken) {
       return NextResponse.json(
         { error: "Authentication required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -33,14 +33,14 @@ export async function GET(request) {
     } catch (error) {
       return NextResponse.json(
         { error: "Invalid authentication token" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
     if (decoded.role !== "teacher") {
       return NextResponse.json(
         { error: "Only teachers can access analytics" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -55,7 +55,7 @@ export async function GET(request) {
     if (!classroom) {
       return NextResponse.json(
         { error: "Classroom not found or access denied" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -129,7 +129,7 @@ export async function GET(request) {
           ? submissions.reduce(
               (sum, sub) =>
                 sum + (sub.totalMarksObtained / sub.totalMarks) * 100,
-              0
+              0,
             ) / submissions.length
           : 0;
 
@@ -154,7 +154,7 @@ export async function GET(request) {
       analytics.totalTests * analytics.totalStudents;
     if (totalPossibleSubmissions > 0) {
       analytics.participationRate = Math.round(
-        (totalSubmissions / totalPossibleSubmissions) * 100
+        (totalSubmissions / totalPossibleSubmissions) * 100,
       );
     }
 
@@ -163,7 +163,7 @@ export async function GET(request) {
     console.error("Error fetching class analytics:", error);
     return NextResponse.json(
       { error: "Failed to fetch analytics" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

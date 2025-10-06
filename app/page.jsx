@@ -64,7 +64,10 @@ export default function Home() {
             </p>
             <p>Join thousands of students already using our platform</p>
             <Link href="/selection">
-              <Button variant="secondary" className="md:w-[200px]">
+              <Button
+                variant="secondary"
+                className="md:w-[200px] dark:bg-white dark:text-black"
+              >
                 Get started free
               </Button>
             </Link>

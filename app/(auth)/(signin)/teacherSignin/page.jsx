@@ -49,7 +49,7 @@ const page = () => {
       setLoading(false);
       if (error.response) {
         setErrorMsg(
-          error.response.data?.message || "email does'nt exist signup"
+          error.response.data?.message || "email does'nt exist signup",
         );
       } else {
         setErrorMsg("somthing went wrong try again later");

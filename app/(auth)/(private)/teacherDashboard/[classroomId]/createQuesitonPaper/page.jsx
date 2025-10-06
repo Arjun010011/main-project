@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useParams } from "next/navigation";
-import { FlaskConical, Calculator, AtomIcon } from "lucide-react";
+import { FlaskConical, Calculator, AtomIcon, Loader2 } from "lucide-react";
 import { useState } from "react";
 
 function Page() {
@@ -14,6 +14,7 @@ function Page() {
   const [errmsg, setErrmsg] = useState("");
   const [prompt, setPrompt] = useState("");
   const [questionPaperName, setQuestionPaperName] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const [subject, setSubject] = useState({
     physics: false,
@@ -30,7 +31,7 @@ function Page() {
       const index = updated.findIndex(
         (item) =>
           item.subject === e.target.dataset.subject &&
-          item.difficulty === e.target.dataset.difficulty
+          item.difficulty === e.target.dataset.difficulty,
       );
       if (index !== -1) {
         updated[index].number_of_questions = Number(e.target.value);
@@ -48,6 +49,7 @@ function Page() {
   // Submit config to backend
   const getQuestionPaper = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const sendData = {
@@ -59,12 +61,12 @@ function Page() {
 
       const res = await axios.post(
         "/api/classRoom/question_generation",
-        sendData
+        sendData,
       );
 
       if (res.status === 200) {
         setMessage(
-          "Question paper created successfully. You can download it from the 'Print Paper' section."
+          "Question paper created successfully. You can download it from the 'Print Paper' section.",
         );
         setPrompt("");
         setQuestionPaperName("");
@@ -82,6 +84,8 @@ function Page() {
       setErrmsg("Something went wrong. Please try again.");
       setMessage("");
       console.error(error);
+    } finally {
+      setLoading(false); // 👈 stop loading
     }
   };
 
@@ -110,8 +114,8 @@ function Page() {
 
         <div className="mb-6">
           <p className="font-semibold mb-2">
-            Add AI prompt to filter questions intelligently(choose or for manual
-            input)
+            Add AI prompt to filter questions intelligently (choose or for
+            manual input)
           </p>
           <textarea
             rows={3}
@@ -125,6 +129,7 @@ function Page() {
             </div>
           )}
         </div>
+
         <div
           className={`w-full flex items-center justify-center gap-3 ${
             prompt ? "hidden" : "block"
@@ -205,9 +210,21 @@ function Page() {
           );
         })}
 
+        {/* Button with Loading Spinner */}
         <div className="mt-6 flex items-center justify-center">
-          <Button type="submit" className="px-6">
-            Generate Question Paper
+          <Button
+            type="submit"
+            className="px-6 flex items-center gap-2"
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              "Generate Question Paper"
+            )}
           </Button>
         </div>
       </form>

@@ -26,7 +26,7 @@ export async function POST(req) {
   if (questionInput.length === 0 && prompt) {
     try {
       const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash-latest",
+        model: "gemini-2.5-flash",
       });
 
       const content = `
