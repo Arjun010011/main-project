@@ -6,6 +6,8 @@ import { format } from "date-fns";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import StudentSidebar from "./_components/StudentSidebar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export default function StudentClassroomPage() {
   const params = useParams();
@@ -19,7 +21,6 @@ export default function StudentClassroomPage() {
     const fetchClassroomData = async () => {
       setLoading(true);
       try {
-        // Fetch classroom details
         const classroomRes = await axios.post(
           "/api/classRoom/getClassStudent",
           {
@@ -28,7 +29,6 @@ export default function StudentClassroomPage() {
         );
         setClassroom(classroomRes.data.classRoomInfo);
 
-        // Fetch live tests for this classroom
         const liveTestsRes = await axios.post(
           "/api/classRoom/getActiveLiveTests",
           {
@@ -51,14 +51,11 @@ export default function StudentClassroomPage() {
 
   const handleJoinTest = async (testId) => {
     try {
-      // Verify test access before allowing the student to join
       const response = await axios.post("/api/classRoom/verifyTestAccess", {
         questionPaperId: testId,
       });
 
       if (response.data.success) {
-        // Access granted - navigate to test interface
-        console.log("Access granted for test:", testId);
         router.push(`/studentDashboard/${studentClassroomId}/test/${testId}`);
       }
     } catch (error) {
@@ -76,96 +73,128 @@ export default function StudentClassroomPage() {
   };
 
   return (
-    <div className="pt-[100px] min-lg:pl-[270px] pr-5 dark:bg-gray-800 max-sm:pt-20 max-sm:p-5 min-h-screen">
-      <div className="flex gap-6">
-        <StudentSidebar />
-
-        <div className="flex-1">
-          <div className="mb-6">
-            <h1 className="font-bold text-3xl mb-2 text-black dark:text-white">
-              Clasroom Name: {classroom?.className || "Classroom"}
+    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950">
+      <StudentSidebar />
+      <div className="flex-1 p-8 sm:p-12 lg:ml-[270px] pt-24 max-sm:p-4 max-sm:pt-20">
+        <div className="max-w-7xl mx-auto">
+          {/* Classroom Header */}
+          <header className="mb-10">
+            <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-2">
+              {classroom?.className || "Classroom"}
             </h1>
-            <div className="text-sm text-gray-600 dark:text-gray-300">
+            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+              <span className="flex items-center gap-1">
+                <Users size={16} /> {classroom?.studentsCount || 0} Students
+              </span>
+              <span className="hidden sm:inline">|</span>
               <p>
                 Subject:{" "}
-                {classroom?.subjectName && `${classroom.subjectName}  `}
+                <span className="font-medium text-gray-800 dark:text-gray-200">
+                  {classroom?.subjectName || "N/A"}
+                </span>
               </p>
               <p>
                 Section:{" "}
-                {classroom?.sectionName && `${classroom.sectionName}  `}
+                <span className="font-medium text-gray-800 dark:text-gray-200">
+                  {classroom?.sectionName || "N/A"}
+                </span>
               </p>
-              <p>Classroom Code: {classroom?.code}</p>
+              <p>
+                Code:{" "}
+                <span className="font-medium text-gray-800 dark:text-gray-200">
+                  {classroom?.code || "N/A"}
+                </span>
+              </p>
             </div>
-          </div>
+          </header>
 
-          <div className="mb-8">
-            <h2 className="font-bold text-xl mb-4 text-black dark:text-white">
-              Tests
+          {/* Tests Section */}
+          <section>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+              Live Tests
             </h2>
 
             {loading ? (
               <div className="flex items-center justify-center h-40">
-                <Loader className="animate-spin text-black dark:text-white" />
+                <Loader className="animate-spin text-blue-500" size={40} />
               </div>
             ) : liveTests.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-40 text-gray-500 dark:text-gray-300">
-                <span className="text-lg">No tests available.</span>
-                <span className="text-sm mt-2">
-                  You have either completed all available tests or there are no
-                  live tests in this classroom.
+              <div className="flex flex-col items-center justify-center p-12 bg-white dark:bg-gray-900 rounded-lg shadow-inner text-center">
+                <span className="text-xl font-semibold text-gray-700 dark:text-gray-300">
+                  No tests available.
                 </span>
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 max-w-sm">
+                  There are no live tests in this classroom or you have
+                  completed all of them.
+                </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {liveTests.map((test) => (
-                  <div
+                  <Card
                     key={test.id}
-                    className="p-5 border-1 border-gray-300 dark:border-gray-700 rounded-lg shadow-lg bg-white dark:bg-gray-900 flex flex-col gap-4"
+                    className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden"
                   >
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                        <span className="text-xs text-green-600 dark:text-green-400 font-medium">
-                          LIVE NOW
-                        </span>
+                    <CardHeader className="p-6 pb-0">
+                      <div className="flex items-center justify-between mb-2">
+                        <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+                          {test.questionPaperName}
+                        </CardTitle>
+                        <Badge
+                          variant="secondary"
+                          className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                        >
+                          <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-1"></span>
+                          LIVE
+                        </Badge>
                       </div>
-
-                      <span className="font-bold text-lg text-black dark:text-white">
-                        {test.questionPaperName}
-                      </span>
-                    </div>
-
-                    <div className="flex flex-col lg:flex-row gap-2 text-sm text-gray-600 dark:text-gray-400">
-                      <div className="flex items-center gap-2">
-                        <Clock size={14} />
-                        <span>Duration: {formatDuration(test.duration)}</span>
+                    </CardHeader>
+                    <CardContent className="p-6 pt-4 text-sm text-gray-600 dark:text-gray-400">
+                      <div className="grid gap-3">
+                        <div className="flex items-center gap-2">
+                          <Clock
+                            size={16}
+                            className="text-gray-500 dark:text-gray-500"
+                          />
+                          <span>
+                            <span className="font-medium">Duration:</span>{" "}
+                            {formatDuration(test.duration)}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Award
+                            size={16}
+                            className="text-gray-500 dark:text-gray-500"
+                          />
+                          <span>
+                            <span className="font-medium">Total Marks:</span>{" "}
+                            {test.totalMarks || "N/A"}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">Started At:</span>
+                          <span>
+                            {test.startedAt
+                              ? format(
+                                  new Date(test.startedAt),
+                                  "h:mm a, MMM d, yyyy",
+                                )
+                              : "N/A"}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Award size={14} />
-                        <span>Total Marks: {test.totalMarks || "N/A"}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Users size={14} />
-                        <span>
-                          Started:{" "}
-                          {test.startedAt
-                            ? format(new Date(test.startedAt), "h:mm a")
-                            : "N/A"}
-                        </span>
-                      </div>
-                    </div>
-
-                    <Button
-                      className="w-full  text-white dark:bg-gray-800 curosr-pointer"
-                      onClick={() => handleJoinTest(test.id)}
-                    >
-                      Join Test
-                    </Button>
-                  </div>
+                      <Button
+                        className="w-full mt-6 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition-colors"
+                        onClick={() => handleJoinTest(test.id)}
+                      >
+                        Join Test
+                      </Button>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
             )}
-          </div>
+          </section>
         </div>
       </div>
     </div>

@@ -1,10 +1,8 @@
 "use client";
+
 import { useEffect, useState } from "react";
-import { Loader, Award, Clock, Calendar, TrendingUp } from "lucide-react";
 import { useParams } from "next/navigation";
-import axios from "axios";
-import { format } from "date-fns";
-import StudentSidebar from "../_components/StudentSidebar";
+import storeUser from "@/lib/store/userStore";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -18,7 +16,19 @@ import {
   LineElement,
   Filler,
 } from "chart.js";
-import { Line, Doughnut } from "react-chartjs-2";
+import { Doughnut, Line } from "react-chartjs-2";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  User,
+  TrendingUp,
+  Target,
+  Award,
+  Activity,
+  ArrowUp,
+  ArrowDown,
+  Minus,
+  Brain,
+} from "lucide-react";
 
 ChartJS.register(
   CategoryScale,
@@ -30,402 +40,275 @@ ChartJS.register(
   ArcElement,
   PointElement,
   LineElement,
-  Filler
+  Filler,
 );
 
-export default function CompletedTestsPage() {
-  const params = useParams();
-  const studentClassroomId = params.studentClassroomId;
-  const [submissions, setSubmissions] = useState([]);
+export default function StudentAnalyticsPage() {
+  const { studentClassroomId } = useParams();
+  const studentInfo = storeUser((state) => state.studentInfo); // get logged-in student
+  const studentId = studentInfo?.id;
+
+  const [student, setStudent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchSubmissions = async () => {
+    if (!studentId || !studentClassroomId) return;
+
+    const fetchStudent = async () => {
       try {
         setLoading(true);
-        const response = await axios.post(
-          "/api/classRoom/getStudentSubmissions",
-          {
-            classroomId: studentClassroomId,
-          }
+        const res = await fetch(
+          `/api/classRoom/getStudentAnalytics?classroomId=${studentClassroomId}&studentId=${studentId}`,
         );
+        if (!res.ok) throw new Error("Failed to fetch student analytics");
 
-        if (response.data.success) {
-          setSubmissions(response.data.submissions);
-        }
-      } catch (error) {
-        console.error("Error fetching submissions:", error);
-        setError("Failed to load completed tests");
+        const data = await res.json();
+        setStudent(data.students[0] || null);
+      } catch (err) {
+        setError(err.message);
       } finally {
         setLoading(false);
       }
     };
 
-    if (studentClassroomId) {
-      fetchSubmissions();
-    }
-  }, [studentClassroomId]);
-
-  // --- Analytics Calculations ---
-  const totalTests = submissions.length;
-  const averageScore =
-    totalTests > 0
-      ? Math.round(
-          (submissions.reduce((sum, s) => sum + s.percentage, 0) / totalTests) *
-            100
-        ) / 100
-      : 0;
-  const highestScore =
-    totalTests > 0 ? Math.max(...submissions.map((s) => s.percentage)) : 0;
-  const lowestScore =
-    totalTests > 0 ? Math.min(...submissions.map((s) => s.percentage)) : 0;
-  const improvement =
-    totalTests > 1
-      ? Math.round(
-          (submissions[totalTests - 1].percentage - submissions[0].percentage) *
-            100
-        ) / 100
-      : 0;
-  const scoreDistribution = {
-    excellent: submissions.filter((s) => s.percentage >= 90).length,
-    good: submissions.filter((s) => s.percentage >= 80 && s.percentage < 90)
-      .length,
-    average: submissions.filter((s) => s.percentage >= 70 && s.percentage < 80)
-      .length,
-    belowAverage: submissions.filter(
-      (s) => s.percentage >= 60 && s.percentage < 70
-    ).length,
-    poor: submissions.filter((s) => s.percentage < 60).length,
+    fetchStudent();
+  }, [studentClassroomId, studentId]);
+  const getImprovementIcon = (improvement) => {
+    if (improvement > 0) return <ArrowUp className="h-4 w-4 text-green-600" />;
+    if (improvement < 0) return <ArrowDown className="h-4 w-4 text-red-600" />;
+    return <Minus className="h-4 w-4 text-gray-600" />;
   };
 
-  // --- Chart Data ---
-  const trendData = {
-    labels: submissions.map((s) => s.testName),
-    datasets: [
-      {
-        label: "Score (%)",
-        data: submissions.map((s) => s.percentage),
-        backgroundColor: "rgba(59, 130, 246, 0.2)",
-        borderColor: "rgba(59, 130, 246, 1)",
-        borderWidth: 3,
-        fill: true,
-        tension: 0.4,
-        pointBackgroundColor: "rgba(59, 130, 246, 1)",
-        pointBorderColor: "#fff",
-        pointBorderWidth: 2,
-        pointRadius: 6,
-      },
-    ],
-  };
-  const doughnutData = {
-    labels: [
-      "Excellent (90-100%)",
-      "Good (80-89%)",
-      "Average (70-79%)",
-      "Below Average (60-69%)",
-      "Poor (<60%)",
-    ],
-    datasets: [
-      {
-        data: [
-          scoreDistribution.excellent,
-          scoreDistribution.good,
-          scoreDistribution.average,
-          scoreDistribution.belowAverage,
-          scoreDistribution.poor,
-        ],
-        backgroundColor: [
-          "rgba(34, 197, 94, 0.8)",
-          "rgba(59, 130, 246, 0.8)",
-          "rgba(245, 158, 11, 0.8)",
-          "rgba(249, 115, 22, 0.8)",
-          "rgba(239, 68, 68, 0.8)",
-        ],
-        borderColor: [
-          "rgba(34, 197, 94, 1)",
-          "rgba(59, 130, 246, 1)",
-          "rgba(245, 158, 11, 1)",
-          "rgba(249, 115, 22, 1)",
-          "rgba(239, 68, 68, 1)",
-        ],
-        borderWidth: 2,
-      },
-    ],
-  };
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "top",
-        labels: {
-          color: "#374151",
-          font: {
-            size:
-              typeof window !== "undefined" && window.innerWidth < 640
-                ? 10
-                : 12,
-            weight: "bold",
-          },
-        },
-      },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        max: 100,
-        grid: {
-          color: "rgba(0, 0, 0, 0.1)",
-        },
-        ticks: {
-          color: "#6B7280",
-          font: {
-            size:
-              typeof window !== "undefined" && window.innerWidth < 640
-                ? 10
-                : 12,
-          },
-        },
-      },
-      x: {
-        grid: {
-          color: "rgba(0, 0, 0, 0.1)",
-        },
-        ticks: {
-          color: "#6B7280",
-          font: {
-            size:
-              typeof window !== "undefined" && window.innerWidth < 640
-                ? 10
-                : 12,
-          },
-        },
-      },
-    },
-  };
-  const doughnutOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "bottom",
-        labels: {
-          color: "#374151",
-          font: {
-            size:
-              typeof window !== "undefined" && window.innerWidth < 640 ? 9 : 11,
-          },
-          padding:
-            typeof window !== "undefined" && window.innerWidth < 640 ? 15 : 20,
-        },
-      },
-    },
+  const getScoreColor = (score) => {
+    if (score >= 90) return "text-green-600";
+    if (score >= 80) return "text-blue-600";
+    if (score >= 70) return "text-yellow-600";
+    if (score >= 60) return "text-orange-600";
+    return "text-red-600";
   };
 
-  const getScoreColor = (percentage) => {
-    if (percentage >= 90) return "text-green-600 dark:text-green-400";
-    if (percentage >= 80) return "text-blue-600 dark:text-blue-400";
-    if (percentage >= 70) return "text-yellow-600 dark:text-yellow-400";
-    if (percentage >= 60) return "text-orange-600 dark:text-orange-400";
-    return "text-red-600 dark:text-red-400";
-  };
-
-  const getScoreBadge = (percentage) => {
-    if (percentage >= 90)
-      return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
-    if (percentage >= 80)
-      return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
-    if (percentage >= 70)
-      return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
-    if (percentage >= 60)
-      return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
-    return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
-  };
-
-  if (loading) {
-    return (
-      <div className="pt-[100px] min-lg:pl-[270px] pr-5 dark:bg-gray-800 max-sm:pt-20 max-sm:p-5 min-h-screen">
-        <div className="flex gap-6">
-          <StudentSidebar />
-          <div className="flex-1">
-            <div className="flex items-center justify-center h-40">
-              <Loader className="animate-spin text-black dark:text-white" />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <div className="pt-32 text-center">Loading...</div>;
+  if (error)
+    return <div className="pt-32 text-center text-red-600">{error}</div>;
+  if (!student)
+    return <div className="pt-32 text-center">No analytics found</div>;
 
   return (
-    <div className="pt-[100px] min-lg:pl-[270px] pr-5 dark:bg-gray-800 max-sm:pt-20 max-sm:p-5 min-h-screen">
-      <div className="flex gap-6">
-        <StudentSidebar />
-
-        <div className="flex-1">
-          <div className="mb-6">
-            <h1 className="font-bold text-3xl mb-2 text-black dark:text-white">
-              Completed Tests
-            </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-300">
-              View your test results and performance history
+    <div className="pt-[100px] min-lg:pl-[270px] pr-5 dark:bg-gray-800 max-sm:p-5 max-sm:pt-[100px] min-h-screen">
+      <div className="max-w-7xl mx-auto mt-20 space-y-6">
+        {/* Student Header */}
+        <Card className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+          <CardHeader className="px-4 sm:px-6">
+            <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg">
+              <User className="h-5 w-5 sm:h-6 sm:w-6" />
+              {student.studentName} - Performance Overview
+            </CardTitle>
+            <p className="text-blue-100 text-sm sm:text-base">
+              {student.studentEmail}
             </p>
-          </div>
+          </CardHeader>
+        </Card>
 
-          {error ? (
-            <div className="flex flex-col items-center justify-center h-40 text-gray-500 dark:text-gray-300">
-              <span className="text-lg">{error}</span>
-            </div>
-          ) : submissions.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-40 text-gray-500 dark:text-gray-300">
-              <Award className="w-12 h-12 mb-4 text-gray-400" />
-              <span className="text-lg">No completed tests yet.</span>
-              <span className="text-sm mt-2">
-                Complete a test to see your results here.
-              </span>
-            </div>
-          ) : (
-            <>
-              {/* Summary Cards */}
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6">
-                <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg p-4 flex flex-col items-center">
-                  <div className="text-xs sm:text-sm font-medium mb-1">
-                    Total Tests
-                  </div>
-                  <div className="text-lg sm:text-xl lg:text-2xl font-bold">
-                    {totalTests}
-                  </div>
-                </div>
-                <div className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-lg p-4 flex flex-col items-center">
-                  <div className="text-xs sm:text-sm font-medium mb-1">
-                    Average Score
-                  </div>
-                  <div className="text-lg sm:text-xl lg:text-2xl font-bold">
-                    {averageScore}%
-                  </div>
-                </div>
-                <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg p-4 flex flex-col items-center">
-                  <div className="text-xs sm:text-sm font-medium mb-1">
-                    Highest Score
-                  </div>
-                  <div className="text-lg sm:text-xl lg:text-2xl font-bold">
-                    {highestScore}%
-                  </div>
-                </div>
-                <div className="bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-lg p-4 flex flex-col items-center">
-                  <div className="text-xs sm:text-sm font-medium mb-1">
-                    Improvement
-                  </div>
-                  <div className="text-lg sm:text-xl lg:text-2xl font-bold flex items-center gap-1">
-                    {improvement > 0 ? (
-                      <TrendingUp className="h-4 w-4 text-green-200" />
-                    ) : improvement < 0 ? (
-                      <TrendingUp className="h-4 w-4 text-red-200 rotate-180" />
-                    ) : (
-                      <TrendingUp className="h-4 w-4 text-gray-200" />
-                    )}
-                    {Math.abs(improvement)}%
-                  </div>
-                </div>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+          <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white">
+            <CardHeader className="flex justify-between pb-2 px-3 sm:px-6">
+              <CardTitle className="text-xs sm:text-sm font-medium">
+                Average Score
+              </CardTitle>
+              <Target className="h-3 w-3 sm:h-4 sm:w-4" />
+            </CardHeader>
+            <CardContent className="px-3 sm:px-6">
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold">
+                {student.averageScore}%
               </div>
+              <p className="text-xs text-green-100">Overall performance</p>
+            </CardContent>
+          </Card>
 
-              {/* Charts */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6">
-                {/* Performance Trend */}
-                <div className="bg-white dark:bg-gray-900 rounded-lg shadow p-4">
-                  <div className="font-semibold mb-2 text-sm sm:text-base flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
-                    Performance Trend
-                  </div>
-                  <div className="h-64 sm:h-80">
-                    <Line data={trendData} options={chartOptions} />
-                  </div>
-                </div>
-                {/* Score Distribution */}
-                <div className="bg-white dark:bg-gray-900 rounded-lg shadow p-4">
-                  <div className="font-semibold mb-2 text-sm sm:text-base flex items-center gap-2">
-                    <Award className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
-                    Score Distribution
-                  </div>
-                  <div className="h-64 sm:h-80">
-                    <Doughnut data={doughnutData} options={doughnutOptions} />
-                  </div>
-                </div>
+          <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+            <CardHeader className="flex justify-between pb-2 px-3 sm:px-6">
+              <CardTitle className="text-xs sm:text-sm font-medium">
+                Highest Score
+              </CardTitle>
+              <Award className="h-3 w-3 sm:h-4 sm:w-4" />
+            </CardHeader>
+            <CardContent className="px-3 sm:px-6">
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold">
+                {student.highestScore}%
               </div>
+              <p className="text-xs text-blue-100">Best performance</p>
+            </CardContent>
+          </Card>
 
-              {/* Test History Table */}
-              <div className="bg-white dark:bg-gray-900 rounded-lg shadow p-4 overflow-x-auto">
-                <div className="font-semibold mb-2 text-sm sm:text-base flex items-center gap-2">
-                  <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
-                  Test History
-                </div>
-                <table className="w-full text-xs sm:text-sm">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left py-2 sm:py-3 px-2 sm:px-4 font-semibold">
-                        Test Name
-                      </th>
-                      <th className="text-left py-2 sm:py-3 px-2 sm:px-4 font-semibold">
-                        Score
-                      </th>
-                      <th className="text-left py-2 sm:py-3 px-2 sm:px-4 font-semibold">
-                        Date
-                      </th>
-                      <th className="text-left py-2 sm:py-3 px-2 sm:px-4 font-semibold">
-                        Performance
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {submissions.map((submission) => (
-                      <tr
-                        key={submission.id}
-                        className="border-b hover:bg-gray-50 dark:hover:bg-gray-800"
-                      >
-                        <td className="py-2 sm:py-3 px-2 sm:px-4">
-                          {submission.testName}
-                        </td>
-                        <td className="py-2 sm:py-3 px-2 sm:px-4">
-                          <span
-                            className={`font-semibold ${getScoreColor(
-                              submission.percentage
-                            )}`}
-                          >
-                            {submission.percentage}%
-                          </span>
-                        </td>
-                        <td className="py-2 sm:py-3 px-2 sm:px-4">
-                          {format(
-                            new Date(submission.submittedAt),
-                            "MMM dd, yyyy 'at' h:mm a"
-                          )}
-                        </td>
-                        <td className="py-2 sm:py-3 px-2 sm:px-4">
-                          <span
-                            className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getScoreBadge(
-                              submission.percentage
-                            )}`}
-                          >
-                            {submission.percentage >= 90
-                              ? "Excellent"
-                              : submission.percentage >= 80
-                              ? "Good"
-                              : submission.percentage >= 70
-                              ? "Average"
-                              : submission.percentage >= 60
-                              ? "Below Average"
-                              : "Poor"}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+          <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+            <CardHeader className="flex justify-between pb-2 px-3 sm:px-6">
+              <CardTitle className="text-xs sm:text-sm font-medium">
+                Tests Taken
+              </CardTitle>
+              <Activity className="h-3 w-3 sm:h-4 sm:w-4" />
+            </CardHeader>
+            <CardContent className="px-3 sm:px-6">
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold">
+                {student.totalTests}
               </div>
-            </>
-          )}
+              <p className="text-xs text-purple-100">Total participation</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white">
+            <CardHeader className="flex justify-between pb-2 px-3 sm:px-6">
+              <CardTitle className="text-xs sm:text-sm font-medium">
+                Improvement
+              </CardTitle>
+              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+            </CardHeader>
+            <CardContent className="px-3 sm:px-6">
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold flex items-center gap-1">
+                {getImprovementIcon(student.improvement)}
+                {Math.abs(student.improvement)}%
+              </div>
+              <p className="text-xs text-orange-100">Progress over time</p>
+            </CardContent>
+          </Card>
         </div>
+
+        {/* Charts & AI Suggestions */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          {/* Performance Trend */}
+          {student.performanceTrend.length > 0 && (
+            <Card>
+              <CardHeader className="px-4 sm:px-6">
+                <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                  <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+                  Performance Trend
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="px-4 sm:px-6">
+                <div className="h-64 sm:h-80">
+                  <Line
+                    data={{
+                      labels: student.performanceTrend.map((t) => t.testName),
+                      datasets: [
+                        {
+                          label: "Score (%)",
+                          data: student.performanceTrend.map((t) => t.score),
+                          backgroundColor: "rgba(59, 130, 246, 0.2)",
+                          borderColor: "rgba(59, 130, 246, 1)",
+                          borderWidth: 3,
+                          fill: true,
+                          tension: 0.4,
+                          pointBackgroundColor: "rgba(59, 130, 246, 1)",
+                          pointBorderColor: "#fff",
+                          pointBorderWidth: 2,
+                          pointRadius: 6,
+                        },
+                      ],
+                    }}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      plugins: { legend: { position: "top" } },
+                      scales: { y: { beginAtZero: true, max: 100 } },
+                    }}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Score Distribution */}
+          <Card>
+            <CardHeader className="px-4 sm:px-6">
+              <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                <Award className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+                Score Distribution
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="px-4 sm:px-6">
+              <div className="h-64 sm:h-80">
+                <Doughnut
+                  data={{
+                    labels: [
+                      "Excellent (90-100%)",
+                      "Good (80-89%)",
+                      "Average (70-79%)",
+                      "Below Average (60-69%)",
+                      "Poor (<60%)",
+                    ],
+                    datasets: [
+                      {
+                        data: [
+                          student.scoreDistribution.excellent,
+                          student.scoreDistribution.good,
+                          student.scoreDistribution.average,
+                          student.scoreDistribution.belowAverage,
+                          student.scoreDistribution.poor,
+                        ],
+                        backgroundColor: [
+                          "rgba(34, 197, 94, 0.8)",
+                          "rgba(59, 130, 246, 0.8)",
+                          "rgba(245, 158, 11, 0.8)",
+                          "rgba(249, 115, 22, 0.8)",
+                          "rgba(239, 68, 68, 0.8)",
+                        ],
+                        borderColor: [
+                          "rgba(34, 197, 94, 1)",
+                          "rgba(59, 130, 246, 1)",
+                          "rgba(245, 158, 11, 1)",
+                          "rgba(249, 115, 22, 1)",
+                          "rgba(239, 68, 68, 1)",
+                        ],
+                        borderWidth: 2,
+                      },
+                    ],
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: "bottom" } },
+                  }}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* AI Suggestions Section */}
+        {student.detailedSubmissionAnalytics?.length > 0 && (
+          <Card>
+            <CardHeader className="px-4 sm:px-6">
+              <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                <Brain className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-600" />
+                AI Insights & Suggestions
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="px-4 sm:px-6">
+              <div className="space-y-4">
+                {student.detailedSubmissionAnalytics.map(
+                  (item) =>
+                    item.aiSuggestion && (
+                      <div
+                        key={item.submissionId}
+                        className="border-b pb-3 last:border-b-0 last:pb-0"
+                      >
+                        <h4 className="font-semibold text-sm sm:text-base text-gray-800 dark:text-gray-200 mb-1">
+                          Test: {item.questionPaperName}
+                        </h4>
+                        <div
+                          className="text-gray-700 dark:text-gray-300 text-sm"
+                          dangerouslySetInnerHTML={{
+                            __html: item.aiSuggestion,
+                          }}
+                        />
+                      </div>
+                    ),
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
