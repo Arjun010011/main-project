@@ -2,161 +2,136 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import jwt from "jsonwebtoken";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+
 export async function POST(request) {
   try {
     const { questionPaperId, answers } = await request.json();
 
-    // Get the student token from cookies
     const studentToken = request.cookies.get("studentToken")?.value;
-
-    if (!studentToken) {
+    if (!studentToken)
       return NextResponse.json(
         { error: "Authentication required" },
         { status: 401 },
       );
-    }
 
-    if (!questionPaperId || !answers) {
+    if (!questionPaperId || !answers)
       return NextResponse.json(
         { error: "Question paper ID and answers are required" },
         { status: 400 },
       );
-    }
 
-    // Verify the student token
+    // Verify student token
     let studentId;
     try {
       const decoded = jwt.verify(studentToken, process.env.JWT_SECRET);
-      if (decoded.role !== "student") {
+      if (decoded.role !== "student")
         return NextResponse.json(
           { error: "Access denied. Students only." },
           { status: 403 },
         );
-      }
       studentId = decoded.id;
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: "Invalid authentication token" },
         { status: 401 },
       );
     }
 
-    // Verify test access and get test data
+    // Fetch question paper & verify access
     const questionPaper = await prisma.questionPaper.findUnique({
       where: { id: questionPaperId },
       include: {
         classroom: {
           include: {
-            students: {
-              where: { id: studentId },
-              select: { id: true },
-            },
+            students: { where: { id: studentId }, select: { id: true } },
           },
         },
-        questions: {
-          include: {
-            question: true,
-          },
-        },
+        questions: { include: { question: true } },
       },
     });
 
-    if (!questionPaper) {
+    if (!questionPaper)
       return NextResponse.json({ error: "Test not found" }, { status: 404 });
-    }
-
-    // Check if the test is live
-    if (questionPaper.status !== "live" || !questionPaper.isActive) {
+    if (questionPaper.status !== "live" || !questionPaper.isActive)
       return NextResponse.json(
         { error: "Test is not currently live" },
         { status: 403 },
       );
-    }
-
-    // Check if student belongs to the classroom
-    if (questionPaper.classroom.students.length === 0) {
+    if (questionPaper.classroom.students.length === 0)
       return NextResponse.json(
         { error: "Access denied. You are not enrolled in this classroom." },
         { status: 403 },
       );
-    }
 
-    // Check if student has already submitted this test
+    // Check previous submission
     const existingSubmission = await prisma.submission.findFirst({
-      where: {
-        studentId: studentId,
-        questionPaperId: questionPaperId,
-      },
+      where: { studentId, questionPaperId },
     });
-
-    if (existingSubmission) {
+    if (existingSubmission)
       return NextResponse.json(
         { error: "You have already submitted this test" },
         { status: 400 },
       );
-    }
 
     // Calculate scores
     let totalMarksObtained = 0;
     const answerDetails = [];
 
-    for (const questionPaperQuestion of questionPaper.questions) {
-      // The answers object uses QuestionPaperQuestion.id as keys, not questionId
-      const questionPaperQuestionId = questionPaperQuestion.id;
-      const studentAnswer = answers[questionPaperQuestionId];
-      const correctAnswer = questionPaperQuestion.question.Correct_Answer;
-
+    for (const q of questionPaper.questions) {
+      const studentAnswer = answers[q.id];
+      const correctAnswer = q.question.Correct_Answer;
       const isCorrect = studentAnswer === correctAnswer;
-      const marksObtained = isCorrect ? 1 : 0; // Assuming 1 mark per question
-
-      totalMarksObtained += marksObtained;
+      totalMarksObtained += isCorrect ? 1 : 0;
 
       answerDetails.push({
-        questionPaperQuestionId: questionPaperQuestionId,
-        questionId: questionPaperQuestion.questionId.toString(),
+        questionPaperQuestionId: q.id,
+        questionId: q.questionId.toString(),
         selectedAnswer: studentAnswer || null,
-        correctAnswer: correctAnswer,
-        isCorrect: isCorrect,
-        marksObtained: marksObtained,
+        correctAnswer,
+        isCorrect,
+        marksObtained: isCorrect ? 1 : 0,
       });
     }
-    // Create submission record
+
+    // Save submission
     const submission = await prisma.submission.create({
       data: {
-        studentId: studentId,
-        questionPaperId: questionPaperId,
+        studentId,
+        questionPaperId,
         answers: answerDetails,
-        totalMarksObtained: totalMarksObtained,
-        totalMarks: questionPaper.questions.length, // Assuming 1 mark per question
+        totalMarksObtained,
+        totalMarks: questionPaper.questions.length,
         submittedAt: new Date(),
       },
     });
-    if (submission) {
-      const createAnalytics = await prisma.analytics.create({
-        data: {
-          questionPaper: questionPaper.questions,
-          submission: {
-            connect: {
-              id: submission.id,
-            },
-          },
-          answer: answerDetails,
-        },
-      });
-      if (createAnalytics) {
+
+    // Create analytics record with placeholder
+    const createAnalytics = await prisma.analytics.create({
+      data: {
+        questionPaper: questionPaper.questions,
+        submission: { connect: { id: submission.id } },
+        answer: answerDetails,
+        Ai_suggestion: `
+<div class="p-4 bg-gray-100 rounded-lg text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+  <p>Fetching AI insights... please check back later or reload this page.</p>
+</div>
+        `,
+      },
+    });
+
+    // Run Gemini in background
+    (async () => {
+      try {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
         const data = await prisma.analytics.findUnique({
-          where: {
-            id: createAnalytics.id,
-          },
+          where: { id: createAnalytics.id },
         });
         const { questionPaper, answer } = data;
 
-        const model = genAI.getGenerativeModel({
-          model: "gemini-2.5-flash",
-        });
-
         const content = `
+          
 **Role:** You are a highly intelligent and meticulous KCET examiner assistant AI. Your primary function is to provide an in-depth, comprehensive analysis of student performance on provided question papers and answers.
 
 **Critical Requirements - YOU MUST FOLLOW THESE:**
@@ -292,33 +267,31 @@ ${JSON.stringify(answer, null, 2)}
 \`\`\`
 `;
         const result = await model.generateContent(content);
-        const response = await result.response;
-        const responseText = await response.text();
-        const data1 = await prisma.analytics.update({
-          where: {
-            id: createAnalytics.id,
-          },
-          data: {
-            Ai_suggestion: responseText,
-          },
+        const responseText = await result.response.text();
+
+        await prisma.analytics.update({
+          where: { id: createAnalytics.id },
+          data: { Ai_suggestion: responseText },
         });
-        if (data1) {
-          return NextResponse.json({
-            success: true,
-            message: "Test submitted successfully",
-            submission: {
-              id: submission.id,
-              totalMarksObtained: submission.totalMarksObtained,
-              totalMarks: submission.totalMarks,
-              percentage: Math.round(
-                (submission.totalMarksObtained / submission.totalMarks) * 100,
-              ),
-              submittedAt: submission.submittedAt,
-            },
-          });
-        }
+      } catch (err) {
+        console.error("Background Gemini task failed:", err);
       }
-    }
+    })();
+
+    // ✅ Return immediately with placeholder
+    return NextResponse.json({
+      success: true,
+      message: "Test submitted successfully",
+      submission: {
+        id: submission.id,
+        totalMarksObtained,
+        totalMarks: submission.totalMarks,
+        percentage: Math.round(
+          (totalMarksObtained / submission.totalMarks) * 100,
+        ),
+        submittedAt: submission.submittedAt,
+      },
+    });
   } catch (error) {
     console.error("Error submitting test:", error);
     return NextResponse.json(
