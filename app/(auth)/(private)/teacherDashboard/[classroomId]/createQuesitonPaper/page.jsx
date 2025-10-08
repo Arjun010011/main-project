@@ -15,6 +15,7 @@ function Page() {
   const [prompt, setPrompt] = useState("");
   const [questionPaperName, setQuestionPaperName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [duration, setDuration] = useState(1); // default 1 hour
 
   const [subject, setSubject] = useState({
     physics: false,
@@ -57,6 +58,7 @@ function Page() {
         questionInput: quesitonParameters,
         questionPaperName,
         prompt,
+        duration, // send duration
       };
 
       const res = await axios.post(
@@ -75,6 +77,7 @@ function Page() {
           chemistry: false,
           mathematics: false,
         });
+        setDuration(1); // reset to default
         setErrmsg("");
       } else {
         setErrmsg("Question paper creation failed. Please try again later.");
@@ -85,7 +88,7 @@ function Page() {
       setMessage("");
       console.error(error);
     } finally {
-      setLoading(false); // 👈 stop loading
+      setLoading(false);
     }
   };
 
@@ -209,6 +212,25 @@ function Page() {
             </div>
           );
         })}
+
+        {/* Duration Dropdown */}
+        <div className="mb-6 w-1/3">
+          <label className="font-semibold mb-2 block">Duration (hours)</label>
+          <select
+            className="border border-gray-300 rounded-md p-2 w-full"
+            value={duration}
+            onChange={(e) => setDuration(Number(e.target.value))}
+          >
+            {[1, 2, 3, 4].map((hour) => (
+              <option key={hour} value={hour}>
+                {hour} {hour === 1 ? "hour" : "hours"}
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-gray-500 mt-1">
+            Default is 1 hour if not changed
+          </p>
+        </div>
 
         {/* Button with Loading Spinner */}
         <div className="mt-6 flex items-center justify-center">

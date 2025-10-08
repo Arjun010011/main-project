@@ -86,7 +86,7 @@ model QuestionPaper {
   classroomId       String
   questionPaperName String
   isLiveTest        Boolean                 @default(false)
-  duration          Int?
+  duration          Int?                    @default(1)
   endedAt           DateTime?
   isActive          Boolean                 @default(false)
   scheduledAt       DateTime?

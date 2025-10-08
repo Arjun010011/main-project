@@ -104,7 +104,7 @@ export default function TestPage() {
             <div className="flex justify-center items-center gap-6 text-sm text-gray-600 dark:text-gray-300">
               <div className="flex items-center gap-2">
                 <Clock size={16} />
-                <span>Duration: {testInfo.duration || "N/A"} minutes</span>
+                <span>Duration: {testInfo.duration || "N/A"} hour</span>
               </div>
               <div className="flex items-center gap-2">
                 <span>Total Marks: {testInfo.totalMarks || "N/A"}</span>

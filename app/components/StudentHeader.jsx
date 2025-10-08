@@ -56,7 +56,6 @@ const StudentHeader = () => {
                 </button>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuLabel>Delete account</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <Link href="/studentDashboard">
                 <DropdownMenuLabel>Go to home</DropdownMenuLabel>

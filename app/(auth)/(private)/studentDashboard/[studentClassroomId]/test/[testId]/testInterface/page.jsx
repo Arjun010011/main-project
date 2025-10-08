@@ -100,7 +100,8 @@ export default function TestInterface() {
         const questionsData = testResponse.data.questionPaper.questions || [];
         setTestData(testInfo);
         setQuestions(questionsData);
-        setTimeLeft(testInfo.duraton ? testInfo.duration : 100 * 60);
+
+        setTimeLeft(testInfo.duration ? testInfo.duration * 3600 : 100 * 60);
       } catch (error) {
         console.error("Error loading test:", error);
         const errorMessage =
@@ -260,7 +261,7 @@ export default function TestInterface() {
     if (!testStarted || !timeLeft || testLocked) return;
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
-        if (prev <= 1) {
+        if (prev <= 0) {
           setTestLocked(true);
           setCurrentQuestionIndex(questions.length - 1);
           submitTestFinal();
@@ -383,7 +384,7 @@ export default function TestInterface() {
               <div className="flex justify-center items-center gap-6 text-sm text-gray-600 dark:text-gray-300 mb-6">
                 <div className="flex items-center gap-2">
                   <Clock size={16} />
-                  <span>Duration: {testData?.duration || "N/A"} minutes</span>
+                  <span>Duration: {testData?.duration || "N/A"} hour</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span>Total Questions: {questions.length}</span>

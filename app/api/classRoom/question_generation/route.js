@@ -10,7 +10,7 @@ BigInt.prototype.toJSON = function () {
 export async function POST(req) {
   const body = await req.json();
   const { classroomId, questionPaperName, prompt } = body;
-  let { questionInput = [] } = body;
+  let { questionInput = [], duration = 1 } = body; // default duration 1 hour
 
   // Validate basic input
   if (!classroomId || !questionPaperName) {
@@ -22,25 +22,24 @@ export async function POST(req) {
     );
   }
 
+  // AI generation if questionInput empty
   let aiQuesitonInput;
   if (questionInput.length === 0 && prompt) {
     try {
-      const model = genAI.getGenerativeModel({
-        model: "gemini-2.5-flash",
-      });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
       const content = `
-      From the following prompt, extract the required question structure as a JSON array.
-      Each item in the array should contain:
-      {
-        subject: string(Physics,Chemistry or Maths don't sound it as mathmatics instead it is stored as maths in database so use Maths),
-        topic: string (optional),
-        difficulty: string (Easy | Medium | Hard),
-        number_of_questions: number
-      }
-      give the output as json nothing else is needed, you don't have to mention it as json give the output in "" not in '''
-      Prompt: """${prompt}"""
-    `;
+        From the following prompt, extract the required question structure as a JSON array.
+        Each item in the array should contain:
+        {
+          subject: string (Physics, Chemistry or Maths),
+          topic: string (optional),
+          difficulty: string (Easy | Medium | Hard),
+          number_of_questions: number
+        }
+        give the output as json nothing else is needed
+        Prompt: """${prompt}"""
+      `;
 
       const result = await model.generateContent(content);
       const response = await result.response;
@@ -56,9 +55,7 @@ export async function POST(req) {
         console.error("JSON parsing error:", err, responseText);
         return new Response(
           JSON.stringify({ message: "Failed to extract valid JSON from AI." }),
-          {
-            status: 400,
-          },
+          { status: 400 },
         );
       }
 
@@ -67,31 +64,28 @@ export async function POST(req) {
           JSON.stringify({
             message: "Prompt did not yield valid question data.",
           }),
-          {
-            status: 400,
-          },
+          { status: 400 },
         );
       }
     } catch (error) {
       return new Response(
         JSON.stringify({ message: "Gemini error: " + error.message }),
-        {
-          status: 500,
-        },
+        { status: 500 },
       );
     }
   }
-  const questionArray = [];
+
   if (aiQuesitonInput) questionInput = aiQuesitonInput;
+
+  const questionArray = [];
+
   for (const param of questionInput) {
     const { subject, topic, difficulty, number_of_questions } = param;
 
     if (!subject || !difficulty || !number_of_questions) {
       return new Response(
         JSON.stringify({ message: "Some fields are missing in parsed input." }),
-        {
-          status: 400,
-        },
+        { status: 400 },
       );
     }
 
@@ -100,7 +94,6 @@ export async function POST(req) {
 
     try {
       if (topic) {
-        // Filter by subject, difficulty, AND topic
         query = `
           SELECT id
           FROM "Questions"
@@ -116,7 +109,6 @@ export async function POST(req) {
           `%${topic}%`,
         );
       } else {
-        // Filter by subject and difficulty only
         query = `
           SELECT id
           FROM "Questions"
@@ -146,19 +138,19 @@ export async function POST(req) {
   if (questionArray.length === 0) {
     return new Response(
       JSON.stringify({ message: "No questions matched the prompt." }),
-      {
-        status: 404,
-      },
+      { status: 404 },
     );
   }
 
-  // Create the question paper
+  // Create the question paper with duration and totalMarks
   let questionPaper;
   try {
     questionPaper = await prisma.questionPaper.create({
       data: {
         classroomId,
         questionPaperName,
+        duration, // save duration
+        totalMarks: questionArray.length, // total marks = total questions
       },
     });
   } catch (error) {
@@ -194,6 +186,7 @@ export async function POST(req) {
       message: "Question paper created successfully from prompt!",
       questionPaperId: questionPaper.id,
       questionCount: questionArray.length,
+      duration,
     }),
     { status: 200 },
   );

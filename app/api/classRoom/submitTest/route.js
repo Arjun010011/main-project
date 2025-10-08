@@ -278,7 +278,7 @@ ${JSON.stringify(answer, null, 2)}
       }
     })();
 
-    // ✅ Return immediately with placeholder
+    // Return immediately with placeholder
     return NextResponse.json({
       success: true,
       message: "Test submitted successfully",

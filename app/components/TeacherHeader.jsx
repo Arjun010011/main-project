@@ -134,7 +134,6 @@ const TeacherHeader = () => {
                 </button>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuLabel>Delete account</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <Link href="/teacherDashboard">
                 <DropdownMenuLabel>Go to home</DropdownMenuLabel>
