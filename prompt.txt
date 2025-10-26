@@ -1,0 +1,111 @@
+🧠 Project: AI-Powered Online Examination and Performance Analytics System
+⚙️ Tech Stack
+
+Frontend: Next.js
+
+State Management: Zustand
+
+Database: Supabase (PostgreSQL)
+
+ORM: Prisma
+
+AI Layer: Gemini API (for question generation, analytics, and recommendations)
+
+Styling: Modern minimal + glassmorphism-inspired UI (Figma design)
+
+👥 User Roles
+🧑‍🏫 Teacher
+Features:
+
+Classroom Management
+
+Can create classrooms.
+
+Can invite students (via link or code).
+
+Can view all students in a classroom.
+
+Question Paper Generation
+
+From the “Generate Question Paper” section:
+
+Option 1: AI-based generation (using prompts via Gemini API).
+
+Option 2: Manual creation by selecting parameters (subject, difficulty, number of questions, etc.).
+
+View Papers
+
+Displays all created papers.
+
+Options:
+
+Download as PDF
+
+Move to Live Test (to publish it for students)
+
+Live Test Management
+
+When a paper is moved to live test → it appears under “Live Tests”.
+
+Teacher can click “Make Live” to activate it.
+
+Once live, students in the classroom can attempt it in real-time.
+
+Analytics
+
+Overall Class Analytics: View aggregated class performance (avg. score, accuracy trends, weak topics).
+
+Individual Analytics: See detailed performance of each student (shared component reused on both sides).
+
+🧑‍🎓 Student
+Features:
+
+Classroom
+
+Can join a classroom via invite code or link.
+
+Can view all other students in the classroom.
+
+Live Test Participation
+
+Can see active/live tests made by teachers.
+
+Can attempt the test and submit answers.
+
+AI Question Recommendation
+
+“Question Recommendation” button → AI suggests follow-up or practice questions based on previous test performance.
+
+AI Roadmap Generator
+
+“AI Roadmap” section → Gemini API generates a custom roadmap (HTML-based page) with concepts and resources to study for improvement.
+
+Analytics
+
+Personal performance analytics dashboard (same component as teacher but filtered to current user only).
+
+🧩 Component Reuse
+
+The Analytics component is shared between student and teacher pages:
+
+On student side: shows analytics for that student only.
+
+On teacher side: displays all students in the classroom + aggregated metrics.
+
+🚀 Workflow Summary
+
+Teacher creates a classroom → invites students.
+
+Teacher generates question papers (AI or manual).
+
+Teacher publishes paper to live test.
+
+Students join the class → view and attempt live test.
+
+AI analyzes performance → provides:
+
+Question recommendations
+
+Personalized AI roadmap
+
+Class + student analytics (for teacher and student respectively).

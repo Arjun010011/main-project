@@ -41,12 +41,13 @@ export async function POST(req) {
       const cookie = serialize("teacherToken", token, {
         httpOnly: true,
         path: "/",
+        maxAge: 60 * 60 * 24 * 7, // 7 days
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
       });
 
       // Remove password before returning user
-      const { password, ...passLessUser } = userExist;
+      const { password: _password, ...passLessUser } = userExist;
 
       return new Response(
         JSON.stringify({
@@ -93,12 +94,12 @@ export async function POST(req) {
       const cookie = serialize("studentToken", token, {
         httpOnly: true,
         path: "/",
-        maxAge: 64 * 60 * 24 * 7, // 7 days in seconds
+        maxAge: 60 * 60 * 24 * 7, // 7 days in seconds
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
       });
 
-      const { password, ...passLessUser } = userExist;
+      const { password: _password, ...passLessUser } = userExist;
 
       return new Response(
         JSON.stringify({

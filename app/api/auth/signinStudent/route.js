@@ -17,12 +17,12 @@ export async function POST(req) {
         const cookie = serialize("studentToken", token, {
           httpOnly: true,
           path: "/",
-          maxAge: 64 * 60 * 24 * 7, // 7 days in seconds
+          maxAge: 60 * 60 * 24 * 7, // 7 days in seconds
           sameSite: "lax",
           secure: process.env.NODE_ENV === "production",
         });
 
-        const { password, ...passLessUser } = userExist;
+        const { password: _password, ...passLessUser } = userExist;
         return new Response(
           JSON.stringify({
             message: "user authenticated successfully",
@@ -38,7 +38,7 @@ export async function POST(req) {
       } else {
         return new Response(
           JSON.stringify({ message: "password did'nt match" }),
-          { status: 402 }
+          { status: 401 }
         );
       }
     }
@@ -48,9 +48,9 @@ export async function POST(req) {
       JSON.stringify({
         message: "something went wrong",
         errormsg: error,
-        status: 502,
+        status: 400,
       }),
-      { status: 501 }
+      { status: 400 }
     );
   }
 }

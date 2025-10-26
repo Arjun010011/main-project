@@ -7,8 +7,8 @@ export async function POST(req) {
     const userExist = await prisma.student.findUnique({ where: { email } });
     if (userExist) {
       return new Response(
-        JSON.stringify({ message: "user already exists", status: 500 }),
-        { status: 500 },
+        JSON.stringify({ message: "user already exists" }),
+        { status: 409 },
       );
     }
     const hashedPassword = bcryptjs.hashSync(password, 10);
@@ -20,23 +20,20 @@ export async function POST(req) {
         role,
       },
     });
+    const { password: _password, ...safeUser } = user;
     return new Response(
       JSON.stringify({
         message: "User created successfully",
-        status: 201,
-        user: user,
+        user: safeUser,
       }),
-      {
-        status: 201,
-      },
+      { status: 201 },
     );
   } catch (error) {
     console.error("soemthing went wrong", error);
     return new Response(
       JSON.stringify({
         message: "something went wrong",
-        errormsg: error,
-        status: 500,
+        errormsg: error?.message || String(error),
       }),
       { status: 500 },
     );
