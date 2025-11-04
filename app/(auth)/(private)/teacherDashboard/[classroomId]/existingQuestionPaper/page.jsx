@@ -190,7 +190,10 @@ function QuestionPaperPage() {
             {content?.totalPaper ?? 0}
           </span>
         </p>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 39d5eb6696ae02a6eb6a5f01f7a8801e4eef1ee2
       </header>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
