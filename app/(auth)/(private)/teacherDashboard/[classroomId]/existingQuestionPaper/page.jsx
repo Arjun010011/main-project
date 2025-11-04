@@ -24,7 +24,7 @@ function QuestionPaperPage() {
           "/api/classRoom/fetchQuestionPapers",
           {
             classroomId,
-          },
+          }
         );
         setContent(data);
       } catch (error) {
@@ -75,7 +75,7 @@ function QuestionPaperPage() {
       options.forEach((opt) => {
         const optLines = doc.splitTextToSize(
           `${opt.label} ${opt.text}`,
-          pageWidth - 25,
+          pageWidth - 25
         );
         if (y + optLines.length * 6 > pageHeight - 30) {
           addFooter(doc, pageWidth, pageHeight);
@@ -106,7 +106,7 @@ function QuestionPaperPage() {
       String(doc.internal.getNumberOfPages()),
       pageWidth / 2,
       pageHeight - 10,
-      { align: "center" },
+      { align: "center" }
     );
     doc.text("1B0616K22", pageWidth - 10, pageHeight - 10, { align: "right" });
   };
@@ -147,7 +147,7 @@ function QuestionPaperPage() {
       setContent((prevContent) => ({
         ...prevContent,
         questionPaperDetails: prevContent.questionPaperDetails.filter(
-          (p) => p.id !== id,
+          (p) => p.id !== id
         ),
         totalPaper: prevContent.totalPaper - 1,
       }));
@@ -190,10 +190,6 @@ function QuestionPaperPage() {
             {content?.totalPaper ?? 0}
           </span>
         </p>
-<<<<<<< HEAD
-
-=======
->>>>>>> 39d5eb6696ae02a6eb6a5f01f7a8801e4eef1ee2
       </header>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -203,7 +199,7 @@ function QuestionPaperPage() {
           .map((questionPaper) => {
             const date = format(
               new Date(questionPaper.createdAt),
-              "do MMMM yyyy, h:mm a",
+              "do MMMM yyyy, h:mm a"
             );
             return (
               <div
@@ -226,7 +222,7 @@ function QuestionPaperPage() {
                     onClick={() =>
                       handlePreview(
                         questionPaper.id,
-                        questionPaper.questionPaperName,
+                        questionPaper.questionPaperName
                       )
                     }
                   >

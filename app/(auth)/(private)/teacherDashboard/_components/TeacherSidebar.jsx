@@ -85,7 +85,6 @@ const teacherSidebar = () => {
                 Student Analytics
               </li>
             </Link>
-<<<<<<< HEAD
             <Link href={`/teacherDashboard/${classroomId}/retakeCandidates`}>
               <li className="py-3 px-2 rounded-md flex gap-2 hover:bg-gray-200 transition-colors duration-500 dark:hover:bg-gray-700">
                 <BarChart3 />
@@ -98,8 +97,7 @@ const teacherSidebar = () => {
                 Predictions (ML)
               </li>
             </Link>
-=======
->>>>>>> 39d5eb6696ae02a6eb6a5f01f7a8801e4eef1ee2
+            =======
           </ul>
         </motion.div>
       </AnimatePresence>

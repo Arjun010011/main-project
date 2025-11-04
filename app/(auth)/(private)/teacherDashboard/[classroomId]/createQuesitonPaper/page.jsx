@@ -4,11 +4,7 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useParams } from "next/navigation";
 import { FlaskConical, Calculator, AtomIcon, Loader2 } from "lucide-react";
-<<<<<<< HEAD
 import { useEffect, useState } from "react";
-=======
-import { useState } from "react";
->>>>>>> 39d5eb6696ae02a6eb6a5f01f7a8801e4eef1ee2
 
 function Page() {
   const params = useParams();
@@ -20,10 +16,7 @@ function Page() {
   const [questionPaperName, setQuestionPaperName] = useState("");
   const [loading, setLoading] = useState(false);
   const [duration, setDuration] = useState(1); // default 1 hour
-<<<<<<< HEAD
   const [mixHint, setMixHint] = useState(null);
-=======
->>>>>>> 39d5eb6696ae02a6eb6a5f01f7a8801e4eef1ee2
 
   const [subject, setSubject] = useState({
     physics: false,
@@ -33,12 +26,13 @@ function Page() {
 
   const [quesitonParameters, setQuestionParamters] = useState([]);
 
-<<<<<<< HEAD
   // Fetch recommended difficulty mix (ML) for this classroom
   useEffect(() => {
     async function loadMix() {
       try {
-        const res = await fetch(`/api/ml/difficultyMix?classroomId=${classroomId}`);
+        const res = await fetch(
+          `/api/ml/difficultyMix?classroomId=${classroomId}`
+        );
         const json = await res.json();
         if (res.ok) setMixHint(json.mix);
       } catch {}
@@ -46,8 +40,6 @@ function Page() {
     if (classroomId) loadMix();
   }, [classroomId]);
 
-=======
->>>>>>> 39d5eb6696ae02a6eb6a5f01f7a8801e4eef1ee2
   // Collect question metadata
   const quesitonPaperData = (e) => {
     setQuestionParamters((prev) => {
@@ -55,7 +47,7 @@ function Page() {
       const index = updated.findIndex(
         (item) =>
           item.subject === e.target.dataset.subject &&
-          item.difficulty === e.target.dataset.difficulty,
+          item.difficulty === e.target.dataset.difficulty
       );
       if (index !== -1) {
         updated[index].number_of_questions = Number(e.target.value);
@@ -86,12 +78,12 @@ function Page() {
 
       const res = await axios.post(
         "/api/classRoom/question_generation",
-        sendData,
+        sendData
       );
 
       if (res.status === 200) {
         setMessage(
-          "Question paper created successfully. You can download it from the 'Print Paper' section.",
+          "Question paper created successfully. You can download it from the 'Print Paper' section."
         );
         setPrompt("");
         setQuestionPaperName("");
@@ -128,15 +120,19 @@ function Page() {
         onSubmit={getQuestionPaper}
         className="w-full border p-5 rounded-md max-w-4xl"
       >
-<<<<<<< HEAD
         {mixHint && (
           <div className="mb-6 p-3 rounded-md bg-blue-50 dark:bg-black/20 text-sm">
-            <p className="font-semibold mb-1">Recommended difficulty mix (ML)</p>
-            <p>Easy: {(mixHint.Easy * 100).toFixed(0)}% • Medium: {(mixHint.Medium * 100).toFixed(0)}% • Hard: {(mixHint.Hard * 100).toFixed(0)}% {mixHint.average != null && `(class avg: ${mixHint.average}%)`}</p>
+            <p className="font-semibold mb-1">
+              Recommended difficulty mix (ML)
+            </p>
+            <p>
+              Easy: {(mixHint.Easy * 100).toFixed(0)}% • Medium:{" "}
+              {(mixHint.Medium * 100).toFixed(0)}% • Hard:{" "}
+              {(mixHint.Hard * 100).toFixed(0)}%{" "}
+              {mixHint.average != null && `(class avg: ${mixHint.average}%)`}
+            </p>
           </div>
         )}
-=======
->>>>>>> 39d5eb6696ae02a6eb6a5f01f7a8801e4eef1ee2
         <div className="mb-6">
           <p className="font-semibold mb-2">Question Paper Name</p>
           <input
