@@ -69,10 +69,7 @@ model Questions {
   created_at            DateTime                @default(now()) @db.Timestamptz(6)
   Subject               String?
   Difficulty            String?
-<<<<<<< HEAD
   difficultyML          String?
-=======
->>>>>>> 39d5eb6696ae02a6eb6a5f01f7a8801e4eef1ee2
   Question              String?
   Option_A              String?
   Option_B              String?
