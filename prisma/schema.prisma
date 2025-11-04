@@ -1,0 +1,142 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Teacher {
+  id         String      @id @default(uuid())
+  fullName   String
+  email      String      @unique
+  password   String
+  role       Role
+  image      String      @default("https://static.vecteezy.com/system/resources/thumbnails/020/765/399/small_2x/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg")
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  classrooms Classroom[]
+}
+
+model Classroom {
+  id             String           @id @default(uuid())
+  code           String           @unique
+  className      String
+  subjectName    String?
+  sectionName    String?
+  teacherId      String
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  image          String           @default("https://png.pngtree.com/background/20210709/original/pngtree-cartoon-yellow-background-school-season-campus-poster-picture-image_925356.jpg")
+  Teacher        Teacher          @relation(fields: [teacherId], references: [id])
+  QuestionPaper  QuestionPaper[]  @relation("classRoomQuestionPaper")
+  students       Student[]        @relation("StudentClassrooms")
+  blockedStudent BlockedStudent[]
+
+  @@unique([className, teacherId], name: "className_teacherId")
+}
+
+model Student {
+  id          String           @id @default(uuid())
+  email       String           @unique
+  password    String
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  fullName    String
+  image       String           @default("https://static.vecteezy.com/system/resources/thumbnails/020/765/399/small_2x/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg")
+  role        Role
+  submissions Submission[]
+  blockedIn   BlockedStudent[]
+  classrooms  Classroom[]      @relation("StudentClassrooms")
+}
+
+model BlockedStudent {
+  id          String   @id @default(uuid())
+  studentId   String
+  classroomId String
+  blockedAt   DateTime @default(now())
+
+  student   Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  classroom Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, classroomId], name: "unique_blocked_student_in_classroom")
+}
+
+model Questions {
+  id                    BigInt                  @id @default(autoincrement())
+  created_at            DateTime                @default(now()) @db.Timestamptz(6)
+  Subject               String?
+  Difficulty            String?
+  difficultyML          String?
+  Question              String?
+  Option_A              String?
+  Option_B              String?
+  Option_C              String?
+  Option_D              String?
+  Correct_Answer        String?
+  Explanation           String?
+  Chapter               String?
+  QuestionPaperQuestion QuestionPaperQuestion[]
+}
+
+model QuestionPaper {
+  id                String                  @id @default(uuid())
+  createdAt         DateTime                @default(now())
+  classroomId       String
+  questionPaperName String
+  isLiveTest        Boolean                 @default(false)
+  duration          Int?                    @default(1)
+  endedAt           DateTime?
+  isActive          Boolean                 @default(false)
+  scheduledAt       DateTime?
+  startedAt         DateTime?
+  status            TestStatus              @default(draft)
+  totalMarks        Int?
+  classroom         Classroom               @relation("classRoomQuestionPaper", fields: [classroomId], references: [id], onDelete: Cascade)
+  questions         QuestionPaperQuestion[]
+  submissions       Submission[]
+}
+
+model QuestionPaperQuestion {
+  id              String        @id @default(uuid())
+  questionPaperId String
+  questionId      BigInt
+  question        Questions     @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionPaper   QuestionPaper @relation(fields: [questionPaperId], references: [id], onDelete: Cascade)
+}
+
+model Analytics {
+  id            String      @id @default(uuid())
+  submissionId  String      @unique
+  submission    Submission? @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  Ai_suggestion String?
+  questionPaper Json?
+  answer        Json?
+}
+
+model Submission {
+  id                 String        @id @default(uuid())
+  studentId          String
+  questionPaperId    String
+  answers            Json
+  totalMarksObtained Int
+  totalMarks         Int
+  submittedAt        DateTime      @default(now())
+  questionPaper      QuestionPaper @relation(fields: [questionPaperId], references: [id], onDelete: Cascade)
+  student            Student       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  Analytics          Analytics?
+}
+
+enum Role {
+  teacher
+  student
+}
+
+enum TestStatus {
+  draft
+  scheduled
+  live
+  completed
+}

@@ -1,0 +1,56 @@
+import bcryptjs from "bcryptjs";
+import prisma from "@/lib/prisma";
+import jwt from "jsonwebtoken";
+import { serialize } from "cookie";
+export async function POST(req) {
+  try {
+    const { email, password } = await req.json();
+    const userExist = await prisma.student.findUnique({ where: { email } });
+    if (userExist) {
+      const check = await bcryptjs.compare(password, userExist.password);
+      if (check) {
+        const token = jwt.sign(
+          { id: userExist.id, email: userExist.email, role: "student" },
+          process.env.JWT_SECRET, // use a strong secret in .env
+          { expiresIn: "9d" }
+        );
+        const cookie = serialize("studentToken", token, {
+          httpOnly: true,
+          path: "/",
+          maxAge: 60 * 60 * 24 * 7, // 7 days in seconds
+          sameSite: "lax",
+          secure: process.env.NODE_ENV === "production",
+        });
+
+        const { password: _password, ...passLessUser } = userExist;
+        return new Response(
+          JSON.stringify({
+            message: "user authenticated successfully",
+            user: passLessUser,
+          }),
+          {
+            status: 200,
+            headers: {
+              "Set-Cookie": cookie,
+            },
+          }
+        );
+      } else {
+        return new Response(
+          JSON.stringify({ message: "password did'nt match" }),
+          { status: 401 }
+        );
+      }
+    }
+  } catch (error) {
+    console.error("soemthing went wrong", error);
+    return new Response(
+      JSON.stringify({
+        message: "something went wrong",
+        errormsg: error,
+        status: 400,
+      }),
+      { status: 400 }
+    );
+  }
+}
