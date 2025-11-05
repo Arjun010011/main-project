@@ -7,93 +7,120 @@ import jwt from "jsonwebtoken";
 export async function POST(req) {
   try {
     const { email, role, fullName, image } = await req.json();
+    let user;
 
-    if (!email || !role || !fullName) {
+    if (role === "teacher") {
+      // Check if teacher exists
+      let userExist = await prisma.teacher.findUnique({
+        where: { email },
+      });
+
+      if (!userExist) {
+        const randomPassword = crypto.randomBytes(16).toString("hex");
+        const hashedPassword = bcryptjs.hashSync(randomPassword, 10);
+
+        user = await prisma.teacher.create({
+          data: {
+            email,
+            fullName,
+            image,
+            password: hashedPassword,
+            role: "teacher",
+            // no authProvider field in schema; add if needed
+          },
+        });
+        userExist = user;
+      }
+
+      const token = jwt.sign(
+        { id: userExist.id, email: userExist.email, role: "teacher" },
+        process.env.JWT_SECRET,
+        { expiresIn: "9d" }
+      );
+
+      const cookie = serialize("teacherToken", token, {
+        httpOnly: true,
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7, // 7 days
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+      });
+
+      // Remove password before returning user
+      const { password: _password, ...passLessUser } = userExist;
+
       return new Response(
         JSON.stringify({
-          message:
-            "Missing required authentication fields (email, role, fullName).",
+          message: "user authenticated successfully",
+          user: passLessUser,
         }),
-        { status: 400 }
+        {
+          status: 200,
+          headers: {
+            "Set-Cookie": cookie,
+          },
+        }
       );
     }
 
-    let userExist;
-    let model;
-
-    // 1. Determine the Prisma model based on the requested role
-    if (role === "teacher") {
-      model = prisma.teacher;
-    } else if (role === "student") {
-      model = prisma.student;
-    } else {
-      return new Response(
-        JSON.stringify({ message: "Invalid user role specified." }),
-        { status: 400 }
-      );
-    }
-
-    // 2. Check if user exists in the determined model
-    userExist = await model.findUnique({
-      where: { email },
-    });
-
-    // 3. Create user if they don't exist
-    if (!userExist) {
-      // Generate a random password for users created via Google Auth
-      const randomPassword = crypto.randomBytes(16).toString("hex");
-      const hashedPassword = bcryptjs.hashSync(randomPassword, 10);
-
-      userExist = await model.create({
-        data: {
-          email,
-          fullName,
-          image,
-          password: hashedPassword, // Storing a hashed random password
-          role: role,
-        },
+    if (role === "student") {
+      // Check if student exists
+      let userExist = await prisma.student.findUnique({
+        where: { email },
       });
-    }
 
-    // 4. Generate the JWT (Unified Logic)
-    // The JWT payload includes the user's role and ID, regardless of model
-    const token = jwt.sign(
-      { id: userExist.id, email: userExist.email, role: userExist.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "9d" }
-    );
+      if (!userExist) {
+        const randomPassword = crypto.randomBytes(16).toString("hex");
+        const hashedPassword = bcryptjs.hashSync(randomPassword, 10);
 
-    // 5. Serialize the token into a unified cookie
-    const cookie = serialize("authToken", token, {
-      // 👈 Unified Cookie Name
-      httpOnly: true,
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-    });
-
-    // 6. Remove password before returning user
-    const { password: _password, ...passLessUser } = userExist;
-
-    // 7. Return the success response
-    return new Response(
-      JSON.stringify({
-        message: `${userExist.role} authenticated successfully`,
-        user: passLessUser,
-      }),
-      {
-        status: 200,
-        headers: {
-          "Set-Cookie": cookie,
-        },
+        user = await prisma.student.create({
+          data: {
+            email,
+            fullName,
+            password: hashedPassword,
+            image,
+            role: "student",
+          },
+        });
+        userExist = user;
       }
-    );
+
+      const token = jwt.sign(
+        { id: userExist.id, email: userExist.email, role: "student" },
+        process.env.JWT_SECRET,
+        { expiresIn: "9d" }
+      );
+
+      const cookie = serialize("studentToken", token, {
+        httpOnly: true,
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7, // 7 days in seconds
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+      });
+
+      const { password: _password, ...passLessUser } = userExist;
+
+      return new Response(
+        JSON.stringify({
+          message: "user authenticated successfully",
+          user: passLessUser,
+        }),
+        {
+          status: 200,
+          headers: {
+            "Set-Cookie": cookie,
+          },
+        }
+      );
+    }
   } catch (error) {
-    console.error("Google Auth API Error:", error);
+    console.error("something went wrong", error);
     return new Response(
       JSON.stringify({
-        message: "Internal server error during authentication.",
+        message: "something went wrong",
+        errormsg: error.message || error,
+        status: 500,
       }),
       { status: 500 }
     );
