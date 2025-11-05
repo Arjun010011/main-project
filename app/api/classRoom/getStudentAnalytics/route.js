@@ -17,8 +17,10 @@ export async function GET(request) {
       );
     }
 
-    // 1. Get the unified authentication token from cookies
-    const authToken = request.cookies.get("authToken")?.value;
+    // 2. Get the token from cookies (support both teacher and student tokens)
+    const teacherToken = request.cookies.get("teacherToken")?.value;
+    const studentToken = request.cookies.get("studentToken")?.value;
+    const authToken = teacherToken || studentToken;
 
     if (!authToken) {
       return NextResponse.json(
@@ -27,7 +29,7 @@ export async function GET(request) {
       );
     }
 
-    // 2. Verify the token
+    // 3. Verify the token
     let decoded;
     try {
       decoded = jwt.verify(authToken, process.env.JWT_SECRET);
@@ -40,7 +42,7 @@ export async function GET(request) {
 
     const { id: userId, role: userRole } = decoded;
 
-    // --- 3. Access Control Logic ---
+    // --- 4. Access Control Logic ---
     let accessGranted = false;
     let finalStudentIdFilter = requestedStudentId;
 
@@ -87,7 +89,7 @@ export async function GET(request) {
     }
     // --- End Access Control Logic ---
 
-    // 4. Data Fetching (Unified for both roles)
+    // 5. Data Fetching (Unified for both roles)
     // The query now runs if access is granted, and the logic is the same.
     let studentWhereClause = {
       classrooms: {
@@ -138,7 +140,7 @@ export async function GET(request) {
       ? students.filter((student) => student.id === finalStudentIdFilter)
       : students;
 
-    // --- 5. Data Processing (Unchanged) ---
+    // --- 6. Data Processing (Unchanged) ---
     const studentAnalytics = targetStudents.map((student) => {
       const submissions = student.submissions;
       const totalTests = submissions.length;
