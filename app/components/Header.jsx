@@ -23,7 +23,9 @@ const Header = () => {
         <Image src="/logo.png" height={70} width={70} alt="logo" />
       </div>
       <div
-        className={`${open ? "bg-white fixed" : "bg-transparent"} flex flex-col  right-0 top-0  p-5 h-full md:static md:flex-row dark:bg-gray-800    `}
+        className={`${
+          open ? "bg-white fixed" : "bg-transparent"
+        } flex flex-col  right-0 top-0  p-5 h-full md:static md:flex-row dark:bg-gray-800    `}
       >
         <button
           className={`md:hidden text-black absolute right-5 `}
@@ -46,9 +48,6 @@ const Header = () => {
           >
             <Link href="/">
               <li>Home</li>
-            </Link>
-            <Link href="/Pricing">
-              <li>pricing</li>
             </Link>
             <Link href="/About">
               <li>About</li>

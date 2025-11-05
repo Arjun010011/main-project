@@ -8,67 +8,103 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const classroomId = searchParams.get("classroomId");
-    const studentId = searchParams.get("studentId");
+    const requestedStudentId = searchParams.get("studentId"); // Renamed for clarity
 
     if (!classroomId) {
       return NextResponse.json(
         { error: "Classroom ID is required" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
-    // Get the teacher token from cookies
-    const teacherToken = request.cookies.get("teacherToken")?.value;
+    // 1. Get the unified authentication token from cookies
+    const authToken = request.cookies.get("authToken")?.value;
 
-    if (!teacherToken) {
+    if (!authToken) {
       return NextResponse.json(
         { error: "Authentication required" },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
-    // Verify the teacher token
+    // 2. Verify the token
     let decoded;
     try {
-      decoded = jwt.verify(teacherToken, process.env.JWT_SECRET);
+      decoded = jwt.verify(authToken, process.env.JWT_SECRET);
     } catch (error) {
       return NextResponse.json(
         { error: "Invalid authentication token" },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
-    if (decoded.role !== "teacher") {
-      return NextResponse.json(
-        { error: "Only teachers can access analytics" },
-        { status: 403 },
-      );
-    }
+    const { id: userId, role: userRole } = decoded;
 
-    // Verify teacher owns this classroom
-    const classroom = await prisma.classroom.findFirst({
-      where: {
-        id: classroomId,
-        teacherId: decoded.id,
-      },
-    });
+    // --- 3. Access Control Logic ---
+    let accessGranted = false;
+    let finalStudentIdFilter = requestedStudentId;
 
-    if (!classroom) {
-      return NextResponse.json(
-        { error: "Classroom not found or access denied" },
-        { status: 404 },
-      );
-    }
+    if (userRole === "teacher") {
+      // Teacher Access: Must own the classroom being requested.
+      const classroom = await prisma.classroom.findFirst({
+        where: {
+          id: classroomId,
+          teacherId: userId, // Check if teacherId matches the user ID
+        },
+      });
 
-    // Get all students in the classroom
-    const students = await prisma.student.findMany({
-      where: {
-        classrooms: {
-          some: {
-            id: classroomId,
+      if (classroom) {
+        accessGranted = true;
+      }
+    } else if (userRole === "student") {
+      // Student Access: Must be requesting ONLY their own data and be in the classroom.
+      if (requestedStudentId && requestedStudentId === userId) {
+        // Verify the student is actually in this classroom
+        const student = await prisma.student.findFirst({
+          where: {
+            id: userId,
+            classrooms: {
+              some: {
+                id: classroomId,
+              },
+            },
           },
+        });
+
+        if (student) {
+          // Set the student ID filter to ensure only their data is fetched
+          finalStudentIdFilter = userId;
+          accessGranted = true;
+        }
+      }
+    }
+
+    if (!accessGranted) {
+      return NextResponse.json(
+        { error: "Access denied or resource not found." },
+        { status: 403 }
+      );
+    }
+    // --- End Access Control Logic ---
+
+    // 4. Data Fetching (Unified for both roles)
+    // The query now runs if access is granted, and the logic is the same.
+    let studentWhereClause = {
+      classrooms: {
+        some: {
+          id: classroomId,
         },
       },
+    };
+
+    // If a specific student ID filter is set (by teacher or by student for self-access)
+    if (finalStudentIdFilter) {
+      studentWhereClause.id = finalStudentIdFilter;
+    }
+
+    // Get the required students based on the filter
+    const students = await prisma.student.findMany({
+      where: studentWhereClause,
       include: {
         submissions: {
           where: {
@@ -96,10 +132,13 @@ export async function GET(request) {
     });
 
     // If specific student requested, filter to that student
-    const targetStudents = studentId
-      ? students.filter((student) => student.id === studentId)
+    // NOTE: This filter is largely redundant now due to the `finalStudentIdFilter` applied above,
+    // but kept for safety/legacy if the Prisma query was complex.
+    const targetStudents = finalStudentIdFilter
+      ? students.filter((student) => student.id === finalStudentIdFilter)
       : students;
 
+    // --- 5. Data Processing (Unchanged) ---
     const studentAnalytics = targetStudents.map((student) => {
       const submissions = student.submissions;
       const totalTests = submissions.length;
@@ -141,7 +180,7 @@ export async function GET(request) {
           ? Math.round(
               (performanceTrend[performanceTrend.length - 1].score -
                 performanceTrend[0].score) *
-                100,
+                100
             ) / 100
           : 0;
 
@@ -166,10 +205,11 @@ export async function GET(request) {
         improvement,
         scoreDistribution,
         performanceTrend,
-        participationRate: totalTests > 0 ? 100 : 0, // If they have submissions, they participated
+        participationRate: totalTests > 0 ? 100 : 0,
         detailedSubmissionAnalytics,
       };
     });
+    // --- End Data Processing ---
 
     return NextResponse.json({
       students: studentAnalytics,
@@ -179,7 +219,7 @@ export async function GET(request) {
     console.error("Error fetching student analytics:", error);
     return NextResponse.json(
       { error: "Failed to fetch student analytics" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

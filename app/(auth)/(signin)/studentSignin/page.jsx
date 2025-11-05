@@ -83,7 +83,7 @@ const page = () => {
           <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
             <label className="text-sm font-bold">Email</label>
             <input
-              type="text"
+              type="email"
               id="email"
               placeholder="enter your email address"
               className="border-slate-300 border p-2 rounded-lg"
@@ -91,7 +91,7 @@ const page = () => {
             />
             <label className="text-sm font-bold">Password</label>
             <input
-              type="text"
+              type="password"
               id="password"
               placeholder="enter your password"
               className="border-slate-300 border p-2 rounded-lg"
