@@ -41,9 +41,6 @@ const LiveTestDropdown = ({
               Go Live
             </DropdownMenuItem>
           )}
-          <DropdownMenuItem onClick={onSchedule} disabled={isLoading}>
-            Schedule
-          </DropdownMenuItem>
           <DropdownMenuItem
             className="bg-red-50 dark:bg-red-400 dark:text-white text-red-600 "
             onClick={onDelete}

@@ -5,7 +5,6 @@ import {
   FileTextIcon,
   Folder,
   Play,
-  PrinterIcon,
   Menu,
   X,
   BarChart3,
@@ -97,7 +96,6 @@ const teacherSidebar = () => {
                 Predictions (ML)
               </li>
             </Link>
-            =======
           </ul>
         </motion.div>
       </AnimatePresence>
