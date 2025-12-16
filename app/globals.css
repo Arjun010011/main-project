@@ -118,3 +118,40 @@
     @apply bg-background text-foreground;
   }
 }
+/* app/globals.css */
+
+@media print {
+  /* 1. Hide EVERYTHING on the screen by default */
+  body * {
+    visibility: hidden;
+  }
+
+  /* 2. Only make the printable area visible */
+  #printable-paper-container,
+  #printable-paper-container * {
+    visibility: visible;
+  }
+
+  /* 3. Position the paper exactly at top-left */
+  #printable-paper-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: white;
+  }
+
+  /* 4. Force browsers to print background colors (borders, headers) */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* 5. Ensure questions don't get cut in half between pages */
+  .question-item {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

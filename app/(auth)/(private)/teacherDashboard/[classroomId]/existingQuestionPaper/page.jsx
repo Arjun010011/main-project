@@ -5,17 +5,27 @@ import { useEffect, useState } from "react";
 import { Loader, Download, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { jsPDF } from "jspdf";
+// Removed jsPDF import
 import DropDownTeacherMenu from "@/app/components/DropDownTeacherMenu";
+
+// Imports for the Printable Paper Layout
+import "katex/dist/katex.min.css";
+import Latex from "react-latex-next";
 
 function QuestionPaperPage() {
   const params = useParams();
   const classroomId = params.classroomId;
   const [content, setContent] = useState(null);
+
+  // Preview States (Left Unchanged)
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [previewQuestions, setPreviewQuestions] = useState([]);
   const [previewPaperName, setPreviewPaperName] = useState("");
   const [previewLoading, setPreviewLoading] = useState(false);
+
+  // New States for Printing
+  const [downloadingId, setDownloadingId] = useState(null); // Tracks WHICH button is loading
+  const [printData, setPrintData] = useState(null); // Stores data for the hidden print view
 
   useEffect(() => {
     const fetchPaper = async () => {
@@ -34,94 +44,35 @@ function QuestionPaperPage() {
     fetchPaper();
   }, [classroomId]);
 
-  const generateKCETPaper = (questions) => {
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    let y = 25;
+  // --- NEW: Handle Print/Download Logic ---
+  const handleDownloadPDF = async (paperId, paperName) => {
+    // 1. Set the loading state ONLY for this specific paper ID
+    setDownloadingId(paperId);
 
-    doc.setFont("times", "bold");
-    doc.setFontSize(16);
-    doc.text("KCET 2025 Question Paper", pageWidth / 2, 15, {
-      align: "center",
-    });
-
-    doc.setFontSize(12);
-    doc.text("PHYSICS (Code: A1)", pageWidth / 2, 22, { align: "center" });
-
-    questions.forEach((item, index) => {
-      const q = item.question;
-      doc.setFontSize(11);
-      doc.setFont("times", "normal");
-      doc.setTextColor(0);
-
-      const questionText = `${index + 1}. ${q.Question}`;
-      const questionLines = doc.splitTextToSize(questionText, pageWidth - 20);
-      if (y + questionLines.length * 6 > pageHeight - 30) {
-        addFooter(doc, pageWidth, pageHeight);
-        doc.addPage();
-        y = 25;
-      }
-      doc.text(questionLines, 12, y);
-      y += questionLines.length * 6;
-
-      const options = [
-        { label: "(A)", text: q.Option_A },
-        { label: "(B)", text: q.Option_B },
-        { label: "(C)", text: q.Option_C },
-        { label: "(D)", text: q.Option_D },
-      ];
-
-      options.forEach((opt) => {
-        const optLines = doc.splitTextToSize(
-          `${opt.label} ${opt.text}`,
-          pageWidth - 25
-        );
-        if (y + optLines.length * 6 > pageHeight - 30) {
-          addFooter(doc, pageWidth, pageHeight);
-          doc.addPage();
-          y = 25;
-        }
-        doc.text(optLines, 20, y);
-        y += optLines.length * 6;
-      });
-
-      y += 6;
-    });
-
-    addFooter(doc, pageWidth, pageHeight);
-    doc.save("KCET_Question_Paper.pdf");
-  };
-
-  const addFooter = (doc, pageWidth, pageHeight) => {
-    doc.setFontSize(10);
-    doc.setFont("times", "italic");
-    doc.text("Space For Rough Work", pageWidth / 2, pageHeight - 20, {
-      align: "center",
-    });
-    doc.setFontSize(9);
-    doc.setFont("times", "normal");
-    doc.text("A-1", 10, pageHeight - 10);
-    doc.text(
-      String(doc.internal.getNumberOfPages()),
-      pageWidth / 2,
-      pageHeight - 10,
-      { align: "center" }
-    );
-    doc.text("1B0616K22", pageWidth - 10, pageHeight - 10, { align: "right" });
-  };
-
-  const questionPaperDownload = async (paperId) => {
     try {
+      // 2. Fetch the full questions for the paper
       const { data } = await axios.post("/api/classRoom/fetchQuestionPaper", {
         questionPaperId: paperId,
       });
-      generateKCETPaper(data.questionPaper.questions);
+
+      // 3. Update the hidden print template with this data
+      setPrintData({
+        name: paperName,
+        questions: data.questionPaper.questions || [],
+      });
+
+      // 4. Wait a brief moment for React to render the hidden view, then Print
+      setTimeout(() => {
+        window.print();
+        setDownloadingId(null); // Turn off loading after print dialog opens
+      }, 500);
     } catch (error) {
       console.error("Failed to download paper:", error);
+      setDownloadingId(null);
     }
   };
 
+  // --- EXISTING: Preview Logic (Unchanged) ---
   const handlePreview = async (paperId, paperName) => {
     setPreviewPaperName(paperName);
     setShowPreviewModal(true);
@@ -161,11 +112,56 @@ function QuestionPaperPage() {
       await axios.post("/api/classRoom/moveToLiveTest", {
         questionPaperId: paper.id,
       });
-      // You might want to update the state to reflect this change
     } catch (error) {
       console.error("Failed to move to live test", error);
     }
   };
+
+  // --- KCET Header Component for Print View ---
+  const KcetHeader = ({ paperName }) => (
+    <div className="font-serif border-b-2 border-black mb-6 pb-2">
+      <div className="flex justify-between items-stretch mb-2">
+        <div className="border border-black p-2 w-24 text-center flex flex-col justify-center">
+          <p className="text-[10px] font-bold uppercase leading-tight">
+            Subject Code
+          </p>
+          <p className="text-xl font-bold">33</p>
+        </div>
+        <div className="text-center flex-1 px-4 self-center">
+          <h1 className="text-2xl font-bold tracking-widest">
+            CET EXAMINATION - 2025
+          </h1>
+          <p className="text-xl font-bold mt-1 uppercase">PHYSICS</p>
+          <p className="text-sm italic">({paperName})</p>
+        </div>
+        <div className="border border-black p-2 w-24 text-center flex flex-col justify-center">
+          <p className="text-[10px] font-bold uppercase leading-tight">
+            Max Marks
+          </p>
+          <p className="text-xl font-bold">60</p>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 text-sm border-t border-black pt-2">
+        <div className="border-r border-black pr-4">
+          <div className="flex justify-between mb-1">
+            <span className="font-bold">Date: _______________</span>
+            <span className="font-bold">Time: 1 hr 10 min</span>
+          </div>
+        </div>
+        <div className="pl-4 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <span className="font-bold">Version Code:</span>
+            <span className="bg-black text-white px-3 py-0.5 font-bold text-lg">
+              A-1
+            </span>
+          </div>
+          <div>
+            <span className="font-bold">Serial No:</span> ____________
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   if (!content) {
     return (
@@ -201,6 +197,9 @@ function QuestionPaperPage() {
               new Date(questionPaper.createdAt),
               "do MMMM yyyy, h:mm a"
             );
+            // Check if THIS specific paper is currently downloading
+            const isThisPaperDownloading = downloadingId === questionPaper.id;
+
             return (
               <div
                 className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col"
@@ -229,27 +228,39 @@ function QuestionPaperPage() {
                     <Eye className="w-4 h-4 mr-2" />
                     Preview
                   </Button>
+
+                  {/* Updated Download Button */}
                   <Button
                     variant="ghost"
                     size="sm"
                     className="flex-1"
-                    onClick={() => questionPaperDownload(questionPaper.id)}
+                    disabled={isThisPaperDownloading} // Disable ONLY this button
+                    onClick={() =>
+                      handleDownloadPDF(
+                        questionPaper.id,
+                        questionPaper.questionPaperName
+                      )
+                    }
                   >
-                    <Download className="w-4 h-4 mr-2" />
+                    {isThisPaperDownloading ? (
+                      <Loader className="animate-spin w-4 h-4 mr-2" />
+                    ) : (
+                      <Download className="w-4 h-4 mr-2" />
+                    )}
                     Download
                   </Button>
+
                   <DropDownTeacherMenu
                     onDelete={() => deletePaper(questionPaper.id)}
                     onMoveToLiveTest={() => handleMoveToLiveTest(questionPaper)}
-                  >
-                    {/* Assuming DropDownTeacherMenu has a trigger child */}
-                  </DropDownTeacherMenu>
+                  ></DropDownTeacherMenu>
                 </div>
               </div>
             );
           })}
       </div>
 
+      {/* --- PREVIEW MODAL (Unchanged) --- */}
       {showPreviewModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-gray-700">
@@ -323,6 +334,76 @@ function QuestionPaperPage() {
           </div>
         </div>
       )}
+
+      {/* --- HIDDEN PRINT TEMPLATE --- */}
+      {/* This section only becomes visible when window.print() is called */}
+      <div
+        id="printable-paper-container"
+        className="hidden print:block font-serif text-black bg-white p-8"
+      >
+        {printData && (
+          <>
+            <KcetHeader paperName={printData.name} />
+
+            <div className="text-xs mb-6 font-serif leading-tight border-b-2 border-dashed border-gray-400 pb-4">
+              <p className="font-bold mb-1">
+                IMPORTANT INSTRUCTIONS TO CANDIDATES
+              </p>
+              <ol className="list-decimal pl-4 space-y-1">
+                <li>
+                  This question booklet contains {printData.questions.length}{" "}
+                  questions and each question carries 1 mark.
+                </li>
+                <li>
+                  Check that the Booklet does not have any unprinted or torn or
+                  missing pages.
+                </li>
+                <li>
+                  Use only Black Ball Point Pen to darken the circles in the OMR
+                  Sheet.
+                </li>
+              </ol>
+            </div>
+
+            <div className="text-sm">
+              {printData.questions.map((item, index) => (
+                <div key={index} className="question-item mb-4 pb-2">
+                  <div className="flex gap-2">
+                    <span className="font-bold">{index + 1}.</span>
+                    <div className="flex-1">
+                      <div className="mb-2 text-justify">
+                        <Latex>{item.question.Question}</Latex>
+                      </div>
+                      <div className="grid grid-cols-2 gap-x-8 gap-y-1 ml-4">
+                        <div className="flex gap-2">
+                          <span className="font-bold">(A)</span>{" "}
+                          <Latex>{item.question.Option_A}</Latex>
+                        </div>
+                        <div className="flex gap-2">
+                          <span className="font-bold">(B)</span>{" "}
+                          <Latex>{item.question.Option_B}</Latex>
+                        </div>
+                        <div className="flex gap-2">
+                          <span className="font-bold">(C)</span>{" "}
+                          <Latex>{item.question.Option_C}</Latex>
+                        </div>
+                        <div className="flex gap-2">
+                          <span className="font-bold">(D)</span>{" "}
+                          <Latex>{item.question.Option_D}</Latex>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-12 border-t-2 border-dashed border-gray-400 pt-2 text-center text-gray-500 italic text-xs break-inside-avoid">
+              <p>Space For Rough Work</p>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }
