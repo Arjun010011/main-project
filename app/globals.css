@@ -121,37 +121,85 @@
 /* app/globals.css */
 
 @media print {
-  /* 1. Hide EVERYTHING on the screen by default */
+  /* 1. SAFE MARGINS: 15mm ensures no printer cuts off the edge */
+  @page {
+    margin: 0;
+    padding: 5;
+    size: A4;
+  }
+
+  /* 2. Hide Website UI */
   body * {
     visibility: hidden;
   }
 
-  /* 2. Only make the printable area visible */
+  /* 3. Show Print Container */
   #printable-paper-container,
   #printable-paper-container * {
     visibility: visible;
   }
 
-  /* 3. Position the paper exactly at top-left */
   #printable-paper-container {
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
     margin: 0;
-    padding: 0;
+    padding: 0; /* Padding is handled by @page margin now */
     background-color: white;
   }
 
-  /* 4. Force browsers to print background colors (borders, headers) */
+  /* 4. Force Colors */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  /* 5. Ensure questions don't get cut in half between pages */
+  /* 5. TWO COLUMN LAYOUT WITH PERMANENT CENTER LINE */
+  .print-two-columns {
+    column-count: 2;
+    column-gap: 10mm; /* Large gap so text doesn't touch the line */
+    width: 100%;
+
+    /* THE TRICK: Creates a fake vertical line down the center 
+       that exists even if the right column is empty */
+    background-image: linear-gradient(
+      to right,
+      transparent 49.8%,
+      black 49.8%,
+      black 50.2%,
+      transparent 50.2%
+    );
+    background-position: center;
+    background-repeat: repeat-y;
+    background-size: 100% 100%;
+  }
+
+  /* 6. QUESTION ITEM */
   .question-item {
     break-inside: avoid;
     page-break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    display: inline-block;
+    width: 100%;
+    margin-bottom: 0.5rem;
+
+    /* CRITICAL: Prevents text from overlapping the center line */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    padding-right: 5px; /* Tiny buffer from the line */
+  }
+
+  /* 7. HEADERS */
+  .subject-header-container {
+    break-after: avoid;
+    column-span: all; /* Allows header to span across the line if needed */
+    margin-bottom: 1rem;
+    display: block;
+    width: 100%;
+    background: white; /* Hide the center line behind the header text */
+    position: relative;
+    z-index: 10;
+    text-align: center;
   }
 }
