@@ -2,7 +2,7 @@
 import axios from "axios";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Loader, Download, Eye } from "lucide-react";
+import { Loader, Download, Eye, X } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import DropDownTeacherMenu from "@/app/components/DropDownTeacherMenu";
@@ -64,6 +64,7 @@ function QuestionPaperPage() {
         setDownloadingId(null);
       }, 500);
     } catch (error) {
+      console.error("Download failed:", error);
       setDownloadingId(null);
     }
   };
@@ -78,6 +79,7 @@ function QuestionPaperPage() {
       });
       setPreviewQuestions(data.questionPaper.questions || []);
     } catch (error) {
+      console.error("Preview failed:", error);
       setPreviewQuestions([]);
     } finally {
       setPreviewLoading(false);
@@ -96,7 +98,9 @@ function QuestionPaperPage() {
         ),
         totalPaper: prev.totalPaper - 1,
       }));
-    } catch (error) {}
+    } catch (error) {
+      console.error("Delete failed:", error);
+    }
   };
 
   const handleMoveToLiveTest = async (paper) => {
@@ -104,7 +108,15 @@ function QuestionPaperPage() {
       await axios.post("/api/classRoom/moveToLiveTest", {
         questionPaperId: paper.id,
       });
-    } catch (error) {}
+    } catch (error) {
+      console.error("Move to live test failed:", error);
+    }
+  };
+
+  const closePreviewModal = () => {
+    setShowPreviewModal(false);
+    setPreviewQuestions([]);
+    setPreviewPaperName("");
   };
 
   const KcetHeader = ({ paperName }) => (
@@ -152,6 +164,56 @@ function QuestionPaperPage() {
     </div>
   );
 
+  const QuestionDisplay = ({ questions }) => {
+    const groupedQuestions = groupQuestionsBySubject(questions);
+    
+    return (
+      <div className="space-y-6">
+        {Object.entries(groupedQuestions).map(([subject, subjectQuestions]) => (
+          <div key={subject} className="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-b-0">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 pb-2 border-b-2 border-blue-500">
+              {subject}
+            </h3>
+            <div className="space-y-4">
+              {subjectQuestions.map((item, idx) => {
+                const globalIndex = questions.findIndex((q) => q.id === item.id);
+                return (
+                  <div key={item.id} className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
+                    <div className="flex gap-3">
+                      <span className="font-bold text-blue-600 dark:text-blue-400 text-lg shrink-0">
+                        {globalIndex + 1}.
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <div className="mb-3 text-gray-900 dark:text-white">
+                          <Latex>{item.question.Question}</Latex>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {['A', 'B', 'C', 'D'].map((option) => (
+                            <div 
+                              key={option}
+                              className="flex gap-2 items-start bg-white dark:bg-gray-700 p-2 rounded border border-gray-200 dark:border-gray-600"
+                            >
+                              <span className="font-bold text-gray-700 dark:text-gray-300 shrink-0">
+                                ({option})
+                              </span>
+                              <span className="text-gray-800 dark:text-gray-200">
+                                <Latex>{item.question[`Option_${option}`]}</Latex>
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   if (!content)
     return (
       <div className="flex h-screen items-center justify-center">
@@ -165,85 +227,138 @@ function QuestionPaperPage() {
         <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
           Question Papers
         </h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-2">
+          Total Papers: {content.totalPaper}
+        </p>
       </header>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {content.questionPaperDetails
-          .slice()
-          .reverse()
-          .map((questionPaper) => {
-            const date = format(
-              new Date(questionPaper.createdAt),
-              "do MMMM yyyy, h:mm a"
-            );
-            const isDownloading = downloadingId === questionPaper.id;
-            return (
-              <div
-                key={questionPaper.id}
-                className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-md flex flex-col"
-              >
-                <div className="p-5 flex-grow">
-                  <p className="text-sm font-semibold text-black dark:text-white">
-                    {questionPaper.questionPaperName}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Created: {date}
-                  </p>
+      {content.questionPaperDetails.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-gray-500 dark:text-gray-400">No question papers found</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {content.questionPaperDetails
+            .slice()
+            .reverse()
+            .map((questionPaper) => {
+              const date = format(
+                new Date(questionPaper.createdAt),
+                "do MMMM yyyy, h:mm a"
+              );
+              const isDownloading = downloadingId === questionPaper.id;
+              return (
+                <div
+                  key={questionPaper.id}
+                  className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-md hover:shadow-lg transition-shadow flex flex-col"
+                >
+                  <div className="p-5 flex-grow">
+                    <p className="text-sm font-semibold text-black dark:text-white line-clamp-2">
+                      {questionPaper.questionPaperName}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Created: {date}
+                    </p>
+                  </div>
+                  <div className="p-3 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700 flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() =>
+                        handlePreview(
+                          questionPaper.id,
+                          questionPaper.questionPaperName
+                        )
+                      }
+                    >
+                      <Eye className="w-4 h-4 mr-2" /> Preview
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex-1"
+                      disabled={isDownloading}
+                      onClick={() =>
+                        handleDownloadPDF(
+                          questionPaper.id,
+                          questionPaper.questionPaperName
+                        )
+                      }
+                    >
+                      {isDownloading ? (
+                        <Loader className="animate-spin w-4 h-4 mr-2" />
+                      ) : (
+                        <Download className="w-4 h-4 mr-2" />
+                      )}{" "}
+                      Download
+                    </Button>
+                    <DropDownTeacherMenu
+                      onDelete={() => deletePaper(questionPaper.id)}
+                      onMoveToLiveTest={() => handleMoveToLiveTest(questionPaper)}
+                    />
+                  </div>
                 </div>
-                <div className="p-3 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700 flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex-1"
-                    onClick={() =>
-                      handlePreview(
-                        questionPaper.id,
-                        questionPaper.questionPaperName
-                      )
-                    }
-                  >
-                    <Eye className="w-4 h-4 mr-2" /> Preview
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex-1"
-                    disabled={isDownloading}
-                    onClick={() =>
-                      handleDownloadPDF(
-                        questionPaper.id,
-                        questionPaper.questionPaperName
-                      )
-                    }
-                  >
-                    {isDownloading ? (
-                      <Loader className="animate-spin w-4 h-4 mr-2" />
-                    ) : (
-                      <Download className="w-4 h-4 mr-2" />
-                    )}{" "}
-                    Download
-                  </Button>
-                  <DropDownTeacherMenu
-                    onDelete={() => deletePaper(questionPaper.id)}
-                    onMoveToLiveTest={() => handleMoveToLiveTest(questionPaper)}
-                  ></DropDownTeacherMenu>
-                </div>
-              </div>
-            );
-          })}
-      </div>
+              );
+            })}
+        </div>
+      )}
 
+      {/* Preview Modal */}
       {showPreviewModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          {/* ... Preview Modal Content same as before ... */}
-          <div className="relative bg-white p-8 rounded-lg">
-            <button onClick={() => setShowPreviewModal(false)}>Close</button>
-            {/* Add your preview content here */}
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+          onClick={closePreviewModal}
+        >
+          <div 
+            className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {previewPaperName}
+              </h2>
+              <button
+                onClick={closePreviewModal}
+                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                aria-label="Close preview"
+              >
+                <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              {previewLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader className="animate-spin w-8 h-8 text-blue-500" />
+                </div>
+              ) : previewQuestions.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-gray-500 dark:text-gray-400">
+                    No questions found in this paper
+                  </p>
+                </div>
+              ) : (
+                <QuestionDisplay questions={previewQuestions} />
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            {!previewLoading && previewQuestions.length > 0 && (
+              <div className="flex items-center justify-between p-6 border-t border-gray-200 dark:border-gray-700">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Total Questions: {previewQuestions.length}
+                </p>
+                <Button onClick={closePreviewModal}>Close</Button>
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      {/* --- HIDDEN PRINT TEMPLATE --- */}
+      {/* HIDDEN PRINT TEMPLATE */}
       <div
         id="printable-paper-container"
         className="hidden print:block font-serif text-black bg-white"
@@ -267,7 +382,6 @@ function QuestionPaperPage() {
               {Object.entries(groupQuestionsBySubject(printData.questions)).map(
                 ([subject, questions]) => (
                   <div key={subject} className="mb-6">
-                    {/* Subject Header with white background to cover the center line */}
                     <div className="subject-header-container">
                       <div className="inline-block border border-black px-6 py-1 bg-white font-bold uppercase text-center relative z-20">
                         {subject}
